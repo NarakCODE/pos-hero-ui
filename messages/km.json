@@ -1,6 +1,6 @@
 {
   "HomePage": {
-    "appName": "កម្មវិធី HeroUI",
+    "appName": "RakPOS",
     "heading": "ដើម្បីចាប់ផ្ដើម សូមកែសម្រួលឯកសារ <code>page.tsx</code>។",
     "description": "កំពុងស្វែងរកចំណុចចាប់ផ្ដើម ឬការណែនាំបន្ថែមមែនទេ? សូមចូលទៅ <templates>គំរូ</templates> ឬមជ្ឈមណ្ឌល <learning>រៀន</learning>។",
     "ready": "HeroUI រួចរាល់ហើយ",
@@ -11,5 +11,38 @@
   },
   "LanguageSwitcher": {
     "label": "ភាសា"
+  },
+  "AuthShell": {
+    "brandName": "RakPOS",
+    "eyebrow": "កន្លែងធ្វើការសម្រាប់ប្រព័ន្ធលក់",
+    "headline": "បន្តការងារប្រចាំថ្ងៃរបស់អ្នក។",
+    "description": "កន្លែងសាមញ្ញសម្រាប់ការងារដែលធ្វើឱ្យហាងរបស់អ្នកដំណើរការ។",
+    "footer": "បង្កើតឡើងសម្រាប់ប្រតិបត្តិការដែលច្បាស់លាស់ និងស្ងប់ស្ងាត់។",
+    "legal": "© 2026 RakPOS"
+  },
+  "AuthLogin": {
+    "title": "ចូលទៅកាន់ហាង",
+    "description": "ចូលគណនីដើម្បីបន្តទៅកាន់កន្លែងធ្វើការរបស់អ្នក។",
+    "identifierLabel": "អ៊ីមែល ឬលេខទូរស័ព្ទ",
+    "identifierPlaceholder": "អ៊ីមែល/លេខទូរស័ព្ទ",
+    "identifierRequired": "សូមបញ្ចូលអ៊ីមែល ឬលេខទូរស័ព្ទ",
+    "passwordLabel": "ពាក្យសម្ងាត់",
+    "passwordPlaceholder": "ពាក្យសម្ងាត់",
+    "passwordRequired": "សូមបញ្ចូលពាក្យសម្ងាត់",
+    "submit": "ចូលគណនី",
+    "startTrial": "ចាប់ផ្ដើមសាកល្បងឥតគិតថ្លៃ",
+    "forgotPassword": "ភ្លេចពាក្យសម្ងាត់?",
+    "or": "ឬ",
+    "google": "បន្តជាមួយ Google",
+    "facebook": "បន្តជាមួយ Facebook",
+    "apple": "បន្តជាមួយ Apple",
+    "hidePassword": "លាក់ពាក្យសម្ងាត់",
+    "showPassword": "បង្ហាញពាក្យសម្ងាត់",
+    "backToHome": "ត្រឡប់ទៅទំព័រដើម"
+  },
+  "Dashboard": {
+    "title": "ផ្ទាំងគ្រប់គ្រង",
+    "description": "អ្នកបានចូលទៅកាន់កន្លែងធ្វើការ RakPOS របស់អ្នក។",
+    "signOut": "ចាកចេញ"
   }
 }

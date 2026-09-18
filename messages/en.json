@@ -1,6 +1,6 @@
 {
   "HomePage": {
-    "appName": "HeroUI App",
+    "appName": "RakPOS",
     "heading": "To get started, edit the <code>page.tsx</code> file.",
     "description": "Looking for a starting point or more instructions? Head over to <templates>Templates</templates> or the <learning>Learning</learning> center.",
     "ready": "HeroUI is ready",
@@ -11,5 +11,38 @@
   },
   "LanguageSwitcher": {
     "label": "Language"
+  },
+  "AuthShell": {
+    "brandName": "RakPOS",
+    "eyebrow": "Point-of-sale workspace",
+    "headline": "Keep your day moving.",
+    "description": "A focused home for the work that keeps your store running.",
+    "footer": "Built for clear, calm operations.",
+    "legal": "© 2026 RakPOS"
+  },
+  "AuthLogin": {
+    "title": "Sign in to the shop",
+    "description": "Sign in to continue to your workspace.",
+    "identifierLabel": "Email or mobile number",
+    "identifierPlaceholder": "Email/Mobile number",
+    "identifierRequired": "Please enter email or mobile number",
+    "passwordLabel": "Password",
+    "passwordPlaceholder": "Password",
+    "passwordRequired": "Please enter password",
+    "submit": "SIGN IN",
+    "startTrial": "Start a free trial",
+    "forgotPassword": "Forgot password",
+    "or": "or",
+    "google": "Continue with Google",
+    "facebook": "Continue with Facebook",
+    "apple": "Continue with Apple",
+    "hidePassword": "Hide password",
+    "showPassword": "Show password",
+    "backToHome": "Back to home"
+  },
+  "Dashboard": {
+    "title": "Dashboard",
+    "description": "You are signed in to your RakPOS workspace.",
+    "signOut": "Sign out"
   }
 }

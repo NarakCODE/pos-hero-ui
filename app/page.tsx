@@ -2,6 +2,7 @@ import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { Button } from "@heroui/react";
 import { LanguageSwitcher } from "@/components/shared/language-switcher";
+import { Logo } from "@/components/shared/logo";
 import { ThemeSwitcher } from "@/components/shared/theme-switcher";
 
 export default function Home() {
@@ -10,9 +11,7 @@ export default function Home() {
   return (
     <div className="flex flex-col flex-1 items-center justify-center bg-background text-foreground font-sans min-h-screen p-4 sm:p-8">
       <header className="flex w-full max-w-3xl items-center justify-between pb-6">
-        <span className="text-sm font-semibold tracking-tight text-foreground">
-          {t("appName")}
-        </span>
+        <Logo name={t("appName")} size="sm" />
         <div className="flex items-center gap-2">
           <LanguageSwitcher />
           <ThemeSwitcher />

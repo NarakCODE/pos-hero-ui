@@ -59,7 +59,7 @@ export function POSFooter({ className = "" }: { className?: string }) {
       className={`sticky bottom-0 z-30 shrink-0 border-t border-border bg-background px-3 py-2 shadow-xs transition-colors sm:px-4 sm:py-2.5 ${className}`}
     >
       <nav
-        className="mx-auto flex min-w-0 max-w-screen-2xl flex-1 items-center justify-around gap-1 overflow-x-auto sm:justify-center sm:gap-2"
+        className="mx-auto flex min-w-0 max-w-screen-2xl flex-1 items-center justify-start gap-1 overflow-x-auto sm:gap-2"
         aria-label={t("navigation.label")}
       >
         {navigationItems.map((item) => {

@@ -1,7 +1,7 @@
 "use client";
 
-import { ScrollShadow, Table } from "@heroui/react";
-import { Add, Coffee, Minus, Trash } from "reicon-react";
+import { Button, ScrollShadow, Table } from "@heroui/react";
+import { Add, Coffee, Minus, Trash9 } from "reicon-react";
 import type { OrderItemsTableProps, OrderPanelItem } from "./types";
 
 const defaultFormatCurrency = (amount: number) => `$${amount.toFixed(2)}`;
@@ -66,6 +66,8 @@ export function OrderItemsTable({
     return modifiers;
   };
 
+  const totalQuantity = items.reduce((total, item) => total + item.quantity, 0);
+
   if (viewMode === "table") {
     return (
       <div
@@ -113,7 +115,7 @@ export function OrderItemsTable({
                             className="flex size-7 items-center justify-center rounded-full border border-border text-muted transition-colors hover:bg-surface-secondary hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
                             onClick={() => handleDecrease(item)}
                           >
-                            <Minus aria-hidden="true" className="size-3.5" />
+                            <Minus aria-hidden="true" />
                           </button>
                           <span className="min-w-5 text-center font-semibold tabular-nums">
                             {item.quantity}
@@ -124,7 +126,7 @@ export function OrderItemsTable({
                             className="flex size-7 items-center justify-center rounded-full border border-border text-muted transition-colors hover:bg-surface-secondary hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
                             onClick={() => handleIncrease(item)}
                           >
-                            <Add aria-hidden="true" className="size-3.5" />
+                            <Add aria-hidden="true" />
                           </button>
                         </div>
                       </Table.Cell>
@@ -134,14 +136,14 @@ export function OrderItemsTable({
                         </span>
                       </Table.Cell>
                       <Table.Cell className="text-end">
-                        <button
-                          type="button"
-                          aria-label={removeAriaLabel(item.name)}
-                          className="rounded-md p-1.5 text-muted transition-colors hover:bg-danger/10 hover:text-danger focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+                        <Button isIconOnly variant="danger"
                           onClick={() => handleRemove(item)}
+                          aria-label={removeAriaLabel(item.name)}
                         >
-                          <Trash aria-hidden="true" className="size-4" />
-                        </button>
+                          <Trash9 aria-hidden="true" />
+
+                        </Button>
+
                       </Table.Cell>
                     </Table.Row>
                   );
@@ -156,11 +158,18 @@ export function OrderItemsTable({
 
   return (
     <div
-      className={`flex min-h-0 flex-1 flex-col overflow-hidden ${className}`}
+      className={`flex min-h-0 flex-1 flex-col overflow-hidden rounded-xl border border-border/70 bg-surface/30 ${className}`}
       style={maxHeight ? { maxHeight } : undefined}
     >
-      <ScrollShadow className="flex-1 overflow-y-auto pr-1">
-        <div className="flex flex-col gap-2.5">
+      <div className="grid grid-cols-[minmax(0,1fr)_auto_auto_auto] items-center gap-2 border-b border-border/70 bg-surface-secondary/60 px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.1em] text-muted">
+        <span>{labels.item || "Product"} x{totalQuantity}</span>
+        <span>{labels.price || "Price"}</span>
+        <span>{labels.quantity || "QTY"}</span>
+        <span className="text-end">{labels.total || "Amount"}</span>
+      </div>
+
+      <ScrollShadow className="min-h-0 flex-1 overflow-y-auto">
+        <div>
           {items.map((item) => {
             const modifierSummary = formatModifiers(item.modifiers);
             const lineTotal = item.price * item.quantity;
@@ -168,68 +177,62 @@ export function OrderItemsTable({
             return (
               <div
                 key={item.id}
-                className="group rounded-xl border border-border bg-surface/40 p-3 transition-colors hover:border-accent/30 hover:bg-surface"
+                className="grid grid-cols-[minmax(0,1fr)_auto_auto_auto] items-center gap-2 border-b border-border/60 px-3 py-3 last:border-b-0"
               >
-                <div className="flex items-start justify-between gap-3">
-                  <div className="min-w-0">
-                    <p className="truncate text-sm font-semibold text-foreground">
-                      {item.name}
-                    </p>
-                    {modifierSummary ? (
-                      <p className="mt-0.5 line-clamp-2 text-xs text-muted">
-                        {modifierSummary}
-                      </p>
-                    ) : null}
-                    {item.notes ? (
-                      <p className="mt-0.5 text-xs italic text-muted">
-                        {item.notes}
-                      </p>
-                    ) : null}
-                  </div>
-                  <p className="shrink-0 text-sm font-semibold tabular-nums text-foreground">
-                    {item.formattedTotalPrice ?? formatCurrency(lineTotal)}
+                <div className="min-w-0 pe-1">
+                  <p className="break-words text-xs font-semibold leading-4 text-foreground">
+                    {item.name}
                   </p>
+                  {modifierSummary ? (
+                    <p className="mt-1 ps-2 text-[10px] leading-4 text-muted">
+                      {modifierSummary}
+                    </p>
+                  ) : null}
+                  {item.notes ? (
+                    <p className="mt-1 ps-2 text-[10px] italic leading-4 text-muted">
+                      {item.notes}
+                    </p>
+                  ) : null}
                 </div>
 
-                <div className="mt-3 flex items-center justify-between gap-2">
-                  <div className="flex items-center gap-1.5">
-                    <span className="text-xs text-muted">
-                      {item.formattedUnitPrice ?? formatCurrency(item.price)}
-                    </span>
-                  </div>
+                <span className="text-xs tabular-nums text-muted">
+                  {item.formattedUnitPrice ?? formatCurrency(item.price)}
+                </span>
 
-                  <div className="flex items-center gap-2">
-                    <div className="flex items-center gap-1.5">
-                      <button
-                        type="button"
-                        aria-label={decreaseAriaLabel(item.name)}
-                        className="flex size-7 items-center justify-center rounded-full border border-border text-muted transition-colors hover:bg-surface-secondary hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
-                        onClick={() => handleDecrease(item)}
-                      >
-                        <Minus aria-hidden="true" className="size-3.5" />
-                      </button>
-                      <span className="min-w-5 text-center text-sm font-semibold tabular-nums text-foreground">
-                        {item.quantity}
-                      </span>
-                      <button
-                        type="button"
-                        aria-label={increaseAriaLabel(item.name)}
-                        className="flex size-7 items-center justify-center rounded-full border border-border text-muted transition-colors hover:bg-surface-secondary hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
-                        onClick={() => handleIncrease(item)}
-                      >
-                        <Add aria-hidden="true" className="size-3.5" />
-                      </button>
-                    </div>
+                <div className="flex items-center gap-1">
+                  <button
+                    type="button"
+                    aria-label={decreaseAriaLabel(item.name)}
+                    className="flex size-6 items-center justify-center rounded-full border border-border text-muted transition-colors hover:bg-surface-secondary hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+                    onClick={() => handleDecrease(item)}
+                  >
+                    <Minus aria-hidden="true" className="size-3" />
+                  </button>
+                  <span className="min-w-4 text-center text-xs font-semibold tabular-nums text-foreground">
+                    {item.quantity}
+                  </span>
+                  <button
+                    type="button"
+                    aria-label={increaseAriaLabel(item.name)}
+                    className="flex size-6 items-center justify-center rounded-full border border-border text-muted transition-colors hover:bg-surface-secondary hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+                    onClick={() => handleIncrease(item)}
+                  >
+                    <Add aria-hidden="true" className="size-3" />
+                  </button>
+                </div>
 
-                    <button
-                      type="button"
-                      aria-label={removeAriaLabel(item.name)}
-                      className="rounded-md p-1.5 text-muted transition-colors hover:bg-danger/10 hover:text-danger focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
-                      onClick={() => handleRemove(item)}
-                    >
-                      <Trash aria-hidden="true" className="size-4" />
-                    </button>
-                  </div>
+                <div className="flex items-center justify-end gap-1">
+                  <span className="text-xs font-semibold tabular-nums text-foreground">
+                    {item.formattedTotalPrice ?? formatCurrency(lineTotal)}
+                  </span>
+                  <button
+                    type="button"
+                    aria-label={removeAriaLabel(item.name)}
+                    className="rounded-md p-1 text-muted transition-colors hover:bg-danger/10 hover:text-danger focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+                    onClick={() => handleRemove(item)}
+                  >
+                    <Trash9 aria-hidden="true" />
+                  </button>
                 </div>
               </div>
             );

@@ -2,7 +2,7 @@
 
 import { Button, Spinner } from "@heroui/react";
 import { Check, Clock, Printer, Refresh } from "reicon-react";
-import type { PaymentActionsProps } from "./types";
+import type { PaymentActionsProps, QuickActionOption } from "./types";
 
 export function PaymentActions({
   actionsSlot,
@@ -22,45 +22,52 @@ export function PaymentActions({
   paidMessage = "Payment recorded. Ready for the next ticket.",
   paymentMethods,
   paymentTitle = "Payment method",
+  quickActions,
   printLabel = "Print receipt",
   resetLabel = "New order",
   selectedPaymentMethod,
 }: PaymentActionsProps) {
   const displayChargeText = chargeAmount ? `${chargeLabel} ${chargeAmount}` : chargeLabel;
+  const actionTiles: Array<QuickActionOption & { kind: "payment" | "quick" }> = [
+    ...(paymentMethods ?? []).map((method) => ({ ...method, kind: "payment" as const })),
+    ...(quickActions ?? []).map((action) => ({ ...action, kind: "quick" as const })),
+  ];
 
   return (
     <section aria-label="Payment actions" className={`mt-4 flex flex-col gap-3 ${className}`}>
-      {/* Payment Method Selector */}
-      {paymentMethods && paymentMethods.length > 0 ? (
+      {/* Payment and quick action keypad */}
+      {actionTiles.length > 0 ? (
         <div>
           {paymentTitle ? (
             <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted">
               {paymentTitle}
             </p>
           ) : null}
-          <div
-            className="grid gap-2"
-            style={{
-              gridTemplateColumns: `repeat(${Math.min(paymentMethods.length, 3)}, minmax(0, 1fr))`,
-            }}
-          >
-            {paymentMethods.map((method) => {
-              const isSelected = selectedPaymentMethod === method.id;
-              const Icon = method.icon;
+          <div className="grid grid-cols-3 gap-2">
+            {actionTiles.slice(0, 9).map((tile) => {
+              const isSelected = tile.kind === "payment" && selectedPaymentMethod === tile.id;
+              const Icon = tile.icon;
 
               return (
                 <Button
-                  key={method.id}
+                  key={tile.id}
                   fullWidth
                   type="button"
-                  isDisabled={method.disabled}
+                  isDisabled={disabled || tile.disabled}
                   variant={isSelected ? "primary" : "outline"}
                   size="md"
-                  onPress={() => onSelectPaymentMethod?.(method.id)}
-                  className="flex items-center justify-center gap-1.5 px-2 text-xs font-medium"
+                  onPress={() => {
+                    if (tile.kind === "payment") {
+                      onSelectPaymentMethod?.(tile.id);
+                    } else {
+                      tile.onPress?.();
+                    }
+                  }}
+                  aria-label={tile.ariaLabel ?? tile.label}
+                  className="min-h-16 flex-col gap-1 px-1.5 py-2 text-[10px] font-semibold leading-tight"
                 >
-                  {Icon ? <Icon aria-hidden="true" size={16} /> : null}
-                  <span className="truncate">{method.label}</span>
+                  {Icon ? <Icon aria-hidden="true" size={17} /> : null}
+                  {tile.label ? <span className="line-clamp-2 text-center">{tile.label}</span> : null}
                 </Button>
               );
             })}

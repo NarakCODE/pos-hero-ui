@@ -28,9 +28,27 @@ export type CategoryId =
   | "dessert"
   | "snack";
 
-export type SizeId = "large" | "medium" | "small";
-export type SweetnessId = "noSugar" | "lessSugar" | "regularSugar";
-export type AddOnId = "oatMilk" | "whippedCream" | "espressoShot";
+export type SizeId = "extraSmall" | "small" | "medium" | "large" | "extraLarge";
+export type IceId = "regularIce" | "lessIce" | "noIce" | "warm" | "hot";
+export type SweetnessId =
+  | "noSugar"
+  | "quarterSugar"
+  | "lessSugar"
+  | "regularSugar"
+  | "extraSugar";
+export type AddOnId =
+  | "espressoShot"
+  | "oatMilk"
+  | "almondMilk"
+  | "soyMilk"
+  | "whippedCream"
+  | "caramelDrizzle"
+  | "vanillaSyrup"
+  | "hazelnutSyrup"
+  | "bobaPearls"
+  | "cheeseFoam"
+  | "grassJelly"
+  | "coconutJelly";
 export type PaymentMethodId = "cash" | "bankCard" | "khqr";
 
 export type Product = {
@@ -51,6 +69,7 @@ export type OrderItem = {
   productId: string;
   quantity: number;
   size: SizeId;
+  ice?: IceId;
   sweetness: SweetnessId;
   addOns: AddOnId[];
 };
@@ -72,21 +91,42 @@ export const categoryIds: readonly CategoryId[] = [
 ] as const;
 
 export const sizeIds: readonly SizeId[] = [
-  "large",
-  "medium",
+  "extraSmall",
   "small",
+  "medium",
+  "large",
+  "extraLarge",
+] as const;
+
+export const iceIds: readonly IceId[] = [
+  "regularIce",
+  "lessIce",
+  "noIce",
+  "warm",
+  "hot",
 ] as const;
 
 export const sweetnessIds: readonly SweetnessId[] = [
   "noSugar",
+  "quarterSugar",
   "lessSugar",
   "regularSugar",
+  "extraSugar",
 ] as const;
 
 export const addOnIds: readonly AddOnId[] = [
-  "oatMilk",
-  "whippedCream",
   "espressoShot",
+  "oatMilk",
+  "almondMilk",
+  "soyMilk",
+  "whippedCream",
+  "caramelDrizzle",
+  "vanillaSyrup",
+  "hazelnutSyrup",
+  "bobaPearls",
+  "cheeseFoam",
+  "grassJelly",
+  "coconutJelly",
 ] as const;
 
 export const products: Product[] = [
@@ -906,10 +946,11 @@ export const products: Product[] = [
 
 export const initialOrderItems: OrderItem[] = [
   {
-    id: "iced-latte-medium-lessSugar",
+    id: "iced-latte-medium-regularIce-lessSugar",
     productId: "iced-latte",
     quantity: 1,
     size: "medium",
+    ice: "regularIce",
     sweetness: "lessSugar",
     addOns: [],
   },
@@ -922,10 +963,11 @@ export const initialOrderItems: OrderItem[] = [
     addOns: [],
   },
   {
-    id: "biscoff-cookie-latte-large-lessSugar",
+    id: "biscoff-cookie-latte-large-regularIce-lessSugar-whippedCream",
     productId: "biscoff-cookie-latte",
     quantity: 1,
     size: "large",
+    ice: "regularIce",
     sweetness: "lessSugar",
     addOns: ["whippedCream"],
   },

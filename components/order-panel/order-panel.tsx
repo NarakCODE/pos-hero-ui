@@ -20,6 +20,9 @@ export function OrderPanel({
   completeLabel,
   customBillingRows,
   customerName,
+  changeAmount,
+  changeLabel,
+  changeSecondaryAmount,
   decreaseAriaLabel,
   discount,
   discountLabel,
@@ -45,20 +48,34 @@ export function OrderPanel({
   onPrintReceipt,
   onRemoveItem,
   onResetOrder,
+  onOrderChannelChange,
   onSelectPaymentMethod,
   onUpdateQuantity,
+  orderChannel,
+  orderChannelLabel,
   orderNumber,
   orderType,
   paidMessage,
   paymentMethods,
+  paymentLabel,
+  paymentMethod,
   paymentTitle,
   printLabel,
   removeAriaLabel,
   resetLabel,
+  receivedAmount,
+  receivedLabel,
   selectedPaymentMethod,
+  sequenceLabel,
+  sequenceNumber,
   serviceCharge,
   serviceChargeLabel,
+  status,
+  statusLabel,
   subtotal,
+  subtotalLabel,
+  tableTicketLabel,
+  tableTicketNo,
   tableNumber,
   tax,
   taxLabel,
@@ -66,7 +83,9 @@ export function OrderPanel({
   timestamp,
   title,
   total,
+  totalSecondaryAmount,
   viewMode = "list",
+  quickActions,
 }: OrderPanelProps) {
   const containerClasses = className
     ? `flex h-full min-h-0 min-w-0 flex-col bg-background p-4 sm:p-5 ${className}`
@@ -122,7 +141,16 @@ export function OrderPanel({
         orderType={orderType}
         tableNumber={tableNumber}
         customerName={customerName}
+        orderChannel={orderChannel}
+        orderChannelLabel={orderChannelLabel}
+        onOrderChannelChange={onOrderChannelChange}
         timestamp={timestamp}
+        sequenceLabel={sequenceLabel}
+        sequenceNumber={sequenceNumber}
+        status={status}
+        statusLabel={statusLabel}
+        tableTicketLabel={tableTicketLabel}
+        tableTicketNo={tableTicketNo}
         onChangeOrderType={onChangeOrderType}
         changeButtonLabel={changeButtonLabel}
         onClearTicket={onClearTicket}
@@ -155,12 +183,21 @@ export function OrderPanel({
         discount={calculatedDiscount}
         discountRate={discountRate}
         discountLabel={discountLabel}
+        paymentLabel={paymentLabel}
+        paymentMethod={paymentMethod}
+        receivedLabel={receivedLabel}
+        receivedAmount={receivedAmount}
+        changeLabel={changeLabel}
+        changeAmount={changeAmount}
+        changeSecondaryAmount={changeSecondaryAmount}
+        subtotalLabel={subtotalLabel}
         tax={tax !== undefined ? tax : calculatedTax}
         taxRate={taxRate}
         taxLabel={taxLabel}
         serviceCharge={serviceCharge}
         serviceChargeLabel={serviceChargeLabel}
         total={calculatedTotal}
+        totalSecondaryAmount={totalSecondaryAmount}
         itemCount={calculatedItemCount}
         formatCurrency={formatCurrency}
         customRows={customBillingRows}
@@ -170,6 +207,7 @@ export function OrderPanel({
       {/* 4. Payment Actions Section */}
       <PaymentActions
         paymentMethods={paymentMethods}
+        quickActions={quickActions}
         selectedPaymentMethod={selectedPaymentMethod}
         onSelectPaymentMethod={onSelectPaymentMethod}
         paymentTitle={paymentTitle}

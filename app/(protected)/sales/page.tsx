@@ -4,6 +4,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { useCallback, useMemo, useState } from "react";
 import type { IconComponent } from "reicon-react";
 import {
+  Add,
   Card,
   Scan,
   Wallet,
@@ -20,6 +21,8 @@ import {
   type CategoryId,
   categoryIds,
   getProduct,
+  type IceId,
+  iceIds,
   initialOrderItems,
   type OrderItem,
   type PaymentMethodId,
@@ -38,6 +41,7 @@ export default function SalesPage() {
   const [selectedCategory, setSelectedCategory] = useState<CategoryId>("favourites");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedSize, setSelectedSize] = useState<SizeId>("medium");
+  const [selectedIce, setSelectedIce] = useState<IceId>("regularIce");
   const [selectedSweetness, setSelectedSweetness] = useState<SweetnessId>("lessSugar");
   const [selectedAddOns, setSelectedAddOns] = useState<AddOnId[]>([]);
   const [orderItems, setOrderItems] = useState<OrderItem[]>(initialOrderItems);
@@ -55,6 +59,11 @@ export default function SalesPage() {
     [t],
   );
 
+  const iceOptions: Array<{ id: IceId; label: string }> = useMemo(
+    () => iceIds.map((id) => ({ id, label: t(`modifiers.${id}`) })),
+    [t],
+  );
+
   const sweetnessOptions: Array<{ id: SweetnessId; label: string }> = useMemo(
     () => sweetnessIds.map((id) => ({ id, label: t(`modifiers.${id}`) })),
     [t],
@@ -67,9 +76,22 @@ export default function SalesPage() {
 
   const sizeLabels: Record<SizeId, string> = useMemo(
     () => ({
-      large: t("modifiers.large"),
-      medium: t("modifiers.medium"),
+      extraSmall: t("modifiers.extraSmall"),
       small: t("modifiers.small"),
+      medium: t("modifiers.medium"),
+      large: t("modifiers.large"),
+      extraLarge: t("modifiers.extraLarge"),
+    }),
+    [t],
+  );
+
+  const iceLabels: Record<IceId, string> = useMemo(
+    () => ({
+      regularIce: t("modifiers.regularIce"),
+      lessIce: t("modifiers.lessIce"),
+      noIce: t("modifiers.noIce"),
+      warm: t("modifiers.warm"),
+      hot: t("modifiers.hot"),
     }),
     [t],
   );
@@ -77,17 +99,28 @@ export default function SalesPage() {
   const sweetnessLabels: Record<SweetnessId, string> = useMemo(
     () => ({
       noSugar: t("modifiers.noSugar"),
+      quarterSugar: t("modifiers.quarterSugar"),
       lessSugar: t("modifiers.lessSugar"),
       regularSugar: t("modifiers.regularSugar"),
+      extraSugar: t("modifiers.extraSugar"),
     }),
     [t],
   );
 
   const addOnLabels: Record<AddOnId, string> = useMemo(
     () => ({
-      oatMilk: t("modifiers.oatMilk"),
-      whippedCream: t("modifiers.whippedCream"),
       espressoShot: t("modifiers.espressoShot"),
+      oatMilk: t("modifiers.oatMilk"),
+      almondMilk: t("modifiers.almondMilk"),
+      soyMilk: t("modifiers.soyMilk"),
+      whippedCream: t("modifiers.whippedCream"),
+      caramelDrizzle: t("modifiers.caramelDrizzle"),
+      vanillaSyrup: t("modifiers.vanillaSyrup"),
+      hazelnutSyrup: t("modifiers.hazelnutSyrup"),
+      bobaPearls: t("modifiers.bobaPearls"),
+      cheeseFoam: t("modifiers.cheeseFoam"),
+      grassJelly: t("modifiers.grassJelly"),
+      coconutJelly: t("modifiers.coconutJelly"),
     }),
     [t],
   );
@@ -139,9 +172,12 @@ export default function SalesPage() {
       const productName = product.name[locale];
       const modifierSummary = [
         sizeLabels[item.size],
+        item.ice ? iceLabels[item.ice] : undefined,
         sweetnessLabels[item.sweetness],
         ...item.addOns.map((addOn) => addOnLabels[addOn]),
-      ].join(" · ");
+      ]
+        .filter(Boolean)
+        .join(" · ");
 
       return [
         {
@@ -155,10 +191,10 @@ export default function SalesPage() {
         },
       ];
     });
-  }, [orderItems, locale, sizeLabels, sweetnessLabels, addOnLabels, formatCurrency]);
+  }, [orderItems, locale, sizeLabels, iceLabels, sweetnessLabels, addOnLabels, formatCurrency]);
 
   const addProduct = (product: Product) => {
-    const modifierKey = [selectedSize, selectedSweetness, ...selectedAddOns.toSorted()].join("-");
+    const modifierKey = [selectedSize, selectedIce, selectedSweetness, ...selectedAddOns.toSorted()].join("-");
     const orderItemId = `${product.id}-${modifierKey}`;
 
     setOrderItems((currentItems) => {
@@ -179,6 +215,7 @@ export default function SalesPage() {
           productId: product.id,
           quantity: 1,
           size: selectedSize,
+          ice: selectedIce,
           sweetness: selectedSweetness,
           addOns: [...selectedAddOns],
         },
@@ -232,7 +269,6 @@ export default function SalesPage() {
           className="h-full rounded-none border-0"
           orderNumber="1048"
           eyebrow={t("ticketEyebrow")}
-          title={t("ticketTitle")}
           orderType={orderType === "takeaway" ? t("takeaway") : t("dineIn")}
           changeButtonLabel={t("change")}
           onChangeOrderType={() =>
@@ -297,9 +333,10 @@ export default function SalesPage() {
           </div>
 
           {/* 2. Search Menu Items Bar (below tab categories section) */}
-          <div className="shrink-0 border-b border-border/60 bg-surface-secondary/20 px-3.5 py-2 sm:px-4">
+          <div className="flex shrink-0 items-center gap-2 border-b border-border/60 bg-surface-secondary/20 px-3.5 py-2 sm:px-4">
             <SearchField
               aria-label={t("searchLabel")}
+              className="flex-1"
               fullWidth
               onClear={() => setSearchQuery("")}
               value={searchQuery}
@@ -315,6 +352,15 @@ export default function SalesPage() {
                 <SearchField.ClearButton />
               </SearchField.Group>
             </SearchField>
+
+            <Button
+              isIconOnly
+              aria-label={t("addItem")}
+              variant="secondary"
+              className="shrink-0"
+            >
+              <Add aria-hidden="true" size={20} />
+            </Button>
           </div>
 
           {categoryOptions.map((item) => (
@@ -324,7 +370,7 @@ export default function SalesPage() {
               className="min-h-0 flex-1 overflow-y-auto p-3.5 sm:p-4 outline-none"
             >
               {filteredProducts.length > 0 ? (
-                <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 sm:gap-3 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 2xl:grid-cols-5 2xl:gap-3.5">
+                <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2 sm:gap-3 xl:grid-cols-3">
                   {filteredProducts.map((product) => {
                     const productName = product.name[locale];
 
@@ -349,65 +395,103 @@ export default function SalesPage() {
           ))}
         </Tabs>
 
-        {/* Modifiers docked bar */}
+        {/* Modifiers docked bar - Row by row */}
         <section
-          aria-labelledby="modifiers-heading"
-          className="shrink-0 border-t border-border bg-surface-secondary/40 px-3.5 py-2 sm:px-4 sm:py-2.5"
+          aria-label={t("modifiersTitle")}
+          className="shrink-0 border-t border-border bg-surface-secondary/40 px-3.5 py-2.5 sm:px-4 sm:py-3 max-h-72 overflow-y-auto"
         >
-          <div className="flex flex-wrap items-center justify-between gap-2.5 sm:gap-4">
-            <div className="hidden 2xl:block shrink-0">
-              <p className="text-[10px] font-bold uppercase tracking-wider text-muted">
-                {t("modifiersEyebrow")}
-              </p>
-              <h2 id="modifiers-heading" className="text-xs font-semibold text-foreground">
-                {t("modifiersTitle")}
-              </h2>
+          <div className="flex flex-col gap-2.5 sm:gap-3">
+            {/* Size */}
+            <div className="flex flex-col gap-1 min-w-0">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-semibold uppercase tracking-wider text-muted">
+                  {t("modifiers.size")}
+                </span>
+                <span className="text-xs font-medium text-foreground">
+                  {sizeLabels[selectedSize]}
+                </span>
+              </div>
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-1.5 sm:gap-2">
+                {sizeOptions.map((option) => (
+                  <ChoiceButton
+                    key={option.id}
+                    active={selectedSize === option.id}
+                    onPress={() => setSelectedSize(option.id)}
+                  >
+                    {option.label}
+                  </ChoiceButton>
+                ))}
+              </div>
             </div>
 
-            <div className="flex flex-1 flex-wrap items-center gap-3 sm:gap-4 min-w-0">
-              <div className="flex items-center gap-1.5">
-                <span className="text-xs font-medium text-muted shrink-0">{t("modifiers.size")}:</span>
-                <div className="flex gap-1">
-                  {sizeOptions.map((option) => (
-                    <ChoiceButton
-                      key={option.id}
-                      active={selectedSize === option.id}
-                      onPress={() => setSelectedSize(option.id)}
-                    >
-                      {option.label}
-                    </ChoiceButton>
-                  ))}
-                </div>
+            {/* Ice Level */}
+            <div className="flex flex-col gap-1 min-w-0">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-semibold uppercase tracking-wider text-muted">
+                  {t("modifiers.ice")}
+                </span>
+                <span className="text-xs font-medium text-foreground">
+                  {iceLabels[selectedIce]}
+                </span>
               </div>
-
-              <div className="flex items-center gap-1.5">
-                <span className="text-xs font-medium text-muted shrink-0">{t("modifiers.sweetness")}:</span>
-                <div className="flex gap-1">
-                  {sweetnessOptions.map((option) => (
-                    <ChoiceButton
-                      key={option.id}
-                      active={selectedSweetness === option.id}
-                      onPress={() => setSelectedSweetness(option.id)}
-                    >
-                      {option.label}
-                    </ChoiceButton>
-                  ))}
-                </div>
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-1.5 sm:gap-2">
+                {iceOptions.map((option) => (
+                  <ChoiceButton
+                    key={option.id}
+                    active={selectedIce === option.id}
+                    onPress={() => setSelectedIce(option.id)}
+                  >
+                    {option.label}
+                  </ChoiceButton>
+                ))}
               </div>
+            </div>
 
-              <div className="flex items-center gap-1.5">
-                <span className="text-xs font-medium text-muted shrink-0">{t("modifiers.addOns")}:</span>
-                <div className="flex gap-1">
-                  {addOnOptions.map((option) => (
-                    <ChoiceButton
-                      key={option.id}
-                      active={selectedAddOns.includes(option.id)}
-                      onPress={() => toggleAddOn(option.id)}
-                    >
-                      {option.label}
-                    </ChoiceButton>
-                  ))}
-                </div>
+            {/* Sweetness */}
+            <div className="flex flex-col gap-1 min-w-0">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-semibold uppercase tracking-wider text-muted">
+                  {t("modifiers.sweetness")}
+                </span>
+                <span className="text-xs font-medium text-foreground">
+                  {sweetnessLabels[selectedSweetness]}
+                </span>
+              </div>
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-1.5 sm:gap-2">
+                {sweetnessOptions.map((option) => (
+                  <ChoiceButton
+                    key={option.id}
+                    active={selectedSweetness === option.id}
+                    onPress={() => setSelectedSweetness(option.id)}
+                  >
+                    {option.label}
+                  </ChoiceButton>
+                ))}
+              </div>
+            </div>
+
+            {/* Add-ons */}
+            <div className="flex flex-col gap-1 min-w-0">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-semibold uppercase tracking-wider text-muted">
+                  {t("modifiers.addOns")}
+                </span>
+                {selectedAddOns.length > 0 ? (
+                  <span className="text-xs font-medium text-foreground truncate max-w-[60%] text-right">
+                    {selectedAddOns.map((id) => addOnLabels[id]).join(", ")}
+                  </span>
+                ) : null}
+              </div>
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-1.5 sm:gap-2">
+                {addOnOptions.map((option) => (
+                  <ChoiceButton
+                    key={option.id}
+                    active={selectedAddOns.includes(option.id)}
+                    onPress={() => toggleAddOn(option.id)}
+                  >
+                    {option.label}
+                  </ChoiceButton>
+                ))}
               </div>
             </div>
           </div>
@@ -428,12 +512,14 @@ function ChoiceButton({
 }) {
   return (
     <Button
-      size="sm"
+      fullWidth
+      size="lg"
       variant={active ? "primary" : "outline"}
       onPress={onPress}
       aria-pressed={active}
+      className="truncate text-xs font-medium sm:text-sm"
     >
-      {children}
+      <span className="truncate">{children}</span>
     </Button>
   );
 }

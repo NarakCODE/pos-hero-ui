@@ -17,7 +17,11 @@ const languageOptions: Array<{
   { id: "km", label: "ខ្មែរ", },
 ];
 
-export function LanguageSwitcher() {
+export function LanguageSwitcher({
+  className = "w-36",
+}: {
+  className?: string;
+} = {}) {
   const router = useRouter();
   const currentLocale = useLocale();
   const t = useTranslations("LanguageSwitcher");
@@ -38,7 +42,7 @@ export function LanguageSwitcher() {
   return (
     <Select
       aria-label={t("label")}
-      className="w-36"
+      className={className}
       value={selectedLocale}
       onChange={handleLocaleChange}
     >

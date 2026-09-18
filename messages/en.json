@@ -44,5 +44,121 @@
     "title": "Dashboard",
     "description": "You are signed in to your RakPOS workspace.",
     "signOut": "Sign out"
+  },
+  "SalesMenu": {
+    "brandName": "RakPOS",
+    "cashier": "Sokha",
+    "shiftOpen": "Shift open",
+    "signOut": "Sign out",
+    "catalogEyebrow": "Menu",
+    "catalogTitle": "Choose a product",
+    "searchLabel": "Search products",
+    "searchPlaceholder": "Search menu items...",
+    "categoryLabel": "Product categories",
+    "addToTicket": "Add {name} to ticket",
+    "catalogEmpty": "No products match your search.",
+    "categories": {
+      "favourites": "Favourite Items",
+      "bestSellers": "Best Sellers",
+      "signature": "Signature Specials",
+      "icedCoffee": "Iced Coffee",
+      "hotCoffee": "Hot Coffee",
+      "tea": "Tea",
+      "smoothie": "Smoothie & Frappe",
+      "juice": "Fresh Juice & Soda",
+      "breakfast": "Breakfast & Brunch",
+      "sandwich": "Sandwiches & Wraps",
+      "bakery": "Bakery",
+      "dessert": "Desserts",
+      "snack": "Snacks & Bites"
+    },
+    "modifiersEyebrow": "Quick options",
+    "modifiersTitle": "Customize your item",
+    "modifiers": {
+      "size": "Size",
+      "large": "Large",
+      "medium": "Medium",
+      "small": "Small",
+      "sweetness": "Sweetness",
+      "noSugar": "No Sugar",
+      "lessSugar": "Less Sugar",
+      "regularSugar": "Regular",
+      "addOns": "Add-ons",
+      "oatMilk": "Oat Milk",
+      "whippedCream": "Whipped Cream",
+      "espressoShot": "Extra Espresso"
+    },
+    "ticketEyebrow": "Current order",
+    "ticketTitle": "Ticket summary",
+    "ticketNumber": "Ticket #{number}",
+    "takeaway": "Takeaway order",
+    "dineIn": "Dine-in order",
+    "change": "Change",
+    "clearTicket": "Clear",
+    "printReceipt": "Print",
+    "holdTicket": "Hold",
+    "resetTicket": "New order",
+    "emptyTicket": "Your ticket is empty",
+    "emptyTicketHint": "Choose a product to start an order.",
+    "decreaseQuantity": "Decrease quantity for {name}",
+    "increaseQuantity": "Increase quantity for {name}",
+    "removeItem": "Remove {name}",
+    "summary": {
+      "items": "Items ({count})",
+      "discount": "Member discount",
+      "tax": "Tax",
+      "total": "Total"
+    },
+    "payment": {
+      "title": "Payment method",
+      "cash": "Cash",
+      "bankCard": "Bank Card",
+      "khqr": "KHQR",
+      "charge": "Charge {amount}",
+      "complete": "Payment complete",
+      "success": "Payment recorded. Ready for the next ticket."
+    },
+    "navigation": {
+      "label": "Main navigation",
+      "sales": "Sales",
+      "orders": "Orders",
+      "table": "Table",
+      "customer": "Customer",
+      "settings": "Settings",
+      "more": "More"
+    },
+    "pages": {
+      "orders": {
+        "title": "Orders",
+        "eyebrow": "Management",
+        "emptyTitle": "No orders yet",
+        "emptyDescription": "Active and past tickets will appear here once placed.",
+        "goToSales": "Go to Sales"
+      },
+      "table": {
+        "title": "Table Management",
+        "eyebrow": "Floor Plan",
+        "emptyTitle": "No tables configured",
+        "emptyDescription": "Dining zones, table arrangements, and occupancy will appear here."
+      },
+      "customer": {
+        "title": "Customer Directory",
+        "eyebrow": "Loyalty & Profiles",
+        "emptyTitle": "No customers found",
+        "emptyDescription": "Customer accounts, loyalty points, and purchase history will appear here."
+      },
+      "settings": {
+        "title": "Settings",
+        "eyebrow": "Terminal Configuration",
+        "emptyTitle": "POS Settings",
+        "emptyDescription": "Receipt printer, tax rates, payment options, and terminal preferences."
+      },
+      "more": {
+        "title": "More Tools",
+        "eyebrow": "Operations",
+        "emptyTitle": "Additional Tools",
+        "emptyDescription": "Cash drawer management, shift reports, and administrative actions."
+      }
+    }
   }
 }

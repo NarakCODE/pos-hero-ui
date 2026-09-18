@@ -44,5 +44,121 @@
     "title": "ផ្ទាំងគ្រប់គ្រង",
     "description": "អ្នកបានចូលទៅកាន់កន្លែងធ្វើការ RakPOS របស់អ្នក។",
     "signOut": "ចាកចេញ"
+  },
+  "SalesMenu": {
+    "brandName": "RakPOS",
+    "cashier": "សុខា",
+    "shiftOpen": "វេនកំពុងដំណើរការ",
+    "signOut": "ចាកចេញ",
+    "catalogEyebrow": "ម៉ឺនុយ",
+    "catalogTitle": "ជ្រើសរើសផលិតផល",
+    "searchLabel": "ស្វែងរកផលិតផល",
+    "searchPlaceholder": "ស្វែងរកមុខម្ហូប...",
+    "categoryLabel": "ប្រភេទផលិតផល",
+    "addToTicket": "បន្ថែម {name} ទៅក្នុងបញ្ជាទិញ",
+    "catalogEmpty": "រកមិនឃើញផលិតផលដែលត្រូវនឹងការស្វែងរកទេ។",
+    "categories": {
+      "favourites": "មុខម្ហូបចូលចិត្ត",
+      "bestSellers": "លក់ដាច់ជាងគេ",
+      "signature": "ភេសជ្ជៈពិសេស",
+      "icedCoffee": "កាហ្វេត្រជាក់",
+      "hotCoffee": "កាហ្វេក្តៅ",
+      "tea": "តែ",
+      "smoothie": "ភេសជ្ជៈក្រឡុក",
+      "juice": "ទឹកផ្លែឈើ & សូដា",
+      "breakfast": "អាហារពេលព្រឹក",
+      "sandwich": "សាំងវិច & នំប៉័ងរុំ",
+      "bakery": "នំបុ័ង",
+      "dessert": "បង្អែម",
+      "snack": "អាហារសម្រន់"
+    },
+    "modifiersEyebrow": "ជម្រើសរហ័ស",
+    "modifiersTitle": "កែសម្រួលមុខម្ហូប",
+    "modifiers": {
+      "size": "ទំហំ",
+      "large": "ធំ",
+      "medium": "មធ្យម",
+      "small": "តូច",
+      "sweetness": "កម្រិតផ្អែម",
+      "noSugar": "មិនដាក់ស្ករ",
+      "lessSugar": "ស្ករតិច",
+      "regularSugar": "ផ្អែមធម្មតា",
+      "addOns": "បន្ថែម",
+      "oatMilk": "ទឹកដោះគោអូត",
+      "whippedCream": "ក្រែមវីប",
+      "espressoShot": "អេសប្រេសូបន្ថែម"
+    },
+    "ticketEyebrow": "បញ្ជាទិញបច្ចុប្បន្ន",
+    "ticketTitle": "សង្ខេបបញ្ជាទិញ",
+    "ticketNumber": "បញ្ជាទិញ #{number}",
+    "takeaway": "បញ្ជាទិញយកទៅ",
+    "dineIn": "បញ្ជាទិញញ៉ាំនៅហាង",
+    "change": "ផ្លាស់ប្តូរ",
+    "clearTicket": "សម្អាត",
+    "printReceipt": "បោះពុម្ព",
+    "holdTicket": "ផ្អាក",
+    "resetTicket": "បញ្ជាទិញថ្មី",
+    "emptyTicket": "បញ្ជាទិញរបស់អ្នកទទេ",
+    "emptyTicketHint": "ជ្រើសរើសផលិតផលដើម្បីចាប់ផ្តើមបញ្ជាទិញ។",
+    "decreaseQuantity": "បន្ថយចំនួន {name}",
+    "increaseQuantity": "បង្កើនចំនួន {name}",
+    "removeItem": "លុប {name}",
+    "summary": {
+      "items": "មុខទំនិញ ({count})",
+      "discount": "បញ្ចុះតម្លៃសមាជិក",
+      "tax": "ពន្ធ",
+      "total": "សរុប"
+    },
+    "payment": {
+      "title": "វិធីបង់ប្រាក់",
+      "cash": "សាច់ប្រាក់",
+      "bankCard": "កាតធនាគារ",
+      "khqr": "KHQR",
+      "charge": "គិតប្រាក់ {amount}",
+      "complete": "បង់ប្រាក់រួចរាល់",
+      "success": "បានកត់ត្រាការបង់ប្រាក់។ រួចរាល់សម្រាប់បញ្ជាទិញបន្ទាប់។"
+    },
+    "navigation": {
+      "label": "ការរុករកសំខាន់",
+      "sales": "ការលក់",
+      "orders": "បញ្ជាទិញ",
+      "table": "តុ",
+      "customer": "អតិថិជន",
+      "settings": "ការកំណត់",
+      "more": "ច្រើនទៀត"
+    },
+    "pages": {
+      "orders": {
+        "title": "បញ្ជាទិញ",
+        "eyebrow": "ការគ្រប់គ្រង",
+        "emptyTitle": "មិនទាន់មានការបញ្ជាទិញទេ",
+        "emptyDescription": "ការបញ្ជាទិញសកម្ម និងប្រវត្តិបញ្ជាទិញនឹងបង្ហាញនៅទីនេះ។",
+        "goToSales": "ទៅកាន់ការលក់"
+      },
+      "table": {
+        "title": "ការគ្រប់គ្រងតុ",
+        "eyebrow": "ប្លង់ហាង",
+        "emptyTitle": "មិនទាន់បានកំណត់រចនាសម្ព័ន្ធតុទេ",
+        "emptyDescription": "ប្លង់តុ តំបន់អង្គុយ និងស្ថានភាពតុនឹងបង្ហាញនៅទីនេះ។"
+      },
+      "customer": {
+        "title": "បញ្ជីអតិថិជន",
+        "eyebrow": "ភាពស្មោះត្រង់ និងគណនី",
+        "emptyTitle": "រកមិនឃើញអតិថិជនទេ",
+        "emptyDescription": "ព័ត៌មានអតិថិជន ពិន្ទុរង្វាន់ និងប្រវត្តិទិញនឹងបង្ហាញនៅទីនេះ។"
+      },
+      "settings": {
+        "title": "ការកំណត់",
+        "eyebrow": "ការកំណត់ស្ថានីយ",
+        "emptyTitle": "ការកំណត់ប្រព័ន្ធ POS",
+        "emptyDescription": "ម៉ាស៊ីនបោះពុម្ព អត្រាពន្ធ វិធីបង់ប្រាក់ និងការកំណត់ឧបករណ៍។"
+      },
+      "more": {
+        "title": "ឧបករណ៍បន្ថែម",
+        "eyebrow": "ប្រតិបត្តិការ",
+        "emptyTitle": "ឧបករណ៍ប្រតិបត្តិការផ្សេងៗ",
+        "emptyDescription": "ការគ្រប់គ្រងថតប្រាក់ របាយការណ៍បិទវេន និងការផ្លាស់ប្តូរវេនបុគ្គលិក។"
+      }
+    }
   }
 }

@@ -82,7 +82,7 @@ export default function LoginPage() {
 
     setErrors({});
     window.sessionStorage.setItem(authSessionStorageKey, "true");
-    router.replace("/dashboard");
+    router.replace("/sales");
   };
 
   const handleIdentifierChange = (value: string) => {

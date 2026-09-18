@@ -1,0 +1,15 @@
+{
+  "HomePage": {
+    "appName": "កម្មវិធី HeroUI",
+    "heading": "ដើម្បីចាប់ផ្ដើម សូមកែសម្រួលឯកសារ <code>page.tsx</code>។",
+    "description": "កំពុងស្វែងរកចំណុចចាប់ផ្ដើម ឬការណែនាំបន្ថែមមែនទេ? សូមចូលទៅ <templates>គំរូ</templates> ឬមជ្ឈមណ្ឌល <learning>រៀន</learning>។",
+    "ready": "HeroUI រួចរាល់ហើយ",
+    "nextLogoAlt": "ឡូហ្គោ Next.js",
+    "vercelLogoAlt": "សញ្ញា Vercel",
+    "deployNow": "ដាក់ឱ្យប្រើឥឡូវនេះ",
+    "documentation": "ឯកសារណែនាំ"
+  },
+  "LanguageSwitcher": {
+    "label": "ភាសា"
+  }
+}

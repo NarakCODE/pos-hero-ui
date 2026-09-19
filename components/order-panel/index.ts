@@ -1,5 +1,8 @@
 export { BillingSummary } from "./billing-summary";
+export { BankCardPaymentModal } from "./bank-card-payment-modal";
+export { BrandWalletPaymentModal } from "./brand-wallet-payment-modal";
 export { CashPaymentModal } from "./cash-payment-modal";
+export { KHQRPaymentModal } from "./khqr-payment-modal";
 export { OrderHeader } from "./order-header";
 export { OrderItemsTable } from "./order-items-table";
 export { OrderPanel } from "./order-panel";

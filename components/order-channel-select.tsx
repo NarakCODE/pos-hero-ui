@@ -14,8 +14,13 @@ export type OrderChannel = (typeof orderChannels)[number];
 const defaultOrderChannelAvatarSrc =
   "https://heroui-assets.nyc3.cdn.digitaloceanspaces.com/avatars/blue.jpg";
 const orderChannelAvatarSrcByChannel: Partial<Record<OrderChannel, string>> = {
+  "E-GetS":
+    "https://www.e-gets.com/images/common/logo-egets.png",
+  Foodpanda: "https://img.icons8.com/color/1200/foodpanda.jpg",
+  GrabFood:
+    "https://toppng.com/uploads/preview/grab-logo-11550724942n0ghhh9o1u.png",
   Wownow:
-    "https://play-lh.googleusercontent.com/kj-22jffZNodTZmgSdwrn31er69HHFLNqNUSEy-LFl82-CsJBrU1qRDehSpER8PltIf8b_p2FtdsMuPbNc8olg",
+    "https://media.licdn.com/dms/image/v2/D560BAQEOZJiZ1czI1g/company-logo_200_200/company-logo_200_200/0/1681972958993/u_life_kh_super_app_co_ltd_logo?e=2147483647&v=beta&t=Vx4Yylwr809AZKtHMDS6Ib89Gj0cQ0o3Y_NTz5nWxB4",
 };
 
 const orderChannelFallbacks: Record<OrderChannel, string> = {
@@ -43,6 +48,7 @@ export function OrderChannelSelect({
 }: OrderChannelSelectProps) {
   return (
     <Select
+      aria-label={label ?? "Order channel"}
       className={className}
       value={value}
       onChange={(nextValue) => {
@@ -72,6 +78,7 @@ export function OrderChannelSelect({
                 <Avatar size="sm">
                   <Avatar.Image
                     alt={`${selectedChannel} logo`}
+                    className="object-contain"
                     src={getOrderChannelAvatarSrc(selectedChannel)}
                   />
                   <Avatar.Fallback>
@@ -92,6 +99,7 @@ export function OrderChannelSelect({
               <Avatar size="sm">
                 <Avatar.Image
                   alt={`${channel} logo`}
+                  className="object-contain"
                   src={getOrderChannelAvatarSrc(channel)}
                 />
                 <Avatar.Fallback>

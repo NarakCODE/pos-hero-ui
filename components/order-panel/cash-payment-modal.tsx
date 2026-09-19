@@ -80,7 +80,7 @@ export function CashPaymentModal({
     setCashReceived(AMOUNT_DUE.toFixed(2));
   };
 
-  const handleDone = () => {
+  const handleComplete = () => {
     toast.success("Cash payment completed", {
       description: `Payment received: $${receivedAmount.toFixed(2)}`,
     });
@@ -226,9 +226,24 @@ export function CashPaymentModal({
             </section>
           </Modal.Body>
 
-          <Modal.Footer>
-            <Button isDisabled={!canComplete} size="lg" onPress={handleDone}>
-              Done
+          <Modal.Footer className="w-full flex-col gap-2 sm:flex-row">
+            <Button
+              className="sm:flex-1"
+              fullWidth
+              size="lg"
+              slot="close"
+              variant="secondary"
+            >
+              Cancel
+            </Button>
+            <Button
+              className="sm:flex-1"
+              fullWidth
+              isDisabled={!canComplete}
+              size="lg"
+              onPress={handleComplete}
+            >
+              Complete
             </Button>
           </Modal.Footer>
         </Modal.Dialog>

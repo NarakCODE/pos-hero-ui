@@ -3,7 +3,10 @@
 import { Button, Spinner } from "@heroui/react";
 import { useState } from "react";
 import { ArrowRight, Check, Clock, Printer, Refresh } from "reicon-react";
+import { BankCardPaymentModal } from "./bank-card-payment-modal";
+import { BrandWalletPaymentModal } from "./brand-wallet-payment-modal";
 import { CashPaymentModal } from "./cash-payment-modal";
+import { KHQRPaymentModal } from "./khqr-payment-modal";
 import { PaymentMethodDrawer } from "./payment-method-drawer";
 import type { PaymentActionsProps, PaymentMethodOption } from "./types";
 
@@ -66,7 +69,13 @@ export function PaymentActions({
                 key={action.id}
                 action={action}
                 disabled={disabled}
-                onPress={() => onQuickAction?.(action.id)}
+                isSelected={openPaymentMethodId === action.id}
+                onPress={() => {
+                  onQuickAction?.(action.id);
+                  if (action.id === "brandWallet") {
+                    setOpenPaymentMethodId(action.id);
+                  }
+                }}
               />
             ))}
 
@@ -104,6 +113,24 @@ export function PaymentActions({
                   setOpenPaymentMethodId(isOpen ? method.id : null)
                 }
               />
+            ) : method.id === "bankCard" ? (
+              <BankCardPaymentModal
+                key={method.id}
+                isOpen={openPaymentMethodId === method.id}
+                method={method}
+                onOpenChange={(isOpen) =>
+                  setOpenPaymentMethodId(isOpen ? method.id : null)
+                }
+              />
+            ) : method.id === "khqr" ? (
+              <KHQRPaymentModal
+                key={method.id}
+                isOpen={openPaymentMethodId === method.id}
+                method={method}
+                onOpenChange={(isOpen) =>
+                  setOpenPaymentMethodId(isOpen ? method.id : null)
+                }
+              />
             ) : (
               <PaymentMethodDrawer
                 key={method.id}
@@ -115,6 +142,19 @@ export function PaymentActions({
               />
             )
           ))}
+
+          {quickActions?.map((action) =>
+            action.id === "brandWallet" ? (
+              <BrandWalletPaymentModal
+                key={action.id}
+                isOpen={openPaymentMethodId === action.id}
+                method={action}
+                onOpenChange={(isOpen) =>
+                  setOpenPaymentMethodId(isOpen ? action.id : null)
+                }
+              />
+            ) : null,
+          )}
         </div>
       ) : (
         <Button

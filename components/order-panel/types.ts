@@ -1,5 +1,4 @@
 import type { ComponentType, ReactNode } from "react";
-import type { OrderChannel } from "@/components/order-channel-select";
 
 export interface OrderItemModifier {
   label: string;
@@ -31,19 +30,6 @@ export interface PaymentMethodOption {
   disabled?: boolean;
 }
 
-export interface QuickActionOption {
-  id: string;
-  label: string;
-  icon?: ComponentType<{
-    className?: string;
-    size?: number;
-    "aria-hidden"?: boolean | "true" | "false";
-  }>;
-  disabled?: boolean;
-  onPress?: () => void;
-  ariaLabel?: string;
-}
-
 export interface OrderHeaderProps {
   orderNumber?: string | number;
   title?: ReactNode;
@@ -52,15 +38,6 @@ export interface OrderHeaderProps {
   tableNumber?: string | number;
   customerName?: string;
   timestamp?: string;
-  tableTicketNo?: string;
-  sequenceNumber?: string | number;
-  status?: string;
-  statusLabel?: string;
-  orderChannel?: OrderChannel;
-  onOrderChannelChange?: (value: OrderChannel) => void;
-  tableTicketLabel?: string;
-  sequenceLabel?: string;
-  orderChannelLabel?: string;
   onChangeOrderType?: () => void;
   changeButtonLabel?: string;
   onClearTicket?: () => void;
@@ -113,25 +90,15 @@ export interface BillingSummaryProps {
   serviceChargeLabel?: string;
   total: number;
   totalLabel?: string;
-  subtotalLabel?: string;
   itemCount?: number;
   itemsLabel?: string;
   formatCurrency?: (amount: number) => string;
   customRows?: BillingSummaryRow[];
-  paymentLabel?: string;
-  paymentMethod?: ReactNode;
-  receivedLabel?: string;
-  receivedAmount?: ReactNode;
-  changeLabel?: string;
-  changeAmount?: ReactNode;
-  changeSecondaryAmount?: ReactNode;
-  totalSecondaryAmount?: ReactNode;
   className?: string;
 }
 
 export interface PaymentActionsProps {
   paymentMethods?: PaymentMethodOption[];
-  quickActions?: QuickActionOption[];
   selectedPaymentMethod?: string;
   onSelectPaymentMethod?: (methodId: string) => void;
   paymentTitle?: string;
@@ -167,15 +134,6 @@ export interface OrderPanelProps {
   tableNumber?: string | number;
   customerName?: string;
   timestamp?: string;
-  tableTicketNo?: string;
-  sequenceNumber?: string | number;
-  status?: string;
-  statusLabel?: string;
-  orderChannel?: OrderChannel;
-  onOrderChannelChange?: (value: OrderChannel) => void;
-  tableTicketLabel?: string;
-  sequenceLabel?: string;
-  orderChannelLabel?: string;
   onChangeOrderType?: () => void;
   changeButtonLabel?: string;
   onClearTicket?: () => void;
@@ -213,23 +171,13 @@ export interface OrderPanelProps {
   serviceChargeLabel?: string;
   total?: number;
   totalLabel?: string;
-  subtotalLabel?: string;
   itemCount?: number;
   itemsLabel?: string;
   formatCurrency?: (amount: number) => string;
   customBillingRows?: BillingSummaryRow[];
-  paymentLabel?: string;
-  paymentMethod?: ReactNode;
-  receivedLabel?: string;
-  receivedAmount?: ReactNode;
-  changeLabel?: string;
-  changeAmount?: ReactNode;
-  changeSecondaryAmount?: ReactNode;
-  totalSecondaryAmount?: ReactNode;
 
   // Payment Props
   paymentMethods?: PaymentMethodOption[];
-  quickActions?: QuickActionOption[];
   selectedPaymentMethod?: string;
   onSelectPaymentMethod?: (methodId: string) => void;
   paymentTitle?: string;

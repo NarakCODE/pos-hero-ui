@@ -2,8 +2,6 @@
 
 import { Button, Chip } from "@heroui/react";
 import { Clock } from "reicon-react";
-import type { ReactNode } from "react";
-import { OrderChannelSelect } from "@/components/order-channel-select";
 import type { OrderHeaderProps } from "./types";
 
 export function OrderHeader({
@@ -16,19 +14,11 @@ export function OrderHeader({
   eyebrow,
   onChangeOrderType,
   onClearTicket,
-  onOrderChannelChange,
   orderNumber,
-  orderChannel,
-  orderChannelLabel = "Order Channel",
   orderType,
-  sequenceLabel = "Seq.",
-  sequenceNumber,
-  status,
-  statusLabel = "Status",
-  tableTicketLabel = "Table/Ticket No",
-  tableTicketNo,
   tableNumber,
   timestamp,
+  title,
 }: OrderHeaderProps) {
   const formattedOrderNumber =
     orderNumber !== undefined && orderNumber !== null
@@ -37,71 +27,40 @@ export function OrderHeader({
         : `#${orderNumber}`
       : undefined;
 
-  const hasTicketMetadata = Boolean(
-    tableTicketNo || sequenceNumber !== undefined || status || orderChannel,
-  );
-
   return (
     <header className={`flex flex-col gap-3 ${className}`}>
-      {eyebrow || actions || onClearTicket ? (
-        <div className="flex items-center justify-between gap-3">
-          <div className="min-w-0">
-            {eyebrow ? (
-              <p className="text-xs font-medium uppercase tracking-wider text-muted">
-                {eyebrow}
-              </p>
-            ) : null}
-          </div>
-
-          <div className="flex items-center gap-2">
-            {actions}
-            {onClearTicket ? (
-              <Button
-                type="button"
-                variant="tertiary"
-                size="sm"
-                isDisabled={!canClear}
-                onPress={onClearTicket}
-                className="text-muted hover:text-danger focus-visible:text-danger"
-              >
-                {clearButtonLabel}
-              </Button>
-            ) : null}
-          </div>
-        </div>
-      ) : null}
-
-      {hasTicketMetadata ? (
-        <div className="grid grid-cols-2 gap-x-3 gap-y-3 rounded-xl border border-border/70 bg-surface-secondary/60 p-3">
-          {tableTicketNo ? (
-            <MetadataItem label={tableTicketLabel} value={tableTicketNo} />
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          {eyebrow ? (
+            <p className="text-xs font-medium uppercase tracking-wider text-muted">
+              {eyebrow}
+            </p>
           ) : null}
-          {sequenceNumber !== undefined ? (
-            <MetadataItem label={sequenceLabel} value={sequenceNumber} />
-          ) : null}
-          {status ? (
-            <MetadataItem
-              label={statusLabel}
-              value={
-                <Chip color="warning" size="sm" variant="soft">
-                  {status}
-                </Chip>
-              }
-            />
-          ) : null}
-          {orderChannel ? (
-            onOrderChannelChange ? (
-              <OrderChannelSelect
-                label={orderChannelLabel}
-                onChange={onOrderChannelChange}
-                value={orderChannel}
-              />
-            ) : (
-              <MetadataItem label={orderChannelLabel} value={orderChannel} />
-            )
+          {title ? (
+            <h2 className="mt-0.5 truncate text-xl font-bold tracking-tight text-foreground">
+              {title}
+            </h2>
           ) : null}
         </div>
-      ) : formattedOrderNumber || orderType || tableNumber || customerName || timestamp ? (
+
+        <div className="flex items-center gap-2">
+          {actions}
+          {onClearTicket ? (
+            <Button
+              type="button"
+              variant="tertiary"
+              size="sm"
+              isDisabled={!canClear}
+              onPress={onClearTicket}
+              className="text-muted hover:text-danger focus-visible:text-danger"
+            >
+              {clearButtonLabel}
+            </Button>
+          ) : null}
+        </div>
+      </div>
+
+      {formattedOrderNumber || orderType || tableNumber || customerName || timestamp ? (
         <div className="flex items-center justify-between gap-3 rounded-xl border border-border/70 bg-surface-secondary px-3.5 py-2.5 text-sm">
           <div className="flex flex-wrap items-center gap-2 min-w-0">
             {formattedOrderNumber ? (
@@ -151,16 +110,5 @@ export function OrderHeader({
         </div>
       ) : null}
     </header>
-  );
-}
-
-function MetadataItem({ label, value }: { label: string; value: ReactNode }) {
-  return (
-    <div className="min-w-0">
-      <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-muted">
-        {label}
-      </p>
-      <div className="mt-1 break-words text-sm font-semibold text-foreground">{value}</div>
-    </div>
   );
 }

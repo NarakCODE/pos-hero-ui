@@ -11,6 +11,9 @@ const defaultFormatCurrency = (amount: number) => `$${amount.toFixed(2)}`;
 export function OrderPanel({
   actionsSlot,
   ariaLabel = "Order ticket",
+  changeAmount,
+  changeLabel,
+  changeSecondaryAmount,
   changeButtonLabel,
   chargeAmount,
   chargeLabel,
@@ -28,6 +31,7 @@ export function OrderPanel({
   emptyIcon,
   emptyTitle,
   eyebrow,
+  footer,
   formatCurrency = defaultFormatCurrency,
   headerActions,
   holdLabel,
@@ -37,88 +41,98 @@ export function OrderPanel({
   isPaid,
   itemCount,
   items = [],
+  itemsLabel,
   itemTableLabels,
   onChangeOrderType,
   onCharge,
   onClearTicket,
   onHoldOrder,
   onPrintReceipt,
+  onQuickAction,
   onRemoveItem,
   onResetOrder,
   onSelectPaymentMethod,
   onUpdateQuantity,
+  orderChannel,
+  orderChannelLabel,
   orderNumber,
   orderType,
   paidMessage,
+  paymentLabel,
+  paymentMethod,
   paymentMethods,
   paymentTitle,
+  quickActions,
   printLabel,
+  receivedAmount,
+  receivedLabel,
   removeAriaLabel,
   resetLabel,
   selectedPaymentMethod,
+  sequenceLabel,
+  sequenceNumber,
   serviceCharge,
   serviceChargeLabel,
+  status,
+  statusLabel,
   subtotal,
+  subtotalLabel,
   tableNumber,
+  tableTicketLabel,
+  tableTicketNumber,
   tax,
   taxLabel,
   taxRate,
   timestamp,
   title,
   total,
-  viewMode = "list",
+  totalDiscountLabel,
+  totalLabel,
+  viewMode = "table",
 }: OrderPanelProps) {
   const containerClasses = className
-    ? `flex h-full min-h-0 min-w-0 flex-col bg-background p-4 sm:p-5 ${className}`
-    : "flex h-full min-h-0 min-w-0 flex-col rounded-2xl border border-border bg-background p-4 sm:p-5";
+    ? `flex h-full min-h-0 min-w-0 flex-col overflow-hidden bg-background p-3 sm:p-4 ${className}`
+    : "flex h-full min-h-0 min-w-0 flex-col overflow-hidden rounded-2xl border border-border bg-background p-3 sm:p-4";
 
-  // If compound children are provided, render them within the panel container
   if (children) {
     return (
-      <section
-        id={id}
-        aria-label={ariaLabel}
-        className={containerClasses}
-      >
+      <section id={id} aria-label={ariaLabel} className={containerClasses}>
         {children}
       </section>
     );
   }
 
-  // Calculate derived values if not explicitly provided
   const calculatedSubtotal =
     subtotal !== undefined
       ? subtotal
       : items.reduce((acc, item) => acc + item.price * item.quantity, 0);
-
   const calculatedItemCount =
     itemCount !== undefined
       ? itemCount
       : items.reduce((acc, item) => acc + item.quantity, 0);
-
   const calculatedDiscount = discount ?? 0;
   const calculatedTax = tax ?? 0;
   const calculatedTotal =
     total !== undefined
       ? total
       : calculatedSubtotal - calculatedDiscount + calculatedTax + (serviceCharge ?? 0);
-
   const formattedChargeAmount =
-    chargeAmount !== undefined
-      ? chargeAmount
-      : formatCurrency(calculatedTotal);
+    chargeAmount !== undefined ? chargeAmount : formatCurrency(calculatedTotal);
 
   return (
-    <section
-      id={id}
-      aria-label={ariaLabel}
-      className={containerClasses}
-    >
-      {/* 1. Order Header Section */}
+    <section id={id} aria-label={ariaLabel} className={containerClasses}>
       <OrderHeader
         orderNumber={orderNumber}
         title={title}
         eyebrow={eyebrow}
+        tableTicketNumber={tableTicketNumber}
+        tableTicketLabel={tableTicketLabel}
+        sequenceNumber={sequenceNumber}
+        sequenceLabel={sequenceLabel}
+        status={status}
+        statusLabel={statusLabel}
+        orderChannel={orderChannel}
+        orderChannelLabel={orderChannelLabel}
         orderType={orderType}
         tableNumber={tableNumber}
         customerName={customerName}
@@ -131,8 +145,7 @@ export function OrderPanel({
         actions={headerActions}
       />
 
-      {/* 2. Order Items Table Section */}
-      <div className="mt-4 flex min-h-0 flex-1 flex-col">
+      <div className="mt-3 flex min-h-0 flex-1 flex-col overflow-hidden">
         <OrderItemsTable
           items={items}
           onUpdateQuantity={onUpdateQuantity}
@@ -149,29 +162,40 @@ export function OrderPanel({
         />
       </div>
 
-      {/* 3. Billing Summary Section */}
       <BillingSummary
         subtotal={calculatedSubtotal}
+        subtotalLabel={subtotalLabel}
         discount={calculatedDiscount}
         discountRate={discountRate}
         discountLabel={discountLabel}
+        totalDiscountLabel={totalDiscountLabel}
         tax={tax !== undefined ? tax : calculatedTax}
         taxRate={taxRate}
         taxLabel={taxLabel}
         serviceCharge={serviceCharge}
         serviceChargeLabel={serviceChargeLabel}
         total={calculatedTotal}
+        totalLabel={totalLabel}
         itemCount={calculatedItemCount}
+        itemsLabel={itemsLabel}
+        paymentLabel={paymentLabel}
+        paymentMethod={paymentMethod}
+        receivedLabel={receivedLabel}
+        receivedAmount={receivedAmount}
+        changeLabel={changeLabel}
+        changeAmount={changeAmount}
+        changeSecondaryAmount={changeSecondaryAmount}
         formatCurrency={formatCurrency}
         customRows={customBillingRows}
-        className="mt-4"
+        className="mt-3"
       />
 
-      {/* 4. Payment Actions Section */}
       <PaymentActions
         paymentMethods={paymentMethods}
+        quickActions={quickActions}
         selectedPaymentMethod={selectedPaymentMethod}
         onSelectPaymentMethod={onSelectPaymentMethod}
+        onQuickAction={onQuickAction}
         paymentTitle={paymentTitle}
         chargeAmount={formattedChargeAmount}
         chargeLabel={chargeLabel}
@@ -188,12 +212,14 @@ export function OrderPanel({
         onResetOrder={onResetOrder}
         resetLabel={resetLabel}
         actionsSlot={actionsSlot}
+        className="mt-3"
       />
+
+      {footer ? <div className="mt-3 shrink-0">{footer}</div> : null}
     </section>
   );
 }
 
-// Compound component attachments
 OrderPanel.Header = OrderHeader;
 OrderPanel.ItemsTable = OrderItemsTable;
 OrderPanel.BillingSummary = BillingSummary;

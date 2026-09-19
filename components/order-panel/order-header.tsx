@@ -1,6 +1,7 @@
 "use client";
 
-import { Button, Chip } from "@heroui/react";
+import { Button, Chip, Separator } from "@heroui/react";
+import type { ReactNode } from "react";
 import { Clock } from "reicon-react";
 import type { OrderHeaderProps } from "./types";
 
@@ -14,37 +15,65 @@ export function OrderHeader({
   eyebrow,
   onChangeOrderType,
   onClearTicket,
+  orderChannel,
+  orderChannelLabel = "Order channel",
   orderNumber,
   orderType,
+  sequenceLabel = "Seq.",
+  sequenceNumber,
+  status,
+  statusLabel = "Status",
   tableNumber,
+  tableTicketLabel = "Table/Ticket No",
+  tableTicketNumber,
   timestamp,
   title,
 }: OrderHeaderProps) {
   const formattedOrderNumber =
     orderNumber !== undefined && orderNumber !== null
-      ? typeof orderNumber === "string" && (orderNumber.startsWith("#") || orderNumber.toLowerCase().startsWith("ticket"))
+      ? typeof orderNumber === "string" &&
+          (orderNumber.startsWith("#") || orderNumber.toLowerCase().startsWith("ticket"))
         ? orderNumber
         : `#${orderNumber}`
       : undefined;
+  const tableTicketValue =
+    tableTicketNumber ??
+    (tableNumber !== undefined
+      ? typeof tableNumber === "string" && tableNumber.toLowerCase().includes("table")
+        ? tableNumber
+        : `Table ${tableNumber}`
+      : formattedOrderNumber);
+  const sequenceValue = sequenceNumber ?? orderNumber;
+  const statusValue = status ?? orderType;
+  const metadataItems = [tableTicketValue, sequenceValue, statusValue, orderChannel];
+  const hasMetadata = metadataItems.some((value) => value !== undefined && value !== null);
 
   return (
-    <header className={`flex flex-col gap-3 ${className}`}>
+    <header className={`shrink-0 ${className}`}>
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           {eyebrow ? (
-            <p className="text-xs font-medium uppercase tracking-wider text-muted">
+            <p className="text-[10px] font-semibold tracking-[0.16em] text-muted">
               {eyebrow}
             </p>
           ) : null}
           {title ? (
-            <h2 className="mt-0.5 truncate text-xl font-bold tracking-tight text-foreground">
+            <h2 className="mt-1 truncate text-base font-bold tracking-tight text-foreground">
               {title}
             </h2>
           ) : null}
+          {customerName ? (
+            <p className="mt-1 truncate text-xs text-muted">{customerName}</p>
+          ) : null}
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex shrink-0 items-center gap-1">
           {actions}
+          {onChangeOrderType ? (
+            <Button type="button" variant="ghost" size="sm" onPress={onChangeOrderType}>
+              {changeButtonLabel}
+            </Button>
+          ) : null}
           {onClearTicket ? (
             <Button
               type="button"
@@ -60,55 +89,53 @@ export function OrderHeader({
         </div>
       </div>
 
-      {formattedOrderNumber || orderType || tableNumber || customerName || timestamp ? (
-        <div className="flex items-center justify-between gap-3 rounded-xl border border-border/70 bg-surface-secondary px-3.5 py-2.5 text-sm">
-          <div className="flex flex-wrap items-center gap-2 min-w-0">
-            {formattedOrderNumber ? (
-              <span className="font-semibold text-foreground">
-                {formattedOrderNumber}
-              </span>
-            ) : null}
-
-            {orderType ? (
-              <Chip variant="primary" className="text-xs font-medium">
-                <Chip.Label>{orderType}</Chip.Label>
-              </Chip>
-            ) : null}
-
-            {tableNumber ? (
-              <span className="text-xs text-muted">
-                {typeof tableNumber === "string" && tableNumber.toLowerCase().includes("table")
-                  ? tableNumber
-                  : `Table ${tableNumber}`}
-              </span>
-            ) : null}
-
-            {customerName ? (
-              <span className="text-xs font-medium text-foreground">
-                {customerName}
-              </span>
-            ) : null}
-
-            {timestamp ? (
-              <span className="flex items-center gap-1 text-xs text-muted">
-                <Clock aria-hidden="true" size={14} />
-                <span>{timestamp}</span>
-              </span>
-            ) : null}
-          </div>
-
-          {onChangeOrderType ? (
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onPress={onChangeOrderType}
-            >
-              {changeButtonLabel}
-            </Button>
-          ) : null}
+      {hasMetadata ? (
+        <div className="mt-3 grid grid-cols-2 gap-x-4 gap-y-3">
+          <MetadataItem label={tableTicketLabel} value={tableTicketValue} />
+          <MetadataItem align="end" label={sequenceLabel} value={sequenceValue} />
+          <MetadataItem
+            label={statusLabel}
+            value={
+              statusValue ? (
+                <Chip color="warning" size="sm" variant="soft">
+                  {statusValue}
+                </Chip>
+              ) : null
+            }
+          />
+          <MetadataItem align="end" label={orderChannelLabel} value={orderChannel} />
         </div>
       ) : null}
+
+      {timestamp ? (
+        <div className="mt-2 flex items-center gap-1 text-[11px] text-muted">
+          <Clock aria-hidden="true" size={13} />
+          <span>{timestamp}</span>
+        </div>
+      ) : null}
+
+      <Separator className="mt-4" />
     </header>
+  );
+}
+
+function MetadataItem({
+  align = "start",
+  label,
+  value,
+}: {
+  align?: "start" | "end";
+  label: ReactNode;
+  value?: ReactNode;
+}) {
+  if (value === undefined || value === null) {
+    return <div aria-hidden="true" />;
+  }
+
+  return (
+    <div className={`min-w-0 ${align === "end" ? "text-end" : "text-start"}`}>
+      <p className="text-[10px] font-medium tracking-wider text-muted">{label}</p>
+      <div className="mt-0.5 min-w-0 text-sm font-semibold text-foreground">{value}</div>
+    </div>
   );
 }

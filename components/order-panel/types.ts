@@ -34,6 +34,14 @@ export interface OrderHeaderProps {
   orderNumber?: string | number;
   title?: ReactNode;
   eyebrow?: ReactNode;
+  tableTicketNumber?: ReactNode;
+  tableTicketLabel?: ReactNode;
+  sequenceNumber?: ReactNode;
+  sequenceLabel?: ReactNode;
+  status?: ReactNode;
+  statusLabel?: ReactNode;
+  orderChannel?: ReactNode;
+  orderChannelLabel?: ReactNode;
   orderType?: string;
   tableNumber?: string | number;
   customerName?: string;
@@ -80,7 +88,9 @@ export interface BillingSummaryRow {
 
 export interface BillingSummaryProps {
   subtotal: number;
+  subtotalLabel?: string;
   discount?: number;
+  totalDiscountLabel?: string;
   discountRate?: number | string;
   discountLabel?: string;
   tax?: number;
@@ -92,6 +102,13 @@ export interface BillingSummaryProps {
   totalLabel?: string;
   itemCount?: number;
   itemsLabel?: string;
+  paymentLabel?: ReactNode;
+  paymentMethod?: ReactNode;
+  receivedLabel?: ReactNode;
+  receivedAmount?: ReactNode;
+  changeLabel?: ReactNode;
+  changeAmount?: ReactNode;
+  changeSecondaryAmount?: ReactNode;
   formatCurrency?: (amount: number) => string;
   customRows?: BillingSummaryRow[];
   className?: string;
@@ -99,8 +116,10 @@ export interface BillingSummaryProps {
 
 export interface PaymentActionsProps {
   paymentMethods?: PaymentMethodOption[];
+  quickActions?: PaymentMethodOption[];
   selectedPaymentMethod?: string;
   onSelectPaymentMethod?: (methodId: string) => void;
+  onQuickAction?: (actionId: string) => void;
   paymentTitle?: string;
   chargeAmount?: number | string;
   chargeLabel?: string;
@@ -120,6 +139,17 @@ export interface PaymentActionsProps {
   className?: string;
 }
 
+export interface OrderPanelFooterProps {
+  systemLabel?: ReactNode;
+  systemStatus?: ReactNode;
+  shiftLabel?: ReactNode;
+  shiftInfo?: ReactNode;
+  dateTimeLabel?: ReactNode;
+  dateTime?: ReactNode;
+  locale?: string;
+  className?: string;
+}
+
 export interface OrderPanelProps {
   children?: ReactNode;
   className?: string;
@@ -130,6 +160,14 @@ export interface OrderPanelProps {
   orderNumber?: string | number;
   title?: ReactNode;
   eyebrow?: ReactNode;
+  tableTicketNumber?: ReactNode;
+  tableTicketLabel?: ReactNode;
+  sequenceNumber?: ReactNode;
+  sequenceLabel?: ReactNode;
+  status?: ReactNode;
+  statusLabel?: ReactNode;
+  orderChannel?: ReactNode;
+  orderChannelLabel?: ReactNode;
   orderType?: string;
   tableNumber?: string | number;
   customerName?: string;
@@ -161,7 +199,9 @@ export interface OrderPanelProps {
 
   // Billing Props
   subtotal?: number;
+  subtotalLabel?: string;
   discount?: number;
+  totalDiscountLabel?: string;
   discountRate?: number | string;
   discountLabel?: string;
   tax?: number;
@@ -173,13 +213,22 @@ export interface OrderPanelProps {
   totalLabel?: string;
   itemCount?: number;
   itemsLabel?: string;
+  paymentLabel?: ReactNode;
+  paymentMethod?: ReactNode;
+  receivedLabel?: ReactNode;
+  receivedAmount?: ReactNode;
+  changeLabel?: ReactNode;
+  changeAmount?: ReactNode;
+  changeSecondaryAmount?: ReactNode;
   formatCurrency?: (amount: number) => string;
   customBillingRows?: BillingSummaryRow[];
 
   // Payment Props
   paymentMethods?: PaymentMethodOption[];
+  quickActions?: PaymentMethodOption[];
   selectedPaymentMethod?: string;
   onSelectPaymentMethod?: (methodId: string) => void;
+  onQuickAction?: (actionId: string) => void;
   paymentTitle?: string;
   chargeAmount?: number | string;
   chargeLabel?: string;
@@ -195,4 +244,5 @@ export interface OrderPanelProps {
   onResetOrder?: () => void;
   resetLabel?: string;
   actionsSlot?: ReactNode;
+  footer?: ReactNode;
 }

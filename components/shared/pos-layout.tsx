@@ -35,7 +35,7 @@ export function POSLayout({
         <section
           aria-label="Left main workstation"
           className={`flex min-w-0 flex-1 flex-col h-full overflow-hidden border-e border-border bg-background ${
-            rightPanel ? "lg:flex-none lg:w-[70%]" : ""
+            rightPanel ? "lg:flex-none lg:w-[60%]" : ""
           }`}
         >
           {/* 1. Header Section */}
@@ -57,7 +57,7 @@ export function POSLayout({
         {rightPanel ? (
           <aside
             aria-label="Order summary panel"
-            className="hidden h-full shrink-0 flex-col overflow-hidden bg-background lg:flex lg:w-[30%]"
+            className="hidden h-full shrink-0 flex-col overflow-hidden bg-background lg:flex lg:w-[40%]"
           >
             {rightPanel}
           </aside>

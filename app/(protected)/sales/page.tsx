@@ -6,11 +6,24 @@ import type { IconComponent } from "reicon-react";
 import {
   Add,
   Card,
+  Profile,
   Scan,
+  Send2,
+  Tag,
   Wallet,
+  Wallet2,
+  Wallet3,
 } from "reicon-react";
 import { ProductCard } from "@/components/product-card";
-import { OrderPanel, type OrderPanelItem } from "@/components/order-panel";
+import {
+  OrderChannelSelect,
+  type OrderChannel,
+} from "@/components/order-channel-select";
+import {
+  OrderPanel,
+  OrderPanelFooter,
+  type OrderPanelItem,
+} from "@/components/order-panel";
 import { Button, SearchField, Tabs } from "@heroui/react";
 import { POSLayout } from "@/components/shared/pos-layout";
 import { defaultLocale, isLocale, type Locale } from "@/config/i18n";
@@ -21,8 +34,6 @@ import {
   type CategoryId,
   categoryIds,
   getProduct,
-  type IceId,
-  iceIds,
   initialOrderItems,
   type OrderItem,
   type PaymentMethodId,
@@ -37,16 +48,21 @@ import {
 export default function SalesPage() {
   const t = useTranslations("SalesMenu");
   const currentLocale = useLocale();
-  const locale: Locale = isLocale(currentLocale) ? currentLocale : defaultLocale;
-  const [selectedCategory, setSelectedCategory] = useState<CategoryId>("favourites");
+  const locale: Locale = isLocale(currentLocale)
+    ? currentLocale
+    : defaultLocale;
+  const [selectedCategory, setSelectedCategory] =
+    useState<CategoryId>("favourites");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedSize, setSelectedSize] = useState<SizeId>("medium");
-  const [selectedIce, setSelectedIce] = useState<IceId>("regularIce");
-  const [selectedSweetness, setSelectedSweetness] = useState<SweetnessId>("lessSugar");
+  const [selectedSweetness, setSelectedSweetness] =
+    useState<SweetnessId>("lessSugar");
   const [selectedAddOns, setSelectedAddOns] = useState<AddOnId[]>([]);
   const [orderItems, setOrderItems] = useState<OrderItem[]>(initialOrderItems);
-  const [selectedPayment, setSelectedPayment] = useState<PaymentMethodId>("cash");
+  const [selectedPayment, setSelectedPayment] =
+    useState<PaymentMethodId>("cash");
   const [orderType, setOrderType] = useState<"takeaway" | "dineIn">("takeaway");
+  const [orderChannel, setOrderChannel] = useState<OrderChannel>("Wownow");
   const [isPaid, setIsPaid] = useState(false);
 
   const categoryOptions: Array<{ id: CategoryId; label: string }> = useMemo(
@@ -56,11 +72,6 @@ export default function SalesPage() {
 
   const sizeOptions: Array<{ id: SizeId; label: string }> = useMemo(
     () => sizeIds.map((id) => ({ id, label: t(`modifiers.${id}`) })),
-    [t],
-  );
-
-  const iceOptions: Array<{ id: IceId; label: string }> = useMemo(
-    () => iceIds.map((id) => ({ id, label: t(`modifiers.${id}`) })),
     [t],
   );
 
@@ -74,54 +85,30 @@ export default function SalesPage() {
     [t],
   );
 
-  const sizeLabels: Record<SizeId, string> = useMemo(
-    () => ({
-      extraSmall: t("modifiers.extraSmall"),
-      small: t("modifiers.small"),
-      medium: t("modifiers.medium"),
-      large: t("modifiers.large"),
-      extraLarge: t("modifiers.extraLarge"),
-    }),
+  const sizeLabels: Partial<Record<SizeId, string>> = useMemo(
+    () =>
+      sizeIds.reduce(
+        (acc, id) => ({ ...acc, [id]: t(`modifiers.${id}`) }),
+        {} as Record<SizeId, string>,
+      ),
     [t],
   );
 
-  const iceLabels: Record<IceId, string> = useMemo(
-    () => ({
-      regularIce: t("modifiers.regularIce"),
-      lessIce: t("modifiers.lessIce"),
-      noIce: t("modifiers.noIce"),
-      warm: t("modifiers.warm"),
-      hot: t("modifiers.hot"),
-    }),
+  const sweetnessLabels: Partial<Record<SweetnessId, string>> = useMemo(
+    () =>
+      sweetnessIds.reduce(
+        (acc, id) => ({ ...acc, [id]: t(`modifiers.${id}`) }),
+        {} as Record<SweetnessId, string>,
+      ),
     [t],
   );
 
-  const sweetnessLabels: Record<SweetnessId, string> = useMemo(
-    () => ({
-      noSugar: t("modifiers.noSugar"),
-      quarterSugar: t("modifiers.quarterSugar"),
-      lessSugar: t("modifiers.lessSugar"),
-      regularSugar: t("modifiers.regularSugar"),
-      extraSugar: t("modifiers.extraSugar"),
-    }),
-    [t],
-  );
-
-  const addOnLabels: Record<AddOnId, string> = useMemo(
-    () => ({
-      espressoShot: t("modifiers.espressoShot"),
-      oatMilk: t("modifiers.oatMilk"),
-      almondMilk: t("modifiers.almondMilk"),
-      soyMilk: t("modifiers.soyMilk"),
-      whippedCream: t("modifiers.whippedCream"),
-      caramelDrizzle: t("modifiers.caramelDrizzle"),
-      vanillaSyrup: t("modifiers.vanillaSyrup"),
-      hazelnutSyrup: t("modifiers.hazelnutSyrup"),
-      bobaPearls: t("modifiers.bobaPearls"),
-      cheeseFoam: t("modifiers.cheeseFoam"),
-      grassJelly: t("modifiers.grassJelly"),
-      coconutJelly: t("modifiers.coconutJelly"),
-    }),
+  const addOnLabels: Partial<Record<AddOnId, string>> = useMemo(
+    () =>
+      addOnIds.reduce(
+        (acc, id) => ({ ...acc, [id]: t(`modifiers.${id}`) }),
+        {} as Record<AddOnId, string>,
+      ),
     [t],
   );
 
@@ -153,7 +140,10 @@ export default function SalesPage() {
       }),
     [locale],
   );
-  const formatCurrency = useCallback((value: number) => formatter.format(value), [formatter]);
+  const formatCurrency = useCallback(
+    (value: number) => formatter.format(value),
+    [formatter],
+  );
 
   const subtotal = orderItems.reduce((total, item) => {
     const product = getProduct(item.productId);
@@ -162,7 +152,10 @@ export default function SalesPage() {
   const discount = subtotal * 0.05;
   const tax = (subtotal - discount) * 0.1;
   const total = subtotal - discount + tax;
-  const itemCount = orderItems.reduce((count, item) => count + item.quantity, 0);
+  const itemCount = orderItems.reduce(
+    (count, item) => count + item.quantity,
+    0,
+  );
 
   const panelItems: OrderPanelItem[] = useMemo(() => {
     return orderItems.flatMap((item) => {
@@ -172,7 +165,6 @@ export default function SalesPage() {
       const productName = product.name[locale];
       const modifierSummary = [
         sizeLabels[item.size],
-        item.ice ? iceLabels[item.ice] : undefined,
         sweetnessLabels[item.sweetness],
         ...item.addOns.map((addOn) => addOnLabels[addOn]),
       ]
@@ -191,10 +183,21 @@ export default function SalesPage() {
         },
       ];
     });
-  }, [orderItems, locale, sizeLabels, iceLabels, sweetnessLabels, addOnLabels, formatCurrency]);
+  }, [
+    orderItems,
+    locale,
+    sizeLabels,
+    sweetnessLabels,
+    addOnLabels,
+    formatCurrency,
+  ]);
 
   const addProduct = (product: Product) => {
-    const modifierKey = [selectedSize, selectedIce, selectedSweetness, ...selectedAddOns.toSorted()].join("-");
+    const modifierKey = [
+      selectedSize,
+      selectedSweetness,
+      ...selectedAddOns.toSorted(),
+    ].join("-");
     const orderItemId = `${product.id}-${modifierKey}`;
 
     setOrderItems((currentItems) => {
@@ -215,7 +218,6 @@ export default function SalesPage() {
           productId: product.id,
           quantity: 1,
           size: selectedSize,
-          ice: selectedIce,
           sweetness: selectedSweetness,
           addOns: [...selectedAddOns],
         },
@@ -256,6 +258,14 @@ export default function SalesPage() {
     { id: "khqr", icon: Scan, label: t("payment.khqr") },
   ];
 
+  const quickActions = [
+    { id: "brandWallet", icon: Wallet3, label: t("payment.brandWallet") },
+    { id: "digitalWallet", icon: Wallet2, label: t("payment.digitalWallet") },
+    { id: "promotion", icon: Tag, label: t("payment.promotion") },
+    { id: "member", icon: Profile, label: t("payment.member") },
+    { id: "sendKitchen", icon: Send2, label: t("payment.sendKitchen") },
+  ];
+
   const handleClearTicket = () => {
     setOrderItems([]);
     setIsPaid(false);
@@ -269,10 +279,28 @@ export default function SalesPage() {
           className="h-full rounded-none border-0"
           orderNumber="1048"
           eyebrow={t("ticketEyebrow")}
+          title={t("ticketTitle")}
+          tableTicketLabel={t("ticketSummary.tableTicket")}
+          tableTicketNumber="Table02/05"
+          sequenceLabel={t("ticketSummary.sequence")}
+          sequenceNumber="155"
+          statusLabel={t("ticketSummary.status")}
+          status={t("ticketSummary.inProgress")}
+          orderChannelLabel={t("ticketSummary.orderChannel")}
+          orderChannel={
+            <OrderChannelSelect
+              className="w-full"
+              label={null}
+              onChange={setOrderChannel}
+              value={orderChannel}
+            />
+          }
           orderType={orderType === "takeaway" ? t("takeaway") : t("dineIn")}
           changeButtonLabel={t("change")}
           onChangeOrderType={() =>
-            setOrderType((current) => (current === "takeaway" ? "dineIn" : "takeaway"))
+            setOrderType((current) =>
+              current === "takeaway" ? "dineIn" : "takeaway",
+            )
           }
           clearButtonLabel={t("clearTicket")}
           onClearTicket={handleClearTicket}
@@ -284,19 +312,31 @@ export default function SalesPage() {
           increaseAriaLabel={(name) => t("increaseQuantity", { name })}
           removeAriaLabel={(name) => t("removeItem", { name })}
           subtotal={subtotal}
+          subtotalLabel={t("ticketSummary.subtotal")}
           discount={discount}
           discountLabel={t("summary.discount")}
+          totalDiscountLabel={t("ticketSummary.totalDiscount")}
           tax={tax}
           taxLabel={t("summary.tax")}
           total={total}
           totalLabel={t("summary.total")}
           itemCount={itemCount}
           itemsLabel={t("summary.items", { count: itemCount })}
+          paymentLabel={t("ticketSummary.payment")}
+          paymentMethod={t("payment.cash")}
+          receivedLabel={t("ticketSummary.received")}
+          receivedAmount="៛100,000.00"
+          changeLabel={t("ticketSummary.change")}
+          changeAmount="$2.50"
+          changeSecondaryAmount="៛10,000.00"
           formatCurrency={formatCurrency}
           paymentTitle={t("payment.title")}
           paymentMethods={paymentOptions}
+          quickActions={quickActions}
           selectedPaymentMethod={selectedPayment}
-          onSelectPaymentMethod={(id) => setSelectedPayment(id as PaymentMethodId)}
+          onSelectPaymentMethod={(id) =>
+            setSelectedPayment(id as PaymentMethodId)
+          }
           chargeLabel={t("payment.charge", { amount: formatCurrency(total) })}
           completeLabel={t("payment.complete")}
           paidMessage={t("payment.success")}
@@ -308,6 +348,16 @@ export default function SalesPage() {
           onHoldOrder={() => {}}
           resetLabel={t("resetTicket")}
           onResetOrder={handleClearTicket}
+          footer={
+            <OrderPanelFooter
+              locale={locale === "km" ? "km-KH" : "en-US"}
+              systemLabel={t("ticketSummary.system")}
+              systemStatus={t("ticketSummary.online")}
+              shiftLabel={t("ticketSummary.shift")}
+              shiftInfo={`${t("cashier")} · ${t("shiftOpen")}`}
+              dateTimeLabel={t("ticketSummary.dateTime")}
+            />
+          }
         />
       }
     >
@@ -315,7 +365,9 @@ export default function SalesPage() {
         {/* Category Tabs & Products Catalog using default HeroUI Tabs */}
         <Tabs
           selectedKey={selectedCategory}
-          onSelectionChange={(key) => setSelectedCategory(String(key) as CategoryId)}
+          onSelectionChange={(key) =>
+            setSelectedCategory(String(key) as CategoryId)
+          }
           className="flex min-h-0 flex-1 flex-col overflow-hidden gap-0"
         >
           {/* 1. Tab Categories Section */}
@@ -323,7 +375,11 @@ export default function SalesPage() {
             <Tabs.ListContainer>
               <Tabs.List aria-label={t("categoryLabel")}>
                 {categoryOptions.map((item) => (
-                  <Tabs.Tab key={item.id} id={item.id}>
+                  <Tabs.Tab
+                    key={item.id}
+                    id={item.id}
+                    className="w-auto shrink-0 whitespace-nowrap"
+                  >
                     {item.label}
                     <Tabs.Indicator />
                   </Tabs.Tab>
@@ -367,17 +423,19 @@ export default function SalesPage() {
             <Tabs.Panel
               key={item.id}
               id={item.id}
-              className="min-h-0 flex-1 overflow-y-auto p-3.5 sm:p-4 outline-none"
+              className="mt-0 min-h-0 min-w-0 flex-1 overflow-y-auto overscroll-contain p-3.5 outline-none sm:p-4"
             >
               {filteredProducts.length > 0 ? (
-                <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2 sm:gap-3 xl:grid-cols-3">
+                <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 sm:gap-3 md:grid-cols-4">
                   {filteredProducts.map((product) => {
                     const productName = product.name[locale];
 
                     return (
                       <ProductCard
                         key={product.id}
-                        addToTicketLabel={t("addToTicket", { name: productName })}
+                        addToTicketLabel={t("addToTicket", {
+                          name: productName,
+                        })}
                         image={product.image}
                         name={productName}
                         onClick={() => addProduct(product)}
@@ -395,103 +453,65 @@ export default function SalesPage() {
           ))}
         </Tabs>
 
-        {/* Modifiers docked bar - Row by row */}
+        {/* Modifiers docked bar - horizontal rows with bounded scrolling */}
         <section
           aria-label={t("modifiersTitle")}
-          className="shrink-0 border-t border-border bg-surface-secondary/40 px-3.5 py-2.5 sm:px-4 sm:py-3 max-h-72 overflow-y-auto"
+          className="min-h-0 shrink-0 overflow-hidden border-t border-border"
         >
-          <div className="flex flex-col gap-2.5 sm:gap-3">
-            {/* Size */}
-            <div className="flex flex-col gap-1 min-w-0">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-semibold uppercase tracking-wider text-muted">
-                  {t("modifiers.size")}
+          <div className="max-h-[14rem] min-h-0 overflow-y-auto overscroll-contain px-3.5 py-2 sm:max-h-[16rem] sm:px-4 sm:py-2.5 lg:max-h-[18rem] xl:max-h-[20rem]">
+            <div className="flex flex-col gap-2 sm:gap-2.5">
+              {/* Size */}
+              <div className="flex min-w-0 flex-col gap-1.5 sm:flex-row sm:items-center">
+                <span className="w-20 shrink-0 truncate text-xs font-medium text-muted">
+                  {t("modifiers.size")}:
                 </span>
-                <span className="text-xs font-medium text-foreground">
-                  {sizeLabels[selectedSize]}
-                </span>
+                <div className="grid min-w-0 flex-1 grid-cols-2 gap-1.5 sm:grid-cols-3 lg:grid-cols-4">
+                  {sizeOptions.map((option) => (
+                    <ChoiceButton
+                      key={option.id}
+                      active={selectedSize === option.id}
+                      onPress={() => setSelectedSize(option.id)}
+                    >
+                      {option.label}
+                    </ChoiceButton>
+                  ))}
+                </div>
               </div>
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-1.5 sm:gap-2">
-                {sizeOptions.map((option) => (
-                  <ChoiceButton
-                    key={option.id}
-                    active={selectedSize === option.id}
-                    onPress={() => setSelectedSize(option.id)}
-                  >
-                    {option.label}
-                  </ChoiceButton>
-                ))}
-              </div>
-            </div>
 
-            {/* Ice Level */}
-            <div className="flex flex-col gap-1 min-w-0">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-semibold uppercase tracking-wider text-muted">
-                  {t("modifiers.ice")}
+              {/* Sweetness */}
+              <div className="flex min-w-0 flex-col gap-1.5 sm:flex-row sm:items-center">
+                <span className="w-20 shrink-0 truncate text-xs font-medium text-muted">
+                  {t("modifiers.sweetness")}:
                 </span>
-                <span className="text-xs font-medium text-foreground">
-                  {iceLabels[selectedIce]}
-                </span>
+                <div className="grid min-w-0 flex-1 grid-cols-2 gap-1.5 sm:grid-cols-3 lg:grid-cols-4">
+                  {sweetnessOptions.map((option) => (
+                    <ChoiceButton
+                      key={option.id}
+                      active={selectedSweetness === option.id}
+                      onPress={() => setSelectedSweetness(option.id)}
+                    >
+                      {option.label}
+                    </ChoiceButton>
+                  ))}
+                </div>
               </div>
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-1.5 sm:gap-2">
-                {iceOptions.map((option) => (
-                  <ChoiceButton
-                    key={option.id}
-                    active={selectedIce === option.id}
-                    onPress={() => setSelectedIce(option.id)}
-                  >
-                    {option.label}
-                  </ChoiceButton>
-                ))}
-              </div>
-            </div>
 
-            {/* Sweetness */}
-            <div className="flex flex-col gap-1 min-w-0">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-semibold uppercase tracking-wider text-muted">
-                  {t("modifiers.sweetness")}
+              {/* Add-ons */}
+              <div className="flex min-w-0 flex-col gap-1.5 sm:flex-row sm:items-center">
+                <span className="w-20 shrink-0 truncate text-xs font-medium text-muted">
+                  {t("modifiers.addOns")}:
                 </span>
-                <span className="text-xs font-medium text-foreground">
-                  {sweetnessLabels[selectedSweetness]}
-                </span>
-              </div>
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-1.5 sm:gap-2">
-                {sweetnessOptions.map((option) => (
-                  <ChoiceButton
-                    key={option.id}
-                    active={selectedSweetness === option.id}
-                    onPress={() => setSelectedSweetness(option.id)}
-                  >
-                    {option.label}
-                  </ChoiceButton>
-                ))}
-              </div>
-            </div>
-
-            {/* Add-ons */}
-            <div className="flex flex-col gap-1 min-w-0">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-semibold uppercase tracking-wider text-muted">
-                  {t("modifiers.addOns")}
-                </span>
-                {selectedAddOns.length > 0 ? (
-                  <span className="text-xs font-medium text-foreground truncate max-w-[60%] text-right">
-                    {selectedAddOns.map((id) => addOnLabels[id]).join(", ")}
-                  </span>
-                ) : null}
-              </div>
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-1.5 sm:gap-2">
-                {addOnOptions.map((option) => (
-                  <ChoiceButton
-                    key={option.id}
-                    active={selectedAddOns.includes(option.id)}
-                    onPress={() => toggleAddOn(option.id)}
-                  >
-                    {option.label}
-                  </ChoiceButton>
-                ))}
+                <div className="grid min-w-0 flex-1 grid-cols-2 gap-1.5 sm:grid-cols-3 lg:grid-cols-4">
+                  {addOnOptions.map((option) => (
+                    <ChoiceButton
+                      key={option.id}
+                      active={selectedAddOns.includes(option.id)}
+                      onPress={() => toggleAddOn(option.id)}
+                    >
+                      {option.label}
+                    </ChoiceButton>
+                  ))}
+                </div>
               </div>
             </div>
           </div>
@@ -513,13 +533,12 @@ function ChoiceButton({
   return (
     <Button
       fullWidth
-      size="lg"
+      size="sm"
       variant={active ? "primary" : "outline"}
       onPress={onPress}
       aria-pressed={active}
-      className="truncate text-xs font-medium sm:text-sm"
     >
-      <span className="truncate">{children}</span>
+      {children}
     </Button>
   );
 }

@@ -124,7 +124,11 @@
       "totalDiscount": "Total Discount",
       "payment": "Payment",
       "received": "Received",
-      "change": "Change"
+      "change": "Change",
+      "system": "System",
+      "online": "Online",
+      "shift": "Shift",
+      "dateTime": "Date & time"
     },
     "ticketNumber": "Ticket #{number}",
     "takeaway": "Takeaway order",

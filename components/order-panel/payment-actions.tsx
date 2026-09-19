@@ -1,8 +1,11 @@
 "use client";
 
 import { Button, Spinner } from "@heroui/react";
-import { Check, Clock, Printer, Refresh } from "reicon-react";
-import type { PaymentActionsProps } from "./types";
+import { useState } from "react";
+import { ArrowRight, Check, Clock, Printer, Refresh } from "reicon-react";
+import { CashPaymentModal } from "./cash-payment-modal";
+import { PaymentMethodDrawer } from "./payment-method-drawer";
+import type { PaymentActionsProps, PaymentMethodOption } from "./types";
 
 export function PaymentActions({
   actionsSlot,
@@ -17,134 +20,157 @@ export function PaymentActions({
   onCharge,
   onHoldOrder,
   onPrintReceipt,
+  onQuickAction,
   onResetOrder,
   onSelectPaymentMethod,
   paidMessage = "Payment recorded. Ready for the next ticket.",
   paymentMethods,
   paymentTitle = "Payment method",
   printLabel = "Print receipt",
+  quickActions,
   resetLabel = "New order",
   selectedPaymentMethod,
 }: PaymentActionsProps) {
+  const [openPaymentMethodId, setOpenPaymentMethodId] = useState<string | null>(null);
   const displayChargeText = chargeAmount ? `${chargeLabel} ${chargeAmount}` : chargeLabel;
+  const hasActionGrid = Boolean(
+    (paymentMethods && paymentMethods.length > 0) || (quickActions && quickActions.length > 0),
+  );
 
   return (
-    <section aria-label="Payment actions" className={`mt-4 flex flex-col gap-3 ${className}`}>
-      {/* Payment Method Selector */}
-      {paymentMethods && paymentMethods.length > 0 ? (
+    <section aria-label="Payment actions" className={`shrink-0 ${className}`}>
+      {hasActionGrid ? (
         <div>
           {paymentTitle ? (
-            <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted">
+            <p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.16em] text-muted">
               {paymentTitle}
             </p>
           ) : null}
-          <div
-            className="grid gap-2"
-            style={{
-              gridTemplateColumns: `repeat(${Math.min(paymentMethods.length, 3)}, minmax(0, 1fr))`,
-            }}
-          >
-            {paymentMethods.map((method) => {
-              const isSelected = selectedPaymentMethod === method.id;
-              const Icon = method.icon;
 
-              return (
-                <Button
-                  key={method.id}
-                  fullWidth
-                  type="button"
-                  isDisabled={method.disabled}
-                  variant={isSelected ? "primary" : "outline"}
-                  size="md"
-                  onPress={() => onSelectPaymentMethod?.(method.id)}
-                  className="flex items-center justify-center gap-1.5 px-2 text-xs font-medium"
-                >
-                  {Icon ? <Icon aria-hidden="true" size={16} /> : null}
-                  <span className="truncate">{method.label}</span>
-                </Button>
-              );
-            })}
+          <div className="grid grid-cols-3 gap-2">
+            {paymentMethods?.map((method) => (
+              <ActionButton
+                key={method.id}
+                action={method}
+                disabled={disabled}
+                isSelected={selectedPaymentMethod === method.id}
+                onPress={() => {
+                  onSelectPaymentMethod?.(method.id);
+                  setOpenPaymentMethodId(method.id);
+                }}
+              />
+            ))}
+
+            {quickActions?.map((action) => (
+              <ActionButton
+                key={action.id}
+                action={action}
+                disabled={disabled}
+                onPress={() => onQuickAction?.(action.id)}
+              />
+            ))}
+
+            <Button
+              fullWidth
+              isIconOnly
+              aria-label={isPaid ? completeLabel : displayChargeText}
+              isDisabled={disabled || isCharging}
+              isPending={isCharging}
+              size="lg"
+              type="button"
+              variant={isPaid ? "secondary" : "primary"}
+              onPress={onCharge}
+              className="w-full"
+            >
+              {({ isPending }) =>
+                isPending ? (
+                  <Spinner color="current" size="sm" />
+                ) : isPaid ? (
+                  <Check aria-hidden="true" size={20} />
+                ) : (
+                  <ArrowRight aria-hidden="true" size={22} />
+                )
+              }
+            </Button>
           </div>
-        </div>
-      ) : null}
 
-      {/* Main Payment / Charge Button */}
-      <Button
-        fullWidth
-        size="lg"
-        type="button"
-        isDisabled={disabled || isCharging}
-        isPending={isCharging}
-        variant={isPaid ? "secondary" : "primary"}
-        onPress={onCharge}
-        className="font-semibold"
-      >
-        {({ isPending }) => (
-          <span className="flex items-center justify-center gap-2">
-            {isPending ? <Spinner color="current" size="sm" /> : null}
-            {isPaid ? (
-              <>
-                <Check aria-hidden="true" size={18} />
-                <span>{completeLabel}</span>
-              </>
+          {paymentMethods?.map((method) => (
+            method.id === "cash" ? (
+              <CashPaymentModal
+                key={method.id}
+                isOpen={openPaymentMethodId === method.id}
+                method={method}
+                onOpenChange={(isOpen) =>
+                  setOpenPaymentMethodId(isOpen ? method.id : null)
+                }
+              />
             ) : (
-              <span>{displayChargeText}</span>
-            )}
-          </span>
-        )}
-      </Button>
+              <PaymentMethodDrawer
+                key={method.id}
+                isOpen={openPaymentMethodId === method.id}
+                method={method}
+                onOpenChange={(isOpen) =>
+                  setOpenPaymentMethodId(isOpen ? method.id : null)
+                }
+              />
+            )
+          ))}
+        </div>
+      ) : (
+        <Button
+          fullWidth
+          size="lg"
+          type="button"
+          isDisabled={disabled || isCharging}
+          isPending={isCharging}
+          variant={isPaid ? "secondary" : "primary"}
+          onPress={onCharge}
+          className="font-semibold"
+        >
+          {({ isPending }) => (
+            <span className="flex items-center justify-center gap-2">
+              {isPending ? <Spinner color="current" size="sm" /> : null}
+              {isPaid ? (
+                <>
+                  <Check aria-hidden="true" size={18} />
+                  <span>{completeLabel}</span>
+                </>
+              ) : (
+                <span>{displayChargeText}</span>
+              )}
+            </span>
+          )}
+        </Button>
+      )}
 
-      {/* Paid Success Banner */}
       {isPaid && paidMessage ? (
         <div
           role="status"
-          className="flex items-center justify-center gap-2 rounded-xl bg-success/10 py-2 px-3 text-center text-xs font-medium text-success"
+          className="mt-2 flex items-center justify-center gap-2 rounded-xl bg-success/10 px-3 py-2 text-center text-xs font-medium text-success"
         >
           <Check aria-hidden="true" size={14} className="shrink-0" />
           <span>{paidMessage}</span>
         </div>
       ) : null}
 
-      {/* Auxiliary Action Controls */}
       {onPrintReceipt || onHoldOrder || onResetOrder || actionsSlot ? (
-        <div className="flex items-center gap-2 pt-1">
+        <div className="flex items-center gap-2 pt-2">
           {onPrintReceipt ? (
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              fullWidth
-              onPress={onPrintReceipt}
-              className="text-xs"
-            >
+            <Button type="button" variant="outline" size="sm" fullWidth onPress={onPrintReceipt} className="text-xs">
               <Printer aria-hidden="true" size={14} />
               <span>{printLabel}</span>
             </Button>
           ) : null}
 
           {onHoldOrder && !isPaid ? (
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              fullWidth
-              onPress={onHoldOrder}
-              className="text-xs"
-            >
+            <Button type="button" variant="outline" size="sm" fullWidth onPress={onHoldOrder} className="text-xs">
               <Clock aria-hidden="true" size={14} />
               <span>{holdLabel}</span>
             </Button>
           ) : null}
 
           {onResetOrder && isPaid ? (
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              fullWidth
-              onPress={onResetOrder}
-              className="text-xs"
-            >
+            <Button type="button" variant="outline" size="sm" fullWidth onPress={onResetOrder} className="text-xs">
               <Refresh aria-hidden="true" size={14} />
               <span>{resetLabel}</span>
             </Button>
@@ -154,5 +180,34 @@ export function PaymentActions({
         </div>
       ) : null}
     </section>
+  );
+}
+
+function ActionButton({
+  action,
+  disabled,
+  isSelected = false,
+  onPress,
+}: {
+  action: PaymentMethodOption;
+  disabled: boolean;
+  isSelected?: boolean;
+  onPress: () => void;
+}) {
+  const Icon = action.icon;
+
+  return (
+    <Button
+      fullWidth
+      aria-label={action.label}
+      isDisabled={disabled || action.disabled}
+      size="lg"
+      type="button"
+      variant={isSelected ? "primary" : "secondary"}
+      onPress={onPress}
+    >
+      {Icon ? <Icon aria-hidden="true" size={18} /> : null}
+      <span>{action.label}</span>
+    </Button>
   );
 }

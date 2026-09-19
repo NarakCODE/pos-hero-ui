@@ -1,7 +1,7 @@
 "use client";
 
-import { ScrollShadow, Table } from "@heroui/react";
-import { Add, Coffee, Minus, Trash } from "reicon-react";
+import { Button, ScrollShadow, Table } from "@heroui/react";
+import { Add, Coffee, Minus, Trash3 } from "reicon-react";
 import type { OrderItemsTableProps, OrderPanelItem } from "./types";
 
 const defaultFormatCurrency = (amount: number) => `$${amount.toFixed(2)}`;
@@ -30,11 +30,15 @@ export function OrderItemsTable({
 }: OrderItemsTableProps) {
   if (items.length === 0) {
     return (
-      <div className={`flex flex-1 flex-col items-center justify-center rounded-xl border border-dashed border-border px-5 py-10 text-center ${className}`}>
+      <div
+        className={`flex flex-1 flex-col items-center justify-center rounded-xl border border-dashed border-border px-5 py-10 text-center ${className}`}
+      >
         <div className="flex size-12 items-center justify-center rounded-full bg-surface-secondary text-muted">
           {emptyIcon || <Coffee aria-hidden="true" size={24} />}
         </div>
-        <p className="mt-3 text-sm font-semibold text-foreground">{emptyTitle}</p>
+        <p className="mt-3 text-sm font-semibold text-foreground">
+          {emptyTitle}
+        </p>
         <p className="mt-1 text-xs text-muted max-w-56">{emptyDescription}</p>
       </div>
     );
@@ -72,15 +76,25 @@ export function OrderItemsTable({
         className={`flex min-h-0 flex-1 flex-col overflow-hidden ${className}`}
         style={maxHeight ? { maxHeight } : undefined}
       >
-        <Table aria-label={labels.item || "Order items"}>
-          <Table.ScrollContainer>
-            <Table.Content className="w-full text-sm">
-              <Table.Header>
-                <Table.Column isRowHeader>{labels.item || "Item"}</Table.Column>
-                <Table.Column>{labels.price || "Price"}</Table.Column>
-                <Table.Column>{labels.quantity || "Qty"}</Table.Column>
-                <Table.Column>{labels.total || "Total"}</Table.Column>
-                <Table.Column className="w-12 text-end">{labels.action || ""}</Table.Column>
+        <Table className="min-h-0 flex-1" variant="secondary">
+          <Table.ScrollContainer className="min-h-0 flex-1 overflow-x-auto overflow-y-auto overscroll-contain">
+            <Table.Content
+              aria-label={labels.item || "Order items"}
+              className="w-full min-w-[30rem] text-sm"
+            >
+              <Table.Header className="sticky top-0 z-10 bg-surface-secondary">
+                <Table.Column className="w-full" isRowHeader>
+                  {labels.item || "Product"}
+                </Table.Column>
+                <Table.Column className="w-20 text-end">
+                  {labels.price || "Price"}
+                </Table.Column>
+                <Table.Column className="w-32 text-center">
+                  {labels.quantity || "QTY"}
+                </Table.Column>
+                <Table.Column className="w-36 text-end">
+                  {labels.total || "Amount"}
+                </Table.Column>
               </Table.Header>
               <Table.Body>
                 {items.map((item) => {
@@ -88,60 +102,73 @@ export function OrderItemsTable({
                   const lineTotal = item.price * item.quantity;
 
                   return (
-                    <Table.Row key={item.id}>
-                      <Table.Cell>
-                        <div className="min-w-32">
-                          <p className="font-semibold text-foreground">{item.name}</p>
+                    <Table.Row
+                      key={item.id}
+                      className="[&_.table__cell]:border-0"
+                    >
+                      <Table.Cell className="align-top">
+                        <div className="min-w-32 py-1">
+                          <p className="font-semibold leading-5 text-foreground">
+                            {item.name}
+                          </p>
                           {modifierSummary ? (
-                            <p className="text-xs text-muted">{modifierSummary}</p>
+                            <p className="mt-1 text-[11px] leading-4 text-muted">
+                              {modifierSummary}
+                            </p>
                           ) : null}
                           {item.notes ? (
-                            <p className="text-xs italic text-muted">{item.notes}</p>
+                            <p className="text-xs italic text-muted">
+                              {item.notes}
+                            </p>
                           ) : null}
                         </div>
                       </Table.Cell>
-                      <Table.Cell>
-                        <span className="text-muted">
-                          {item.formattedUnitPrice ?? formatCurrency(item.price)}
+                      <Table.Cell className="align-top text-end">
+                        <span className="block py-1 text-xs tabular-nums text-muted">
+                          {item.formattedUnitPrice ??
+                            formatCurrency(item.price)}
                         </span>
                       </Table.Cell>
-                      <Table.Cell>
-                        <div className="flex items-center gap-1.5">
-                          <button
-                            type="button"
+                      <Table.Cell className="align-top">
+                        <div className="flex items-center justify-center gap-1.5 py-1">
+                          <Button
                             aria-label={decreaseAriaLabel(item.name)}
-                            className="flex size-7 items-center justify-center rounded-full border border-border text-muted transition-colors hover:bg-surface-secondary hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
-                            onClick={() => handleDecrease(item)}
+                            isIconOnly
+                            onPress={() => handleDecrease(item)}
+                            size="sm"
+                            variant="secondary"
                           >
-                            <Minus aria-hidden="true" className="size-3.5" />
-                          </button>
+                            <Minus aria-hidden="true" />
+                          </Button>
                           <span className="min-w-5 text-center font-semibold tabular-nums">
                             {item.quantity}
                           </span>
-                          <button
-                            type="button"
+                          <Button
                             aria-label={increaseAriaLabel(item.name)}
-                            className="flex size-7 items-center justify-center rounded-full border border-border text-muted transition-colors hover:bg-surface-secondary hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
-                            onClick={() => handleIncrease(item)}
+                            isIconOnly
+                            onPress={() => handleIncrease(item)}
+                            size="sm"
+                            variant="secondary"
                           >
-                            <Add aria-hidden="true" className="size-3.5" />
-                          </button>
+                            <Add aria-hidden="true" />
+                          </Button>
                         </div>
                       </Table.Cell>
-                      <Table.Cell>
-                        <span className="font-semibold text-foreground">
-                          {item.formattedTotalPrice ?? formatCurrency(lineTotal)}
-                        </span>
-                      </Table.Cell>
-                      <Table.Cell className="text-end">
-                        <button
-                          type="button"
-                          aria-label={removeAriaLabel(item.name)}
-                          className="rounded-md p-1.5 text-muted transition-colors hover:bg-danger/10 hover:text-danger focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
-                          onClick={() => handleRemove(item)}
-                        >
-                          <Trash aria-hidden="true" className="size-4" />
-                        </button>
+                      <Table.Cell className="align-top text-end">
+                        <div className="flex items-center justify-end gap-2 py-1">
+                          <span className="font-semibold tabular-nums text-foreground">
+                            {item.formattedTotalPrice ?? formatCurrency(lineTotal)}
+                          </span>
+                          <Button
+                            aria-label={removeAriaLabel(item.name)}
+                            isIconOnly
+                            onPress={() => handleRemove(item)}
+                            size="sm"
+                            variant="danger-soft"
+                          >
+                            <Trash3 aria-hidden="true" />
+                          </Button>
+                        </div>
                       </Table.Cell>
                     </Table.Row>
                   );
@@ -200,35 +227,38 @@ export function OrderItemsTable({
 
                   <div className="flex items-center gap-2">
                     <div className="flex items-center gap-1.5">
-                      <button
-                        type="button"
+                      <Button
                         aria-label={decreaseAriaLabel(item.name)}
-                        className="flex size-7 items-center justify-center rounded-full border border-border text-muted transition-colors hover:bg-surface-secondary hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
-                        onClick={() => handleDecrease(item)}
+                        isIconOnly
+                        onPress={() => handleDecrease(item)}
+                        size="sm"
+                        variant="secondary"
                       >
-                        <Minus aria-hidden="true" className="size-3.5" />
-                      </button>
+                        <Minus aria-hidden="true" />
+                      </Button>
                       <span className="min-w-5 text-center text-sm font-semibold tabular-nums text-foreground">
                         {item.quantity}
                       </span>
-                      <button
-                        type="button"
+                      <Button
                         aria-label={increaseAriaLabel(item.name)}
-                        className="flex size-7 items-center justify-center rounded-full border border-border text-muted transition-colors hover:bg-surface-secondary hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
-                        onClick={() => handleIncrease(item)}
+                        isIconOnly
+                        onPress={() => handleIncrease(item)}
+                        size="sm"
+                        variant="secondary"
                       >
-                        <Add aria-hidden="true" className="size-3.5" />
-                      </button>
+                        <Add aria-hidden="true" />
+                      </Button>
                     </div>
 
-                    <button
-                      type="button"
+                    <Button
                       aria-label={removeAriaLabel(item.name)}
-                      className="rounded-md p-1.5 text-muted transition-colors hover:bg-danger/10 hover:text-danger focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
-                      onClick={() => handleRemove(item)}
+                      isIconOnly
+                      onPress={() => handleRemove(item)}
+                      size="sm"
+                      variant="danger"
                     >
-                      <Trash aria-hidden="true" className="size-4" />
-                    </button>
+                      <Trash3 aria-hidden="true" size={16} />
+                    </Button>
                   </div>
                 </div>
               </div>

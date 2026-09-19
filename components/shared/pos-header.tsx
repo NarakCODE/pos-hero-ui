@@ -1,13 +1,11 @@
 "use client";
 
-import { Button, InputGroup, TextField } from "@heroui/react";
+import { InputGroup, TextField } from "@heroui/react";
 import { useTranslations } from "next-intl";
-import { useRouter } from "next/navigation";
-import { Logout, Search } from "reicon-react";
+import { Search } from "reicon-react";
 import { LanguageSwitcher } from "@/components/shared/language-switcher";
 import { Logo } from "@/components/shared/logo";
 import { ThemeSwitcher } from "@/components/shared/theme-switcher";
-import { authSessionStorageKey } from "@/config/auth";
 
 interface POSHeaderProps {
   searchQuery?: string;
@@ -27,12 +25,6 @@ export function POSHeader({
   title,
 }: POSHeaderProps) {
   const t = useTranslations("SalesMenu");
-  const router = useRouter();
-
-  const handleSignOut = () => {
-    window.sessionStorage.removeItem(authSessionStorageKey);
-    router.replace("/login");
-  };
 
   return (
     <header
@@ -74,24 +66,12 @@ export function POSHeader({
           <div className="flex-1" />
         )}
 
-        {/* Right: Switchers, Sign Out */}
+        {/* Right: Switchers */}
         <div className="flex items-center gap-1.5 shrink-0 sm:gap-2">
           <div className="hidden sm:block">
             <LanguageSwitcher className="w-28" />
           </div>
           <ThemeSwitcher />
-
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onPress={handleSignOut}
-            aria-label={t("signOut")}
-            className="flex items-center gap-1.5 text-muted hover:border-danger/30 hover:bg-danger/10 hover:text-danger focus-visible:text-danger"
-          >
-            <Logout aria-hidden="true" size={15} />
-            <span className="hidden xl:inline text-xs">{t("signOut")}</span>
-          </Button>
         </div>
       </div>
     </header>

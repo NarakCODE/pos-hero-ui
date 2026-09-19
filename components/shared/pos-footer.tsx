@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { usePathname, useRouter } from "next/navigation";
 import type { IconComponent } from "reicon-react";
 import {
+  Logout,
   More2,
   Note2,
   Profile,
@@ -12,6 +13,7 @@ import {
   Settings,
   Shop,
 } from "reicon-react";
+import { authSessionStorageKey } from "@/config/auth";
 
 type NavigationId = "sales" | "orders" | "table" | "customer" | "settings" | "more";
 
@@ -53,33 +55,52 @@ export function POSFooter({ className = "" }: { className?: string }) {
     }
   };
 
+  const handleSignOut = () => {
+    window.sessionStorage.removeItem(authSessionStorageKey);
+    router.replace("/login");
+  };
+
   return (
     <footer
       aria-label="POS Navigation"
       className={`sticky bottom-0 z-30 shrink-0 border-t border-border bg-background px-3 py-2 shadow-xs transition-colors sm:px-4 sm:py-2.5 ${className}`}
     >
-      <nav
-        className="mx-auto flex min-w-0 max-w-screen-2xl flex-1 items-center justify-around gap-1 overflow-x-auto sm:justify-center sm:gap-2"
-        aria-label={t("navigation.label")}
-      >
-        {navigationItems.map((item) => {
-          const isActive = pathname.startsWith(item.href) || activeId === item.id;
-          const Icon = item.icon;
+      <div className="flex min-w-0 items-center gap-3">
+        <Button
+          type="button"
+          variant="danger-soft"
+          size="lg"
+          onPress={handleSignOut}
+          aria-label={t("signOut")}
+          className="shrink-0"
+        >
+          <Logout aria-hidden="true" size={15} />
+          <span className="hidden text-xs sm:inline">{t("signOut")}</span>
+        </Button>
 
-          return (
-            <Button
-              key={item.id}
-              size="lg"
-              variant={isActive ? "primary" : "ghost"}
-              onPress={() => handleNavigate(item.href)}
-              aria-current={isActive ? "page" : undefined}
-            >
-              <Icon aria-hidden="true" size={20} />
-              <span>{labels[item.id]}</span>
-            </Button>
-          );
-        })}
-      </nav>
+        <nav
+          className="flex min-w-0 flex-1 items-center justify-around gap-1 overflow-x-auto sm:justify-center sm:gap-2"
+          aria-label={t("navigation.label")}
+        >
+          {navigationItems.map((item) => {
+            const isActive = pathname.startsWith(item.href) || activeId === item.id;
+            const Icon = item.icon;
+
+            return (
+              <Button
+                key={item.id}
+                size="lg"
+                variant={isActive ? "primary" : "ghost"}
+                onPress={() => handleNavigate(item.href)}
+                aria-current={isActive ? "page" : undefined}
+              >
+                <Icon aria-hidden="true" size={20} />
+                <span>{labels[item.id]}</span>
+              </Button>
+            );
+          })}
+        </nav>
+      </div>
     </footer>
   );
 }

@@ -21,7 +21,6 @@ import {
 } from "@/components/order-channel-select";
 import {
   OrderPanel,
-  OrderPanelFooter,
   type AppliedPromotion,
   type OrderPanelItem,
 } from "@/components/order-panel";
@@ -292,7 +291,9 @@ export default function SalesPage() {
   return (
     <POSLayout
       showSearch={false}
+      headerTitle={t("navigation.sales")}
       rightPanelLabel={t("ticketTitle")}
+      rightPanelClassName="scrollbar-thin overflow-y-auto"
       rightPanel={
         <OrderPanel
           className="h-full rounded-none border-0"
@@ -370,22 +371,7 @@ export default function SalesPage() {
           onHoldOrder={() => {}}
           resetLabel={t("resetTicket")}
           onResetOrder={handleClearTicket}
-          footer={
-            <OrderPanelFooter
-              locale={locale === "km" ? "km-KH" : "en-US"}
-              systemLabel={t("ticketSummary.system")}
-              systemStatus={t("ticketSummary.online")}
-              shiftLabel={t("ticketSummary.shift")}
-              shiftInfo={`${t("cashier")} · ${t("shiftOpen")}`}
-              dateTimeLabel={t("ticketSummary.dateTime")}
-              signOutTriggerLabel={t("signOut")}
-              signOutHeader={t("signOutDialog.header")}
-              signOutBody={t("signOutDialog.body")}
-              signOutCancelLabel={t("signOutDialog.cancel")}
-              signOutConfirmLabel={t("signOutDialog.confirm")}
-            />
-          }
-        />
+      />
       }
     >
       <div className="flex h-full min-h-0 flex-1 flex-col overflow-hidden">
@@ -415,7 +401,7 @@ export default function SalesPage() {
           </Tabs.ListContainer>
 
           {/* 2. Search Menu Items Bar (below tab categories section) */}
-          <div className="flex shrink-0 items-center gap-2 px-3.5 sm:px-4 py-3">
+          <div className="flex shrink-0 items-center gap-2 px-[var(--pos-content-padding)] py-3">
             <SearchField
               aria-label={t("searchLabel")}
               className="flex-1"
@@ -446,7 +432,11 @@ export default function SalesPage() {
           </div>
 
           {categoryOptions.map((item) => (
-            <Tabs.Panel key={item.id} id={item.id}>
+            <Tabs.Panel
+              key={item.id}
+              id={item.id}
+              className="mt-0 min-h-0 min-w-0 flex-1 overflow-y-auto overscroll-contain p-[var(--pos-content-padding)]"
+            >
               {filteredProducts.length > 0 ? (
                 <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 sm:gap-3 md:grid-cols-4">
                   {filteredProducts.map((product) => {
@@ -480,7 +470,7 @@ export default function SalesPage() {
           aria-label={t("modifiersTitle")}
           className="min-h-0 shrink-0 overflow-hidden border-t border-border"
         >
-          <div className="max-h-[14rem] min-h-0 overflow-y-auto overscroll-contain px-3.5 py-2 sm:max-h-[16rem] sm:px-4 sm:py-2.5 lg:max-h-[18rem] xl:max-h-[20rem]">
+          <div className="max-h-[14rem] min-h-0 overflow-y-auto overscroll-contain px-[var(--pos-content-padding)] py-2 sm:max-h-[16rem] sm:py-2.5 lg:max-h-[18rem] xl:max-h-[20rem]">
             <div className="flex flex-col gap-2 sm:gap-2.5">
               {/* Size */}
               <div className="flex min-w-0 flex-col gap-1.5 sm:flex-row sm:items-center">

@@ -1,8 +1,9 @@
 "use client";
 
 import { Button } from "@heroui/react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { usePathname, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import type { IconComponent } from "reicon-react";
 import {
   Logout,
@@ -34,12 +35,29 @@ const navigationItems: NavigationItem[] = [
 ];
 
 export function POSFooter({ className = "" }: { className?: string }) {
+  const locale = useLocale();
   const t = useTranslations("SalesMenu");
   const pathname = usePathname();
   const router = useRouter();
+  const [currentTime, setCurrentTime] = useState<Date | null>(null);
+
+  useEffect(() => {
+    const updateTime = () => setCurrentTime(new Date());
+
+    updateTime();
+    const intervalId = window.setInterval(updateTime, 60_000);
+
+    return () => window.clearInterval(intervalId);
+  }, []);
 
   const currentNav = navigationItems.find((item) => pathname.startsWith(item.href));
   const activeId: NavigationId = currentNav?.id ?? "sales";
+  const timeLabel = currentTime
+    ? new Intl.DateTimeFormat(locale === "km" ? "km-KH" : "en-US", {
+        hour: "numeric",
+        minute: "2-digit",
+      }).format(currentTime)
+    : "—";
 
   const labels: Record<NavigationId, string> = {
     sales: t("navigation.sales"),
@@ -64,7 +82,7 @@ export function POSFooter({ className = "" }: { className?: string }) {
   return (
     <footer
       aria-label="POS Navigation"
-      className={`sticky bottom-0 z-30 shrink-0 border-t border-border bg-background px-3 py-2 shadow-xs transition-colors sm:px-4 sm:py-2.5 ${className}`}
+      className={`sticky bottom-0 z-30 shrink-0 border-t border-border bg-background px-[var(--pos-content-padding)] py-2 shadow-xs transition-colors sm:py-2.5 ${className}`}
     >
       <div className="flex min-w-0 items-center gap-3">
         <SignOutAlertDialog
@@ -109,6 +127,18 @@ export function POSFooter({ className = "" }: { className?: string }) {
             );
           })}
         </nav>
+
+        <div
+          aria-label={t("ticketSummary.dateTime")}
+          className="hidden shrink-0 items-center border-s border-border/70 ps-3 text-end text-xs lg:flex"
+        >
+          <div className="flex flex-col gap-0.5">
+            <span className="font-medium text-foreground">
+              {t("cashier")} · {t("shiftOpen")}
+            </span>
+            <time className="text-muted">{timeLabel}</time>
+          </div>
+        </div>
       </div>
     </footer>
   );

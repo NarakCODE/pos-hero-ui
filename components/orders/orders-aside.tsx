@@ -41,7 +41,7 @@ export function OrdersAside({ selectedOrderId }: OrdersAsideProps) {
       aria-labelledby="orders-aside-title"
       className="flex h-full min-h-0 flex-col bg-background"
     >
-      <header className="shrink-0 px-5 py-4 sm:px-6">
+      <header className="shrink-0 p-[var(--pos-content-padding)]">
         <div className="mb-4">
           <p className="text-[10px] font-semibold tracking-[0.16em] text-muted">
             {t("aside.eyebrow")}
@@ -87,7 +87,7 @@ export function OrdersAside({ selectedOrderId }: OrdersAsideProps) {
         </div>
       </header>
 
-      <div className="flex min-h-0 flex-1 flex-col px-5 pb-4 sm:px-6">
+      <div className="flex min-h-0 flex-1 flex-col px-[var(--pos-content-padding)] pb-[var(--pos-content-padding)]">
         <section
           aria-labelledby="orders-items-title"
           className="flex min-h-0 flex-1 flex-col border-y border-border/70"

@@ -1,27 +1,16 @@
-"use client";
-
-import { useTranslations } from "next-intl";
-import { Profile } from "reicon-react";
+import { getTranslations } from "next-intl/server";
+import { CustomerWorkspace } from "@/components/customer/customer-workspace";
 import { POSLayout } from "@/components/shared/pos-layout";
-import { POSContextPanel } from "@/components/shared/pos-context-panel";
-import { POSPagePlaceholder } from "@/components/shared/pos-page-placeholder";
 
-export default function CustomerPage() {
-  const t = useTranslations("SalesMenu");
+export default async function CustomerPage() {
+  const t = await getTranslations("SalesMenu");
 
   return (
     <POSLayout
       showSearch={false}
       headerTitle={t("pages.customer.title")}
-      rightPanel={<POSContextPanel kind="customer" />}
     >
-      <POSPagePlaceholder
-        title={t("pages.customer.title")}
-        eyebrow={t("pages.customer.eyebrow")}
-        emptyTitle={t("pages.customer.emptyTitle")}
-        emptyDescription={t("pages.customer.emptyDescription")}
-        icon={Profile}
-      />
+      <CustomerWorkspace />
     </POSLayout>
   );
 }

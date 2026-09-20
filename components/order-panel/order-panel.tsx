@@ -103,8 +103,8 @@ export function OrderPanel({
   const handleRemovePromotion = onRemovePromotion ?? (() => setLocalPromotion(null));
 
   const containerClasses = className
-    ? `flex h-full min-h-0 min-w-0 flex-col overflow-hidden bg-background p-3 sm:p-4 ${className}`
-    : "flex h-full min-h-0 min-w-0 flex-col overflow-hidden rounded-2xl border border-border bg-background p-3 sm:p-4";
+    ? `flex h-full min-h-0 min-w-0 flex-col overflow-hidden bg-background p-[var(--pos-content-padding)] ${className}`
+    : "flex h-full min-h-0 min-w-0 flex-col overflow-hidden rounded-2xl border border-border bg-background p-[var(--pos-content-padding)]";
 
   if (children) {
     return (

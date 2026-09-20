@@ -3,7 +3,7 @@
 import { isValidElement, useEffect, useState, type ReactNode } from "react";
 import { AlertDialog, Button } from "@heroui/react";
 import { useRouter } from "next/navigation";
-import { Clock, Logout, Wifi } from "reicon-react";
+import { AlertTriangle, Clock, Logout6, Wifi } from "reicon-react";
 import { authSessionStorageKey } from "@/config/auth";
 import type { OrderPanelFooterProps, SignOutAlertDialogProps } from "./types";
 
@@ -17,7 +17,7 @@ export function SignOutAlertDialog({
   onConfirm,
   onOpenChange,
   onSignOut,
-  status = "accent",
+  status = "danger",
   trigger,
   triggerClassName = "bg-accent-soft text-accent-soft-foreground",
 }: SignOutAlertDialogProps) {
@@ -46,26 +46,38 @@ export function SignOutAlertDialog({
       {isValidElement(trigger) ? (
         trigger
       ) : (
-        <Button className={triggerClassName}>
+        <Button className={triggerClassName} variant="danger">
           {trigger ?? confirmLabel}
         </Button>
       )}
-      <AlertDialog.Backdrop>
+      <AlertDialog.Backdrop
+        className="bg-linear-to-t from-red-950/90 via-red-950/50 to-transparent dark:from-red-950/95 dark:via-red-950/60"
+        variant="blur"
+      >
         <AlertDialog.Container>
-          <AlertDialog.Dialog className={`sm:max-w-[400px] ${className}`.trim()}>
+          <AlertDialog.Dialog
+            className={`sm:max-w-[420px] ${className}`.trim()}
+          >
             <AlertDialog.CloseTrigger />
-            <AlertDialog.Header>
-              <AlertDialog.Icon status={status} />
+            <AlertDialog.Header className="items-center text-center">
+              <AlertDialog.Icon status={status}>
+                <AlertTriangle
+                  aria-hidden="true"
+                  className="size-5"
+                  size={20}
+                />
+              </AlertDialog.Icon>
               <AlertDialog.Heading>{header}</AlertDialog.Heading>
             </AlertDialog.Header>
-            <AlertDialog.Body>
+            <AlertDialog.Body className="text-center">
               <p>{body}</p>
             </AlertDialog.Body>
-            <AlertDialog.Footer>
-              <Button slot="close" variant="tertiary">
+            <AlertDialog.Footer className="flex-col-reverse gap-2">
+              <Button className="w-full" slot="close" variant="tertiary">
                 {cancelLabel}
               </Button>
               <Button
+                className="w-full"
                 slot="close"
                 variant={status === "danger" ? "danger" : "primary"}
                 onPress={handleConfirm}
@@ -130,33 +142,38 @@ export function Statuses() {
 
   return (
     <div className="flex flex-wrap gap-4">
-      {examples.map(({ actions, body, classNames, header, status, trigger }) => (
-        <AlertDialog key={status}>
-          <Button className={classNames}>{trigger}</Button>
-          <AlertDialog.Backdrop>
-            <AlertDialog.Container>
-              <AlertDialog.Dialog className="sm:max-w-[400px]">
-                <AlertDialog.CloseTrigger />
-                <AlertDialog.Header>
-                  <AlertDialog.Icon status={status} />
-                  <AlertDialog.Heading>{header}</AlertDialog.Heading>
-                </AlertDialog.Header>
-                <AlertDialog.Body>
-                  <p>{body}</p>
-                </AlertDialog.Body>
-                <AlertDialog.Footer>
-                  <Button slot="close" variant="tertiary">
-                    {actions.cancel}
-                  </Button>
-                  <Button slot="close" variant={status === "danger" ? "danger" : "primary"}>
-                    {actions.confirm}
-                  </Button>
-                </AlertDialog.Footer>
-              </AlertDialog.Dialog>
-            </AlertDialog.Container>
-          </AlertDialog.Backdrop>
-        </AlertDialog>
-      ))}
+      {examples.map(
+        ({ actions, body, classNames, header, status, trigger }) => (
+          <AlertDialog key={status}>
+            <Button className={classNames}>{trigger}</Button>
+            <AlertDialog.Backdrop>
+              <AlertDialog.Container>
+                <AlertDialog.Dialog className="sm:max-w-[400px]">
+                  <AlertDialog.CloseTrigger />
+                  <AlertDialog.Header>
+                    <AlertDialog.Icon status={status} />
+                    <AlertDialog.Heading>{header}</AlertDialog.Heading>
+                  </AlertDialog.Header>
+                  <AlertDialog.Body>
+                    <p>{body}</p>
+                  </AlertDialog.Body>
+                  <AlertDialog.Footer>
+                    <Button slot="close" variant="tertiary">
+                      {actions.cancel}
+                    </Button>
+                    <Button
+                      slot="close"
+                      variant={status === "danger" ? "danger" : "primary"}
+                    >
+                      {actions.confirm}
+                    </Button>
+                  </AlertDialog.Footer>
+                </AlertDialog.Dialog>
+              </AlertDialog.Container>
+            </AlertDialog.Backdrop>
+          </AlertDialog>
+        ),
+      )}
     </div>
   );
 }
@@ -174,7 +191,7 @@ export function OrderPanelFooter({
   signOutCancelLabel = "Stay Signed In",
   signOutConfirmLabel = "Sign Out",
   signOutHeader = "Sign out of your account?",
-  signOutStatus = "accent",
+  signOutStatus = "danger",
   signOutTrigger,
   signOutTriggerClassName,
   signOutTriggerLabel = "Sign Out",
@@ -206,13 +223,21 @@ export function OrderPanelFooter({
     >
       <div className="flex items-center justify-between gap-2">
         <div className="grid min-w-0 flex-1 grid-cols-3 items-start gap-2">
-          <FooterStatus icon={<Wifi aria-hidden="true" size={13} />} label={systemLabel}>
+          <FooterStatus
+            icon={<Wifi aria-hidden="true" size={13} />}
+            label={systemLabel}
+          >
             {systemStatus}
           </FooterStatus>
 
           <FooterStatus
             label={shiftLabel}
-            icon={<span aria-hidden="true" className="size-1.5 rounded-full bg-success" />}
+            icon={
+              <span
+                aria-hidden="true"
+                className="size-1.5 rounded-full bg-success"
+              />
+            }
           >
             {shiftInfo}
           </FooterStatus>
@@ -238,9 +263,11 @@ export function OrderPanelFooter({
                 signOutTrigger ?? (
                   <Button
                     size="sm"
-                    className={`h-7 px-2.5 text-[11px] font-medium ${signOutTriggerClassName ?? "bg-accent-soft text-accent-soft-foreground"}`}
+                    variant="danger-soft"
+                    className={`h-7 px-2.5 text-[11px] font-medium ${signOutTriggerClassName ?? ""}`}
                   >
-                    <Logout aria-hidden="true" size={13} />
+                    <Logout6 aria-hidden="true" size={24} />
+
                     <span>{signOutTriggerLabel}</span>
                   </Button>
                 )
@@ -268,7 +295,9 @@ function FooterStatus({
         {icon}
         {label}
       </span>
-      <span className="max-w-full truncate font-medium text-foreground/70">{children}</span>
+      <span className="max-w-full truncate font-medium text-foreground/70">
+        {children}
+      </span>
     </div>
   );
 }

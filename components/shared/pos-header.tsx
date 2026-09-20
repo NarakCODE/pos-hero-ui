@@ -29,7 +29,7 @@ export function POSHeader({
   return (
     <header
       aria-label="POS Header"
-      className={`shrink-0 border-b border-border bg-background px-3.5 py-2.5 shadow-xs transition-colors sm:px-4 sm:py-3 ${className}`}
+      className={`shrink-0 border-b border-border bg-background px-[var(--pos-content-padding)] py-2.5 shadow-xs transition-colors sm:py-3 ${className}`}
     >
       <div className="flex items-center justify-between gap-3 sm:gap-4">
         {/* Brand Logo & Title */}

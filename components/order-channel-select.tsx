@@ -45,75 +45,127 @@ interface OrderChannelSelectProps {
   onChange: (value: OrderChannel) => void;
   label?: string | null;
   className?: string;
+  size?: "sm" | "md";
+  variant?: "primary" | "secondary";
 }
 
 export function OrderChannelSelect({
   className = "w-full",
   label = "Order Channel",
   onChange,
+  size = "sm",
   value,
+  variant = "secondary",
 }: OrderChannelSelectProps) {
+  const isSm = size === "sm";
+
   return (
     <Select
       aria-label={label ?? "Order channel"}
       className={className}
+      fullWidth
       value={value}
+      variant={variant}
       onChange={(nextValue) => {
         if (typeof nextValue === "string") {
           onChange(nextValue as OrderChannel);
         }
       }}
     >
-      {label ? <Label>{label}</Label> : null}
-      <Select.Trigger>
-        <Select.Value>
+      {label ? (
+        <Label className="text-xs font-semibold text-muted">{label}</Label>
+      ) : null}
+      <Select.Trigger
+        className={
+          isSm
+            ? "h-8 min-h-8 w-full justify-start ps-2 pe-7 text-xs font-medium sm:text-xs"
+            : "h-9 min-h-9 w-full justify-start ps-2.5 pe-7 text-sm font-medium"
+        }
+      >
+        <Select.Value className={isSm ? "text-xs" : "text-sm"}>
           {({ defaultChildren, isPlaceholder, state }) => {
-            if (isPlaceholder || state.selectedItems.length === 0) {
+            if (isPlaceholder && state.selectedItems.length === 0 && !value) {
               return defaultChildren;
             }
 
-            const selectedChannel = orderChannels.find(
-              (channel) => channel === state.selectedItems[0]?.key,
-            );
+            const selectedChannel =
+              orderChannels.find(
+                (channel) => channel === state.selectedItems[0]?.key,
+              ) ?? orderChannels.find((channel) => channel === value);
 
             if (!selectedChannel) {
               return defaultChildren;
             }
 
             return (
-              <div className="flex items-center gap-2">
-                <Avatar size="sm">
+              <div className="flex min-w-0 items-center gap-1.5">
+                <Avatar
+                  className={
+                    isSm
+                      ? "size-5 shrink-0 rounded-full"
+                      : "size-6 shrink-0 rounded-full"
+                  }
+                  size="sm"
+                >
                   <Avatar.Image
                     alt={`${selectedChannel} logo`}
                     className="object-contain"
                     src={getOrderChannelAvatarSrc(selectedChannel)}
                   />
-                  <Avatar.Fallback>
-                    {orderChannelFallbacks[selectedChannel]}
+                  <Avatar.Fallback
+                    className={
+                      isSm
+                        ? "text-[10px] font-semibold"
+                        : "text-xs font-semibold"
+                    }
+                  >
+                    {orderChannelFallbacks[selectedChannel] ??
+                      selectedChannel.slice(0, 2).toUpperCase()}
                   </Avatar.Fallback>
                 </Avatar>
-                <span>{selectedChannel}</span>
+                <span className="truncate">{selectedChannel}</span>
               </div>
             );
           }}
         </Select.Value>
         <Select.Indicator />
       </Select.Trigger>
-      <Select.Popover>
+      <Select.Popover className="min-w-[160px]" placement="bottom start">
         <ListBox>
           {orderChannels.map((channel) => (
-            <ListBox.Item key={channel} id={channel} textValue={channel}>
-              <Avatar size="sm">
-                <Avatar.Image
-                  alt={`${channel} logo`}
-                  className="object-contain"
-                  src={getOrderChannelAvatarSrc(channel)}
-                />
-                <Avatar.Fallback>
-                  {orderChannelFallbacks[channel]}
-                </Avatar.Fallback>
-              </Avatar>
-              <span>{channel}</span>
+            <ListBox.Item
+              className={isSm ? "py-1.5 text-xs" : "py-2 text-sm"}
+              id={channel}
+              key={channel}
+              textValue={channel}
+            >
+              <div className="flex min-w-0 items-center gap-2">
+                <Avatar
+                  className={
+                    isSm
+                      ? "size-5 shrink-0 rounded-full"
+                      : "size-6 shrink-0 rounded-full"
+                  }
+                  size="sm"
+                >
+                  <Avatar.Image
+                    alt={`${channel} logo`}
+                    className="object-contain"
+                    src={getOrderChannelAvatarSrc(channel)}
+                  />
+                  <Avatar.Fallback
+                    className={
+                      isSm
+                        ? "text-[10px] font-semibold"
+                        : "text-xs font-semibold"
+                    }
+                  >
+                    {orderChannelFallbacks[channel] ??
+                      channel.slice(0, 2).toUpperCase()}
+                  </Avatar.Fallback>
+                </Avatar>
+                <span className="truncate">{channel}</span>
+              </div>
               <ListBox.ItemIndicator />
             </ListBox.Item>
           ))}

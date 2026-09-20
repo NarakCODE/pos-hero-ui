@@ -1,10 +1,7 @@
-"use client";
-
 import { useTranslations } from "next-intl";
-import { Shop } from "reicon-react";
-import { POSContextPanel } from "@/components/shared/pos-context-panel";
 import { POSLayout } from "@/components/shared/pos-layout";
-import { POSPagePlaceholder } from "@/components/shared/pos-page-placeholder";
+import { TableAside } from "@/components/tables/table-aside";
+import { TableFloor } from "@/components/tables/table-floor";
 
 export default function TablePage() {
   const t = useTranslations("SalesMenu");
@@ -13,15 +10,11 @@ export default function TablePage() {
     <POSLayout
       showSearch={false}
       headerTitle={t("pages.table.title")}
-      rightPanel={<POSContextPanel kind="table" />}
+      rightPanelLabel={t("pages.table.asideAriaLabel")}
+      rightPanelClassName="overflow-hidden"
+      rightPanel={<TableAside />}
     >
-      <POSPagePlaceholder
-        title={t("pages.table.title")}
-        eyebrow={t("pages.table.eyebrow")}
-        emptyTitle={t("pages.table.emptyTitle")}
-        emptyDescription={t("pages.table.emptyDescription")}
-        icon={Shop}
-      />
+      <TableFloor />
     </POSLayout>
   );
 }

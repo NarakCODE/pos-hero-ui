@@ -21,15 +21,25 @@ interface POSLayoutProps {
   mainClassName?: string;
   rightPanelClassName?: string;
   footerClassName?: string;
+  contentPadding?: AppLayoutSpacing;
   padding?: AppLayoutSpacing;
   gap?: AppLayoutSpacing;
   maxWidth?: CSSProperties["maxWidth"];
   rightPanelWidth?: CSSProperties["width"];
 }
 
+const contentPaddingClasses: Record<AppLayoutSpacing, string> = {
+  none: "[--pos-content-padding:0rem]",
+  compact:
+    "[--pos-content-padding:0.5rem] sm:[--pos-content-padding:0.75rem]",
+  default: "[--pos-content-padding:0.75rem] sm:[--pos-content-padding:1rem]",
+  comfortable: "[--pos-content-padding:1rem] sm:[--pos-content-padding:1.5rem]",
+};
+
 export function POSLayout({
   children,
   className = "",
+  contentPadding = "default",
   footerClassName,
   gap = "none",
   headerTitle,
@@ -50,7 +60,7 @@ export function POSLayout({
       aside={rightPanel}
       asideLabel={rightPanelLabel}
       asideWidth={rightPanelWidth}
-      className={className}
+      className={`${contentPaddingClasses[contentPadding]} ${className}`}
       footer={<POSFooter className="w-full" />}
       footerClassName={footerClassName}
       gap={gap}

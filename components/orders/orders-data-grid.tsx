@@ -4,6 +4,7 @@ import {
   Avatar,
   Button,
   Chip,
+  Label,
   ListBox,
   Pagination,
   Popover,
@@ -11,19 +12,16 @@ import {
   Select,
   Table,
   Tabs,
-  ToggleButton,
-  ToggleButtonGroup,
 } from "@heroui/react";
 import type { Key, Selection, SortDescriptor } from "@heroui/react";
 import { useMemo, useState } from "react";
 import type { ReactNode } from "react";
 import { useTranslations } from "next-intl";
 import {
-  CloseCircle,
-  Filter,
   Receipt2,
   RotateRight,
   Send2,
+  Sliders,
 } from "reicon-react";
 import { getOrderChannelAvatarSrc } from "@/components/order-channel-select";
 import {
@@ -44,8 +42,6 @@ type PageSize = 25 | 50 | 100;
 const pageSizes: PageSize[] = [25, 50, 100];
 const linkClass = "text-muted hover:bg-surface hover:text-foreground";
 const activeClass = "bg-accent text-accent-foreground hover:bg-accent-hover";
-const filterToggleClass =
-  "h-8 gap-1.5 rounded-lg bg-surface-secondary px-2.5 text-xs font-medium text-muted transition-colors hover:bg-surface-secondary/80 hover:text-foreground data-[selected=true]:bg-accent data-[selected=true]:font-semibold data-[selected=true]:text-accent-foreground data-[selected=true]:hover:bg-accent-hover";
 
 const statusFilterOptions: { id: StatusFilter; labelKey: string }[] = [
   { id: "all", labelKey: "statuses.all" },
@@ -226,7 +222,7 @@ export function OrdersDataGrid({
   };
 
   return (
-    <div className="flex h-full min-h-0 w-full flex-col gap-3 p-3 text-foreground sm:gap-4 sm:p-4">
+    <div className="flex h-full min-h-0 w-full flex-col overflow-hidden text-foreground">
       <OrdersToolbar
         activeFilterCount={activeFilterCount}
         channelFilter={channelFilter}
@@ -243,107 +239,113 @@ export function OrdersDataGrid({
         onStatusFilterChange={updateStatusFilter}
       />
 
-      <Table className="min-h-0 flex-1" variant="secondary">
-        <Table.ScrollContainer className="min-h-0 flex-1 overflow-auto overscroll-contain">
-          <Table.Content
-            aria-label={t("table.label")}
-            selectedKeys={selectedKeys}
-            selectionMode="single"
-            sortDescriptor={sortDescriptor}
-            onSelectionChange={handleSelectionChange}
-            onSortChange={setSortDescriptor}
-          >
-            <Table.Header className="sticky top-0 z-20 bg-surface text-foreground">
-              <Table.Column
-                allowsSorting
-                id="sequence"
-                className="text-center after:hidden"
-              >
-                {({ sortDirection }) => (
-                  <Table.SortableColumnHeader sortDirection={sortDirection}>
-                    {t("table.no")}
-                  </Table.SortableColumnHeader>
-                )}
-              </Table.Column>
-              <Table.Column allowsSorting id="customer" isRowHeader>
-                {({ sortDirection }) => (
-                  <Table.SortableColumnHeader sortDirection={sortDirection}>
-                    {t("table.customer")}
-                  </Table.SortableColumnHeader>
-                )}
-              </Table.Column>
-              <Table.Column allowsSorting id="channel">
-                {({ sortDirection }) => (
-                  <Table.SortableColumnHeader sortDirection={sortDirection}>
-                    {t("table.channel")}
-                  </Table.SortableColumnHeader>
-                )}
-              </Table.Column>
-              <Table.Column allowsSorting id="payment">
-                {({ sortDirection }) => (
-                  <Table.SortableColumnHeader sortDirection={sortDirection}>
-                    {t("table.payment")}
-                  </Table.SortableColumnHeader>
-                )}
-              </Table.Column>
-              <Table.Column allowsSorting id="total" className="text-end">
-                {({ sortDirection }) => (
-                  <Table.SortableColumnHeader sortDirection={sortDirection}>
-                    {t("table.totalBill")}
-                  </Table.SortableColumnHeader>
-                )}
-              </Table.Column>
-              <Table.Column allowsSorting id="created" className="text-end">
-                {({ sortDirection }) => (
-                  <Table.SortableColumnHeader sortDirection={sortDirection}>
-                    {t("table.dateTime")}
-                  </Table.SortableColumnHeader>
-                )}
-              </Table.Column>
-              <Table.Column allowsSorting id="pickup" className="text-end">
-                {({ sortDirection }) => (
-                  <Table.SortableColumnHeader sortDirection={sortDirection}>
-                    {t("table.pickupTime")}
-                  </Table.SortableColumnHeader>
-                )}
-              </Table.Column>
-              <Table.Column allowsSorting id="end" className="text-end">
-                {({ sortDirection }) => (
-                  <Table.SortableColumnHeader sortDirection={sortDirection}>
-                    {t("table.endTime")}
-                  </Table.SortableColumnHeader>
-                )}
-              </Table.Column>
-              <Table.Column allowsSorting id="status" className="text-center">
-                {({ sortDirection }) => (
-                  <Table.SortableColumnHeader sortDirection={sortDirection}>
-                    {t("table.status")}
-                  </Table.SortableColumnHeader>
-                )}
-              </Table.Column>
-            </Table.Header>
-            <Table.Body
-              items={paginatedOrders}
-              renderEmptyState={() => (
-                <div className="p-10 text-center text-sm text-muted">
-                  {t("table.empty")}
-                </div>
-              )}
+      <div className="flex min-h-0 flex-1 p-[var(--pos-content-padding)]">
+        <Table className="min-h-0 flex-1" variant="secondary">
+          <Table.ScrollContainer className="min-h-0 flex-1 overflow-auto overscroll-contain">
+            <Table.Content
+              aria-label={t("table.label")}
+              selectedKeys={selectedKeys}
+              selectionMode="single"
+              sortDescriptor={sortDescriptor}
+              onSelectionChange={handleSelectionChange}
+              onSortChange={setSortDescriptor}
             >
-              {(order) => <OrderTableRows key={order.id} order={order} t={t} />}
-            </Table.Body>
-          </Table.Content>
-        </Table.ScrollContainer>
-      </Table>
+              <Table.Header className="sticky top-0 z-20 bg-surface text-foreground">
+                <Table.Column
+                  allowsSorting
+                  id="sequence"
+                  className="text-center after:hidden"
+                >
+                  {({ sortDirection }) => (
+                    <Table.SortableColumnHeader sortDirection={sortDirection}>
+                      {t("table.no")}
+                    </Table.SortableColumnHeader>
+                  )}
+                </Table.Column>
+                <Table.Column allowsSorting id="customer" isRowHeader>
+                  {({ sortDirection }) => (
+                    <Table.SortableColumnHeader sortDirection={sortDirection}>
+                      {t("table.customer")}
+                    </Table.SortableColumnHeader>
+                  )}
+                </Table.Column>
+                <Table.Column allowsSorting id="channel">
+                  {({ sortDirection }) => (
+                    <Table.SortableColumnHeader sortDirection={sortDirection}>
+                      {t("table.channel")}
+                    </Table.SortableColumnHeader>
+                  )}
+                </Table.Column>
+                <Table.Column allowsSorting id="payment">
+                  {({ sortDirection }) => (
+                    <Table.SortableColumnHeader sortDirection={sortDirection}>
+                      {t("table.payment")}
+                    </Table.SortableColumnHeader>
+                  )}
+                </Table.Column>
+                <Table.Column allowsSorting id="total" className="text-end">
+                  {({ sortDirection }) => (
+                    <Table.SortableColumnHeader sortDirection={sortDirection}>
+                      {t("table.totalBill")}
+                    </Table.SortableColumnHeader>
+                  )}
+                </Table.Column>
+                <Table.Column allowsSorting id="created" className="text-end">
+                  {({ sortDirection }) => (
+                    <Table.SortableColumnHeader sortDirection={sortDirection}>
+                      {t("table.dateTime")}
+                    </Table.SortableColumnHeader>
+                  )}
+                </Table.Column>
+                <Table.Column allowsSorting id="pickup" className="text-end">
+                  {({ sortDirection }) => (
+                    <Table.SortableColumnHeader sortDirection={sortDirection}>
+                      {t("table.pickupTime")}
+                    </Table.SortableColumnHeader>
+                  )}
+                </Table.Column>
+                <Table.Column allowsSorting id="end" className="text-end">
+                  {({ sortDirection }) => (
+                    <Table.SortableColumnHeader sortDirection={sortDirection}>
+                      {t("table.endTime")}
+                    </Table.SortableColumnHeader>
+                  )}
+                </Table.Column>
+                <Table.Column allowsSorting id="status" className="text-center">
+                  {({ sortDirection }) => (
+                    <Table.SortableColumnHeader sortDirection={sortDirection}>
+                      {t("table.status")}
+                    </Table.SortableColumnHeader>
+                  )}
+                </Table.Column>
+              </Table.Header>
+              <Table.Body
+                items={paginatedOrders}
+                renderEmptyState={() => (
+                  <div className="p-10 text-center text-sm text-muted">
+                    {t("table.empty")}
+                  </div>
+                )}
+              >
+                {(order) => (
+                  <OrderTableRows key={order.id} order={order} t={t} />
+                )}
+              </Table.Body>
+            </Table.Content>
+          </Table.ScrollContainer>
+        </Table>
+      </div>
 
-      <TablePagination
-        page={safePage}
-        pageSize={pageSize}
-        totalPages={totalPages}
-        onPageChange={setPage}
-        onPageSizeChange={updatePageSize}
-        t={t}
-      />
+      <div className="shrink-0 px-[var(--pos-content-padding)] pb-[var(--pos-content-padding)]">
+        <TablePagination
+          page={safePage}
+          pageSize={pageSize}
+          totalPages={totalPages}
+          onPageChange={setPage}
+          onPageSizeChange={updatePageSize}
+          t={t}
+        />
+      </div>
     </div>
   );
 }
@@ -378,9 +380,9 @@ function OrdersToolbar({
   t: ReturnType<typeof useTranslations<"OrdersPage">>;
 }) {
   return (
-    <div className="flex shrink-0 flex-col gap-3">
+    <div className="flex shrink-0 flex-col">
       <Tabs
-        className="-mx-3 min-w-0 sm:-mx-4"
+        className="min-w-0"
         selectedKey={statusFilter}
         variant="secondary"
         onSelectionChange={(key) =>
@@ -403,10 +405,11 @@ function OrdersToolbar({
         </Tabs.ListContainer>
       </Tabs>
 
-      <div className="flex items-center gap-2.5">
+      <div className="flex w-full shrink-0 items-center gap-2 px-[var(--pos-content-padding)] py-3">
         <SearchField
           aria-label={t("toolbar.searchLabel")}
-          className="min-w-64 flex-1 sm:max-w-md"
+          className="flex-1"
+          fullWidth
           value={query}
           variant="secondary"
           onChange={onSearchChange}
@@ -418,72 +421,68 @@ function OrdersToolbar({
           </SearchField.Group>
         </SearchField>
 
-        <Popover>
-          <Button
-            aria-label={t("toolbar.filters")}
-            className="relative flex h-10 items-center gap-2 px-3.5 font-medium"
-            variant="secondary"
-          >
-            <Filter aria-hidden="true" size={18} />
-            <span>{t("toolbar.filters")}</span>
-            {activeFilterCount > 0 ? (
-              <Chip
-                className="h-5 min-w-5 justify-center px-1 text-xs font-bold"
-                color="accent"
-                size="sm"
-                variant="soft"
-              >
-                {activeFilterCount}
-              </Chip>
-            ) : null}
-          </Button>
+          <Popover>
+            <Button
+              aria-label={t("toolbar.filters")}
+              className="relative h-10 w-10 min-w-10 shrink-0"
+              isIconOnly
+              variant="secondary"
+            >
+              <Sliders aria-hidden="true" size={18} />
+              {activeFilterCount > 0 ? (
+                <Chip
+                  className="absolute -end-1 -top-1"
+                  color="accent"
+                  size="sm"
+                  variant="soft"
+                >
+                  {activeFilterCount}
+                </Chip>
+              ) : null}
+            </Button>
 
-          <Popover.Content
-            className="w-[340px] max-w-[95vw] rounded-2xl border border-border bg-surface p-0 shadow-2xl sm:w-[420px]"
-            placement="bottom end"
-          >
-            <Popover.Dialog className="flex flex-col outline-none">
-              <div className="flex items-center justify-between border-b border-border/60 px-4 py-3">
-                <div className="flex items-center gap-2">
-                  <Popover.Heading className="text-sm font-semibold text-foreground">
-                    {t("toolbar.filters")}
-                  </Popover.Heading>
+            <Popover.Content
+              className="w-[340px] max-w-[95vw] rounded-2xl border-0 bg-surface p-0 shadow-2xl sm:w-[420px]"
+              placement="bottom end"
+            >
+              <Popover.Dialog className="flex w-full flex-col p-0 text-start outline-none">
+                <div className="flex w-full items-center justify-between px-4 py-3">
+                  <div className="flex items-center gap-2">
+                    <Popover.Heading className="text-start text-sm font-semibold text-foreground">
+                      {t("toolbar.filters")}
+                    </Popover.Heading>
+                    {activeFilterCount > 0 ? (
+                      <Chip
+                        className="h-5 min-w-5 justify-center px-1 text-xs font-semibold"
+                        color="accent"
+                        size="sm"
+                        variant="soft"
+                      >
+                        {activeFilterCount}
+                      </Chip>
+                    ) : null}
+                  </div>
                   {activeFilterCount > 0 ? (
-                    <Chip
-                      className="h-5 min-w-5 justify-center px-1 text-xs font-semibold"
-                      color="accent"
+                    <Button
+                      className="h-7 px-2 text-xs font-medium text-muted hover:text-foreground"
                       size="sm"
-                      variant="soft"
+                      variant="ghost"
+                      onPress={onResetFilters}
                     >
-                      {activeFilterCount}
-                    </Chip>
+                      <RotateRight
+                        aria-hidden="true"
+                        className="mr-1 inline-block"
+                        size={14}
+                      />
+                      {t("toolbar.reset")}
+                    </Button>
                   ) : null}
                 </div>
-                {activeFilterCount > 0 ? (
-                  <Button
-                    className="h-7 px-2 text-xs font-medium text-muted hover:text-foreground"
-                    size="sm"
-                    variant="ghost"
-                    onPress={onResetFilters}
-                  >
-                    <RotateRight
-                      aria-hidden="true"
-                      className="mr-1 inline-block"
-                      size={14}
-                    />
-                    {t("toolbar.reset")}
-                  </Button>
-                ) : null}
-              </div>
 
-              <div className="max-h-[70vh] space-y-4 overflow-y-auto p-4 text-sm">
-                {/* 1. Order Channel */}
-                <div>
-                  <div className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted">
-                    {t("toolbar.channelLabel")}
-                  </div>
-                  <FilterToggleGroup
+                <div className="max-h-[70vh] space-y-4 overflow-y-auto p-4 text-start text-sm">
+                  <FilterSelect
                     ariaLabel={t("toolbar.channelLabel")}
+                    label={t("toolbar.channelLabel")}
                     options={channelFilterOptions.map((opt) => {
                       const avatarSrc =
                         opt.id !== "all"
@@ -493,32 +492,34 @@ function OrdersToolbar({
                       return {
                         id: opt.id,
                         label: t(opt.labelKey),
-                        leading: avatarSrc ? (
-                          <Avatar
-                            aria-hidden="true"
-                            className="h-4 w-4 shrink-0"
-                          >
-                            <Avatar.Image
-                              alt=""
-                              className="object-contain"
-                              src={avatarSrc}
-                            />
-                          </Avatar>
-                        ) : undefined,
+                        leading:
+                          opt.id !== "all" ? (
+                            <Avatar
+                              aria-hidden="true"
+                              className="h-4 w-4 shrink-0"
+                            >
+                              {avatarSrc ? (
+                                <Avatar.Image
+                                  alt=""
+                                  className="object-contain"
+                                  src={avatarSrc}
+                                />
+                              ) : (
+                                <Avatar.Fallback>
+                                  <Receipt2 aria-hidden="true" size={12} />
+                                </Avatar.Fallback>
+                              )}
+                            </Avatar>
+                          ) : undefined,
                       };
                     })}
                     selectedValue={channelFilter}
                     onChange={onChannelFilterChange}
                   />
-                </div>
 
-                {/* 2. Date / Shift */}
-                <div>
-                  <div className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted">
-                    {t("toolbar.dateLabel")}
-                  </div>
-                  <FilterToggleGroup
+                  <FilterSelect
                     ariaLabel={t("toolbar.dateLabel")}
+                    label={t("toolbar.dateLabel")}
                     options={dateFilterOptions.map((opt) => ({
                       id: opt.id,
                       label: t(opt.labelKey),
@@ -526,15 +527,10 @@ function OrdersToolbar({
                     selectedValue={dateFilter}
                     onChange={onDateFilterChange}
                   />
-                </div>
 
-                {/* 3. Payment Status */}
-                <div>
-                  <div className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted">
-                    {t("toolbar.paymentStatusLabel")}
-                  </div>
-                  <FilterToggleGroup
+                  <FilterSelect
                     ariaLabel={t("toolbar.paymentStatusLabel")}
+                    label={t("toolbar.paymentStatusLabel")}
                     options={paymentStatusFilterOptions.map((opt) => ({
                       id: opt.id,
                       label: t(opt.labelKey),
@@ -543,146 +539,88 @@ function OrdersToolbar({
                     onChange={onPaymentStatusFilterChange}
                   />
                 </div>
-              </div>
-            </Popover.Dialog>
-          </Popover.Content>
-        </Popover>
+              </Popover.Dialog>
+            </Popover.Content>
+          </Popover>
       </div>
-
-      {/* Active Filter Chips */}
-      {activeFilterCount > 0 ? (
-        <div className="flex flex-wrap items-center gap-1.5 pt-0.5">
-          <span className="mr-1 text-xs font-medium text-muted">
-            {t("toolbar.filters")}:
-          </span>
-
-          {channelFilter !== "all" ? (
-            <Chip
-              className="gap-1 bg-surface-secondary pr-1 text-xs"
-              size="sm"
-              variant="secondary"
-            >
-              <Chip.Label>
-                {t("toolbar.channelLabel")}: {t(`channels.${channelFilter}`)}
-              </Chip.Label>
-              <Button
-                aria-label={`Remove ${t("toolbar.channelLabel")} filter`}
-                className="size-5 min-w-5 p-0 text-muted hover:bg-danger/15 hover:text-danger"
-                isIconOnly
-                size="sm"
-                variant="ghost"
-                onPress={() => onChannelFilterChange("all")}
-              >
-                <CloseCircle aria-hidden="true" size={14} />
-              </Button>
-            </Chip>
-          ) : null}
-
-          {dateFilter !== "today" ? (
-            <Chip
-              className="gap-1 bg-surface-secondary pr-1 text-xs"
-              size="sm"
-              variant="secondary"
-            >
-              <Chip.Label>
-                {t("toolbar.dateLabel")}: {t(`dateFilters.${dateFilter}`)}
-              </Chip.Label>
-              <Button
-                aria-label={`Remove ${t("toolbar.dateLabel")} filter`}
-                className="size-5 min-w-5 p-0 text-muted hover:bg-danger/15 hover:text-danger"
-                isIconOnly
-                size="sm"
-                variant="ghost"
-                onPress={() => onDateFilterChange("today")}
-              >
-                <CloseCircle aria-hidden="true" size={14} />
-              </Button>
-            </Chip>
-          ) : null}
-
-          {paymentStatusFilter !== "all" ? (
-            <Chip
-              className="gap-1 bg-surface-secondary pr-1 text-xs"
-              size="sm"
-              variant="secondary"
-            >
-              <Chip.Label>
-                {t("toolbar.paymentStatusLabel")}:{" "}
-                {t(`paymentStatuses.${paymentStatusFilter}`)}
-              </Chip.Label>
-              <Button
-                aria-label={`Remove ${t("toolbar.paymentStatusLabel")} filter`}
-                className="size-5 min-w-5 p-0 text-muted hover:bg-danger/15 hover:text-danger"
-                isIconOnly
-                size="sm"
-                variant="ghost"
-                onPress={() => onPaymentStatusFilterChange("all")}
-              >
-                <CloseCircle aria-hidden="true" size={14} />
-              </Button>
-            </Chip>
-          ) : null}
-
-          <Button
-            className="h-6 px-1.5 text-xs text-muted hover:text-foreground"
-            size="sm"
-            variant="ghost"
-            onPress={onResetFilters}
-          >
-            {t("toolbar.clearAll")}
-          </Button>
-        </div>
-      ) : null}
     </div>
   );
 }
 
-type FilterToggleOption<T extends string> = {
+type FilterSelectOption<T extends string> = {
   id: T;
   label: string;
   leading?: ReactNode;
 };
 
-function FilterToggleGroup<T extends string>({
+function FilterSelect<T extends string>({
   ariaLabel,
+  label,
   onChange,
   options,
   selectedValue,
 }: {
   ariaLabel: string;
   onChange: (value: T) => void;
-  options: FilterToggleOption<T>[];
+  options: FilterSelectOption<T>[];
   selectedValue: T;
+  label: string;
 }) {
-  return (
-    <ToggleButtonGroup
-      aria-label={ariaLabel}
-      className="flex flex-wrap gap-1.5"
-      disallowEmptySelection
-      isDetached
-      selectedKeys={new Set([selectedValue])}
-      selectionMode="single"
-      size="sm"
-      onSelectionChange={(keys) => {
-        const selectedKey = Array.from(keys)[0];
+  const currentOption = options.find((opt) => opt.id === selectedValue);
 
-        if (typeof selectedKey === "string") {
-          onChange(selectedKey as T);
+  return (
+    <Select
+      aria-label={ariaLabel}
+      className="w-full"
+      value={selectedValue}
+      variant="secondary"
+      onChange={(value) => {
+        const nextValue = normalizeFilterValue(value);
+
+        if (nextValue) {
+          onChange(nextValue as T);
         }
       }}
     >
-      {options.map((option) => (
-        <ToggleButton
-          className={filterToggleClass}
-          id={option.id}
-          key={option.id}
-          variant="ghost"
-        >
-          {option.leading}
-          {option.label}
-        </ToggleButton>
-      ))}
-    </ToggleButtonGroup>
+      <Label className="text-start text-xs font-semibold text-muted">
+        {label}
+      </Label>
+      <Select.Trigger className="w-full justify-start text-start">
+        <Select.Value>
+          {({ defaultChildren, isPlaceholder }) => {
+            if (isPlaceholder || !currentOption) {
+              return defaultChildren;
+            }
+
+            return (
+              <div className="flex items-center gap-2">
+                {currentOption.leading}
+                <span>{currentOption.label}</span>
+              </div>
+            );
+          }}
+        </Select.Value>
+        <Select.Indicator />
+      </Select.Trigger>
+      <Select.Popover placement="bottom start">
+        <ListBox>
+          {options.map((option) => (
+            <ListBox.Item
+              className="text-start"
+              id={option.id}
+              key={option.id}
+              textValue={option.label}
+            >
+              <div className="flex items-center gap-2">
+                {option.leading}
+                <span>{option.label}</span>
+              </div>
+              <ListBox.ItemIndicator />
+            </ListBox.Item>
+          ))}
+        </ListBox>
+      </Select.Popover>
+    </Select>
   );
 }
 

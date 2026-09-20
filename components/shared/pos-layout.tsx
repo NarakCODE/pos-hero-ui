@@ -1,6 +1,10 @@
 "use client";
 
-import type { ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
+import {
+  AppLayout,
+  type AppLayoutSpacing,
+} from "@/components/shared/app-layout";
 import { POSFooter } from "./pos-footer";
 import { POSHeader } from "./pos-header";
 
@@ -14,60 +18,64 @@ interface POSLayoutProps {
   headerTitle?: string;
   rightPanelLabel?: string;
   className?: string;
+  mainClassName?: string;
+  rightPanelClassName?: string;
+  footerClassName?: string;
+  padding?: AppLayoutSpacing;
+  gap?: AppLayoutSpacing;
+  maxWidth?: CSSProperties["maxWidth"];
+  rightPanelWidth?: CSSProperties["width"];
 }
 
 export function POSLayout({
   children,
   className = "",
+  footerClassName,
+  gap = "none",
   headerTitle,
+  mainClassName,
+  maxWidth = "none",
   onSearchChange,
+  padding = "none",
   rightPanel,
+  rightPanelClassName,
   searchPlaceholder,
   searchQuery,
   showSearch = true,
   rightPanelLabel = "Right panel",
+  rightPanelWidth = "40%",
 }: POSLayoutProps) {
   return (
-    <div
-      className={`flex h-screen h-dvh w-full flex-col overflow-hidden bg-background text-foreground ${className}`}
+    <AppLayout
+      aside={rightPanel}
+      asideLabel={rightPanelLabel}
+      asideWidth={rightPanelWidth}
+      className={className}
+      footer={<POSFooter className="w-full" />}
+      footerClassName={footerClassName}
+      gap={gap}
+      mainLabel="Left main workstation"
+      maxWidth={maxWidth}
+      padding={padding}
+      mainClassName={`flex flex-col bg-background ${
+        rightPanel ? "border-e border-border" : ""
+      } ${mainClassName ?? ""}`}
+      asideClassName={`flex-col bg-background ${rightPanelClassName ?? ""}`}
     >
-      {/* Upper Area: Left Main Workstation + Right Context Panel */}
-      <div className="flex min-h-0 flex-1 w-full overflow-hidden">
-        {/* Left Main Workstation */}
-        <section
-          aria-label="Left main workstation"
-          className={`flex min-w-0 flex-1 flex-col h-full overflow-hidden border-e border-border bg-background ${
-            rightPanel ? "lg:flex-none lg:w-[60%]" : ""
-          }`}
-        >
-          {/* 1. Header Section */}
-          <POSHeader
-            searchQuery={searchQuery}
-            onSearchChange={onSearchChange}
-            searchPlaceholder={searchPlaceholder}
-            showSearch={showSearch}
-            title={headerTitle}
-          />
+      <POSHeader
+        searchQuery={searchQuery}
+        onSearchChange={onSearchChange}
+        searchPlaceholder={searchPlaceholder}
+        showSearch={showSearch}
+        title={headerTitle}
+      />
 
-          {/* 2. Main Content */}
-          <main className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
-            {children}
-          </main>
-        </section>
-
-        {/* Right Side: Dynamic Context Panel */}
-        {rightPanel ? (
-          <aside
-            aria-label={rightPanelLabel}
-            className="hidden h-full shrink-0 flex-col overflow-hidden bg-background lg:flex lg:w-[40%]"
-          >
-            {rightPanel}
-          </aside>
-        ) : null}
+      <div
+        data-slot="pos-layout-content"
+        className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden"
+      >
+        {children}
       </div>
-
-      {/* Footer Section: Stuck at the bottom of the app */}
-      <POSFooter className="sticky bottom-0 z-30 w-full shrink-0" />
-    </div>
+    </AppLayout>
   );
 }

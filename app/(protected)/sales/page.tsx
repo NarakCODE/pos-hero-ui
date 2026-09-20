@@ -389,34 +389,33 @@ export default function SalesPage() {
       }
     >
       <div className="flex h-full min-h-0 flex-1 flex-col overflow-hidden">
-        {/* Category Tabs & Products Catalog using default HeroUI Tabs */}
+        {/* Category Tabs & Products Catalog using secondary HeroUI Tabs */}
         <Tabs
           selectedKey={selectedCategory}
+          variant="secondary"
           onSelectionChange={(key) =>
             setSelectedCategory(String(key) as CategoryId)
           }
           className="flex min-h-0 flex-1 flex-col overflow-hidden gap-0"
         >
           {/* 1. Tab Categories Section */}
-          <div className="shrink-0 bg-background px-3.5 py-2 sm:px-4 sm:py-2.5">
-            <Tabs.ListContainer>
-              <Tabs.List aria-label={t("categoryLabel")}>
-                {categoryOptions.map((item) => (
-                  <Tabs.Tab
-                    key={item.id}
-                    id={item.id}
-                    className="w-auto shrink-0 whitespace-nowrap"
-                  >
-                    {item.label}
-                    <Tabs.Indicator />
-                  </Tabs.Tab>
-                ))}
-              </Tabs.List>
-            </Tabs.ListContainer>
-          </div>
+          <Tabs.ListContainer className="shrink-0">
+            <Tabs.List aria-label={t("categoryLabel")}>
+              {categoryOptions.map((item) => (
+                <Tabs.Tab
+                  key={item.id}
+                  id={item.id}
+                  className="w-auto shrink-0 whitespace-nowrap"
+                >
+                  {item.label}
+                  <Tabs.Indicator />
+                </Tabs.Tab>
+              ))}
+            </Tabs.List>
+          </Tabs.ListContainer>
 
           {/* 2. Search Menu Items Bar (below tab categories section) */}
-          <div className="flex shrink-0 items-center gap-2 px-3.5 sm:px-4">
+          <div className="flex shrink-0 items-center gap-2 px-3.5 sm:px-4 py-3">
             <SearchField
               aria-label={t("searchLabel")}
               className="flex-1"
@@ -447,11 +446,7 @@ export default function SalesPage() {
           </div>
 
           {categoryOptions.map((item) => (
-            <Tabs.Panel
-              key={item.id}
-              id={item.id}
-              className="mt-0 min-h-0 min-w-0 flex-1 overflow-y-auto overscroll-contain p-3.5 outline-none sm:p-4"
-            >
+            <Tabs.Panel key={item.id} id={item.id}>
               {filteredProducts.length > 0 ? (
                 <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 sm:gap-3 md:grid-cols-4">
                   {filteredProducts.map((product) => {

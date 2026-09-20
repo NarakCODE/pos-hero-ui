@@ -10,6 +10,7 @@ import {
   SearchField,
   Select,
   Table,
+  Tabs,
   ToggleButton,
   ToggleButtonGroup,
 } from "@heroui/react";
@@ -108,12 +109,11 @@ export function OrdersDataGrid({
 
   const activeFilterCount = useMemo(() => {
     let count = 0;
-    if (statusFilter !== "all") count++;
     if (channelFilter !== "all") count++;
     if (dateFilter !== "today") count++;
     if (paymentStatusFilter !== "all") count++;
     return count;
-  }, [channelFilter, dateFilter, paymentStatusFilter, statusFilter]);
+  }, [channelFilter, dateFilter, paymentStatusFilter]);
 
   const handleResetFilters = () => {
     setStatusFilter("all");
@@ -378,7 +378,31 @@ function OrdersToolbar({
   t: ReturnType<typeof useTranslations<"OrdersPage">>;
 }) {
   return (
-    <div className="flex shrink-0 flex-col gap-2.5">
+    <div className="flex shrink-0 flex-col gap-3">
+      <Tabs
+        className="-mx-3 min-w-0 sm:-mx-4"
+        selectedKey={statusFilter}
+        variant="secondary"
+        onSelectionChange={(key) =>
+          onStatusFilterChange(String(key) as StatusFilter)
+        }
+      >
+        <Tabs.ListContainer>
+          <Tabs.List aria-label={t("toolbar.statusLabel")}>
+            {statusFilterOptions.map((opt) => (
+              <Tabs.Tab
+                key={opt.id}
+                id={opt.id}
+                className="w-auto shrink-0 whitespace-nowrap"
+              >
+                {t(opt.labelKey)}
+                <Tabs.Indicator />
+              </Tabs.Tab>
+            ))}
+          </Tabs.List>
+        </Tabs.ListContainer>
+      </Tabs>
+
       <div className="flex items-center gap-2.5">
         <SearchField
           aria-label={t("toolbar.searchLabel")}
@@ -453,23 +477,7 @@ function OrdersToolbar({
               </div>
 
               <div className="max-h-[70vh] space-y-4 overflow-y-auto p-4 text-sm">
-                {/* 1. Order Status */}
-                <div>
-                  <div className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted">
-                    {t("toolbar.statusLabel")}
-                  </div>
-                  <FilterToggleGroup
-                    ariaLabel={t("toolbar.statusLabel")}
-                    options={statusFilterOptions.map((opt) => ({
-                      id: opt.id,
-                      label: t(opt.labelKey),
-                    }))}
-                    selectedValue={statusFilter}
-                    onChange={onStatusFilterChange}
-                  />
-                </div>
-
-                {/* 2. Order Channel */}
+                {/* 1. Order Channel */}
                 <div>
                   <div className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted">
                     {t("toolbar.channelLabel")}
@@ -504,7 +512,7 @@ function OrdersToolbar({
                   />
                 </div>
 
-                {/* 3. Date / Shift */}
+                {/* 2. Date / Shift */}
                 <div>
                   <div className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted">
                     {t("toolbar.dateLabel")}
@@ -520,7 +528,7 @@ function OrdersToolbar({
                   />
                 </div>
 
-                {/* 4. Payment Status */}
+                {/* 3. Payment Status */}
                 <div>
                   <div className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted">
                     {t("toolbar.paymentStatusLabel")}
@@ -547,28 +555,6 @@ function OrdersToolbar({
           <span className="mr-1 text-xs font-medium text-muted">
             {t("toolbar.filters")}:
           </span>
-
-          {statusFilter !== "all" ? (
-            <Chip
-              className="gap-1 bg-surface-secondary pr-1 text-xs"
-              size="sm"
-              variant="secondary"
-            >
-              <Chip.Label>
-                {t("toolbar.statusLabel")}: {t(`statuses.${statusFilter}`)}
-              </Chip.Label>
-              <Button
-                aria-label={`Remove ${t("toolbar.statusLabel")} filter`}
-                className="size-5 min-w-5 p-0 text-muted hover:bg-danger/15 hover:text-danger"
-                isIconOnly
-                size="sm"
-                variant="ghost"
-                onPress={() => onStatusFilterChange("all")}
-              >
-                <CloseCircle aria-hidden="true" size={14} />
-              </Button>
-            </Chip>
-          ) : null}
 
           {channelFilter !== "all" ? (
             <Chip

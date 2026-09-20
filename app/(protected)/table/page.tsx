@@ -2,6 +2,7 @@
 
 import { useTranslations } from "next-intl";
 import { Shop } from "reicon-react";
+import { POSContextPanel } from "@/components/shared/pos-context-panel";
 import { POSLayout } from "@/components/shared/pos-layout";
 import { POSPagePlaceholder } from "@/components/shared/pos-page-placeholder";
 
@@ -9,7 +10,11 @@ export default function TablePage() {
   const t = useTranslations("SalesMenu");
 
   return (
-    <POSLayout showSearch={false} headerTitle={t("pages.table.title")}>
+    <POSLayout
+      showSearch={false}
+      headerTitle={t("pages.table.title")}
+      rightPanel={<POSContextPanel kind="table" />}
+    >
       <POSPagePlaceholder
         title={t("pages.table.title")}
         eyebrow={t("pages.table.eyebrow")}

@@ -6,6 +6,7 @@ import type { BillingSummaryProps } from "./types";
 const defaultFormatCurrency = (amount: number) => `$${amount.toFixed(2)}`;
 
 export function BillingSummary({
+  appliedPromotion,
   changeAmount,
   changeLabel = "Change",
   changeSecondaryAmount,
@@ -17,6 +18,8 @@ export function BillingSummary({
   formatCurrency = defaultFormatCurrency,
   itemCount,
   itemsLabel = "Items",
+  onOpenPromotionModal,
+  onRemovePromotion,
   paymentLabel = "Payment",
   paymentMethod,
   receivedAmount,
@@ -95,6 +98,47 @@ export function BillingSummary({
           </span>
         </div>
       ))}
+
+      {appliedPromotion ? (
+        <div className="mt-2.5 rounded-xl border border-accent/30 bg-accent-soft/30 p-2.5">
+          <div className="flex items-center justify-between text-xs">
+            <span className="font-semibold text-accent-soft-foreground">
+              Promotion ({appliedPromotion.code || appliedPromotion.name})
+            </span>
+            <span className="font-bold tabular-nums text-accent-soft-foreground">
+              -{formatCurrency(appliedPromotion.discountAmount)}
+            </span>
+          </div>
+
+          <div className="mt-1 flex items-center justify-between text-[11px] text-muted">
+            <span className="truncate pe-2">
+              {appliedPromotion.description || "Applied discount"}
+            </span>
+
+            <div className="flex shrink-0 items-center gap-2">
+              {onOpenPromotionModal ? (
+                <button
+                  type="button"
+                  onClick={onOpenPromotionModal}
+                  className="font-medium text-foreground hover:underline"
+                >
+                  Change
+                </button>
+              ) : null}
+
+              {onRemovePromotion ? (
+                <button
+                  type="button"
+                  onClick={onRemovePromotion}
+                  className="font-medium text-danger hover:underline"
+                >
+                  [Remove]
+                </button>
+              ) : null}
+            </div>
+          </div>
+        </div>
+      ) : null}
 
       <Separator className="my-3" />
 

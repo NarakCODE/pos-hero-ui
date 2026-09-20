@@ -1,36 +1,31 @@
 "use client";
 
-import { Button } from "@heroui/react";
+import { useState } from "react";
 import { useTranslations } from "next-intl";
-import { useRouter } from "next/navigation";
-import { Note2, Receipt2 } from "reicon-react";
+import { OrdersAside } from "@/components/orders/orders-aside";
+import { orderRecords } from "@/components/orders/orders-data";
+import { OrdersDataGrid } from "@/components/orders/orders-data-grid";
 import { POSLayout } from "@/components/shared/pos-layout";
-import { POSPagePlaceholder } from "@/components/shared/pos-page-placeholder";
 
 export default function OrdersPage() {
   const t = useTranslations("SalesMenu");
-  const router = useRouter();
+  const [selectedOrderId, setSelectedOrderId] = useState<string | null>(
+    orderRecords[0]?.id ?? null,
+  );
 
   return (
-    <POSLayout showSearch={false} headerTitle={t("pages.orders.title")}>
-      <POSPagePlaceholder
-        title={t("pages.orders.title")}
-        eyebrow={t("pages.orders.eyebrow")}
-        emptyTitle={t("pages.orders.emptyTitle")}
-        emptyDescription={t("pages.orders.emptyDescription")}
-        icon={Note2}
-        action={
-          <Button
-            type="button"
-            variant="primary"
-            size="md"
-            onPress={() => router.push("/sales")}
-            className="flex items-center gap-2 font-semibold"
-          >
-            <Receipt2 aria-hidden="true" size={18} />
-            <span>{t("pages.orders.goToSales")}</span>
-          </Button>
-        }
+    <POSLayout
+      showSearch={false}
+      headerTitle={t("pages.orders.title")}
+      rightPanel={
+        <OrdersAside
+          selectedOrderId={selectedOrderId}
+        />
+      }
+    >
+      <OrdersDataGrid
+        onOrderSelect={setSelectedOrderId}
+        selectedOrderId={selectedOrderId}
       />
     </POSLayout>
   );

@@ -45,11 +45,161 @@
     "description": "You are signed in to your RakPOS workspace.",
     "signOut": "Sign out"
   },
+  "OrdersPage": {
+    "toolbar": {
+      "searchLabel": "Search orders",
+      "searchPlaceholder": "Search order...",
+      "channelLabel": "Channel",
+      "dateLabel": "Date / shift",
+      "statusLabel": "Order status",
+      "paymentStatusLabel": "Payment status",
+      "filters": "Filters",
+      "reset": "Reset",
+      "clearAll": "Clear all",
+      "batchActions": "Batch actions",
+      "selected": "{count} selected",
+      "batchPrint": "Batch print",
+      "batchSettle": "Batch settle",
+      "exportCsv": "Export CSV"
+    },
+    "channels": {
+      "all": "All channels",
+      "pos": "In-Store / POS",
+      "dineIn": "Dine-in",
+      "takeAway": "Take Away",
+      "wownow": "WowNow",
+      "foodpanda": "Foodpanda",
+      "grabfood": "GrabFood",
+      "nham24": "NHAM24"
+    },
+    "dateFilters": {
+      "today": "Today",
+      "morning": "Shift Morning",
+      "afternoon": "Shift Afternoon",
+      "evening": "Shift Evening",
+      "custom": "Custom date range"
+    },
+    "statuses": {
+      "all": "All",
+      "new": "New",
+      "inProgress": "In Progress",
+      "onHold": "On Hold",
+      "completed": "Completed",
+      "rejected": "Rejected",
+      "refund": "Refund",
+      "void": "Void",
+      "expired": "Expired",
+      "cancelled": "Cancelled"
+    },
+    "paymentStatuses": {
+      "all": "All payments",
+      "paid": "Paid",
+      "pending": "Pending",
+      "refunded": "Refunded"
+    },
+    "loyaltyTiers": {
+      "vip": "VIP",
+      "gold": "Gold",
+      "silver": "Silver",
+      "member": "Member"
+    },
+    "table": {
+      "label": "Orders data grid",
+      "selectAll": "Select all orders",
+      "selectOrder": "Select order {order}",
+      "no": "No.",
+      "orderId": "Order ID",
+      "tableTicket": "Table / Ticket",
+      "customer": "Customer",
+      "channel": "Order channel",
+      "payment": "Payment",
+      "totalBill": "Total Bill",
+      "dateTime": "Date & Time",
+      "pickupTime": "Pickup Time",
+      "endTime": "End Time",
+      "status": "Status",
+      "items": "Items summary",
+      "quantity": "QTY",
+      "total": "Total amount",
+      "paymentStatus": "Payment status",
+      "orderStatus": "Order status",
+      "created": "Created",
+      "actions": "Actions",
+      "moreItems": "+{count} more",
+      "empty": "No orders match the selected filters."
+    },
+    "details": {
+      "title": "Details for {order}",
+      "itemsTitle": "Items and modifiers",
+      "paymentTitle": "Payment tender",
+      "timelineTitle": "Order timeline",
+      "tender": "Tender",
+      "received": "Received",
+      "change": "Change",
+      "ordered": "Ordered",
+      "kitchenSent": "Kitchen sent",
+      "completed": "Completed"
+    },
+    "actions": {
+      "viewDetails": "View details for {order}",
+      "copyOrder": "Copy order ID {order}",
+      "copiedOrder": "Copied order ID {order}",
+      "printReceipt": "Print receipt for {order}",
+      "more": "More actions for {order}",
+      "expandOrder": "Expand order {order}",
+      "collapseOrder": "Collapse order {order}"
+    },
+    "batch": {
+      "printMessage": "Sent {count} orders to print.",
+      "settleMessage": "Settled payment for {count} orders.",
+      "exportMessage": "Exported {count} orders to CSV."
+    },
+    "pagination": {
+      "showing": "Showing {from}–{to} of {total} orders",
+      "rows": "Rows",
+      "previous": "Previous page",
+      "next": "Next page"
+    },
+    "summary": {
+      "label": "Order summary",
+      "revenue": "Total revenue",
+      "active": "Active orders",
+      "completed": "Completed"
+    },
+    "aside": {
+      "eyebrow": "Order details",
+      "title": "Order details & actions",
+      "tableTicket": "Table/Ticket No",
+      "sequence": "Seq.",
+      "status": "Status",
+      "orderChannel": "Order Channel",
+      "product": "Product",
+      "price": "Price",
+      "quantity": "QTY",
+      "amount": "Amount",
+      "remarkTitle": "Remark",
+      "remark": "Please separate all ice outside the drink",
+      "tenderInfo": "Tender info",
+      "totals": "Totals",
+      "subtotal": "Subtotal",
+      "discount": "Total Discount",
+      "vat": "VAT (10%)",
+      "grandTotal": "Total",
+      "accept": "Accept",
+      "reject": "Reject"
+    }
+  },
   "SalesMenu": {
     "brandName": "RakPOS",
     "cashier": "Sokha",
     "shiftOpen": "Shift open",
     "signOut": "Sign out",
+    "signOutDialog": {
+      "body": "You'll need to sign in again to access your account. Any unsaved changes will be lost.",
+      "cancel": "Stay Signed In",
+      "confirm": "Sign Out",
+      "header": "Sign out of your account?"
+    },
     "catalogEyebrow": "Menu",
     "catalogTitle": "Choose a product",
     "searchLabel": "Search products",
@@ -204,6 +354,88 @@
         "eyebrow": "Operations",
         "emptyTitle": "Additional Tools",
         "emptyDescription": "Cash drawer management, shift reports, and administrative actions."
+      }
+    },
+    "rightPanel": {
+      "orders": {
+        "eyebrow": "Ticket workspace",
+        "title": "Order activity",
+        "summaryTitle": "Keep tickets moving",
+        "summary": "Review open tickets here, then return to Sales when you are ready to create or continue an order.",
+        "metricOneLabel": "Open tickets",
+        "metricOneValue": "0",
+        "metricTwoLabel": "Awaiting payment",
+        "metricTwoValue": "0",
+        "detailsTitle": "Queue status",
+        "detailOneLabel": "Ticket queue",
+        "detailOneValue": "Clear",
+        "detailTwoLabel": "Last activity",
+        "detailTwoValue": "No activity",
+        "action": "Open Sales"
+      },
+      "table": {
+        "eyebrow": "Floor operations",
+        "title": "Floor overview",
+        "summaryTitle": "Manage the dining floor",
+        "summary": "Use the table workspace to start dine-in tickets and keep table occupancy visible to the team.",
+        "metricOneLabel": "Available tables",
+        "metricOneValue": "0",
+        "metricTwoLabel": "Occupied tables",
+        "metricTwoValue": "0",
+        "detailsTitle": "Floor status",
+        "detailOneLabel": "Dining zones",
+        "detailOneValue": "Not configured",
+        "detailTwoLabel": "Open tickets",
+        "detailTwoValue": "0",
+        "action": "Start a ticket"
+      },
+      "customer": {
+        "eyebrow": "Loyalty workspace",
+        "title": "Customer activity",
+        "summaryTitle": "Keep customer context close",
+        "summary": "Find customer profiles, loyalty points, and purchase history without leaving the current POS shell.",
+        "metricOneLabel": "Members",
+        "metricOneValue": "0",
+        "metricTwoLabel": "Rewards available",
+        "metricTwoValue": "0",
+        "detailsTitle": "Customer status",
+        "detailOneLabel": "Profiles",
+        "detailOneValue": "Ready to add",
+        "detailTwoLabel": "Member lookup",
+        "detailTwoValue": "Available",
+        "action": "View customer list"
+      },
+      "settings": {
+        "eyebrow": "Terminal status",
+        "title": "Register health",
+        "summaryTitle": "Keep this register ready",
+        "summary": "Review terminal preferences and payment setup while keeping the main POS navigation in place.",
+        "metricOneLabel": "Register status",
+        "metricOneValue": "Ready",
+        "metricTwoLabel": "Payment methods",
+        "metricTwoValue": "4",
+        "detailsTitle": "Configuration",
+        "detailOneLabel": "Receipt printer",
+        "detailOneValue": "Not connected",
+        "detailTwoLabel": "Last sync",
+        "detailTwoValue": "Not available",
+        "action": "Open settings"
+      },
+      "more": {
+        "eyebrow": "Operations",
+        "title": "Shift tools",
+        "summaryTitle": "Keep operations together",
+        "summary": "Access shift reports, cash drawer tasks, and other operational tools from this workspace.",
+        "metricOneLabel": "Shift status",
+        "metricOneValue": "Open",
+        "metricTwoLabel": "Cash drawer",
+        "metricTwoValue": "Ready",
+        "detailsTitle": "Shift overview",
+        "detailOneLabel": "Current cashier",
+        "detailOneValue": "Sokha",
+        "detailTwoLabel": "Started",
+        "detailTwoValue": "Today",
+        "action": "Open tools"
       }
     }
   }

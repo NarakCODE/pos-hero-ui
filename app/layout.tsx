@@ -1,13 +1,22 @@
 import type { Metadata } from "next";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale } from "next-intl/server";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist_Mono, Inter, Kantumruy_Pro } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./providers";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const inter = Inter({
+  display: "swap",
+  fallback: ["sans-serif"],
   subsets: ["latin"],
+  variable: "--font-inter",
+});
+
+const kantumruyPro = Kantumruy_Pro({
+  display: "swap",
+  fallback: ["Noto Sans Khmer", "sans-serif"],
+  subsets: ["khmer", "latin"],
+  variable: "--font-kantumruy-pro",
 });
 
 const geistMono = Geist_Mono({
@@ -26,11 +35,11 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang={locale}
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${inter.variable} ${kantumruyPro.variable} ${geistMono.variable} h-full antialiased`}
       suppressHydrationWarning
     >
       <body
-        className="min-h-full flex flex-col bg-background text-foreground"
+        className="min-h-full flex flex-col bg-background text-foreground font-sans"
         suppressHydrationWarning
       >
         <NextIntlClientProvider>

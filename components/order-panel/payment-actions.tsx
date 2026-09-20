@@ -1,44 +1,75 @@
 "use client";
 
-import { Button, Spinner } from "@heroui/react";
+import { Avatar, Button, Spinner, Surface } from "@heroui/react";
 import { useState } from "react";
 import { ArrowRight, Check, Clock, Printer, Refresh } from "reicon-react";
 import { BankCardPaymentModal } from "./bank-card-payment-modal";
 import { BrandWalletPaymentModal } from "./brand-wallet-payment-modal";
 import { CashPaymentModal } from "./cash-payment-modal";
+import { DigitalWalletPaymentModal } from "./digital-wallet-payment-modal";
 import { KHQRPaymentModal } from "./khqr-payment-modal";
+import { MemberModal } from "./member-modal";
 import { PaymentMethodDrawer } from "./payment-method-drawer";
-import type { PaymentActionsProps, PaymentMethodOption } from "./types";
+import { PromotionModal } from "./promotion-modal";
+import type {
+  MemberProfile,
+  PaymentActionsProps,
+  PaymentMethodOption,
+} from "./types";
 
 export function PaymentActions({
   actionsSlot,
+  appliedPromotion,
   chargeAmount,
   chargeLabel = "Charge",
   className = "",
   completeLabel = "Payment complete",
   disabled = false,
+  formatCurrency,
   holdLabel = "Hold order",
   isCharging = false,
   isPaid = false,
+  onApplyPromotion,
   onCharge,
   onHoldOrder,
   onPrintReceipt,
   onQuickAction,
+  onRemovePromotion,
   onResetOrder,
   onSelectPaymentMethod,
   paidMessage = "Payment recorded. Ready for the next ticket.",
   paymentMethods,
   paymentTitle = "Payment method",
   printLabel = "Print receipt",
+  promotions,
   quickActions,
   resetLabel = "New order",
   selectedPaymentMethod,
+  subtotal,
 }: PaymentActionsProps) {
   const [openPaymentMethodId, setOpenPaymentMethodId] = useState<string | null>(null);
+  const [appliedMember, setAppliedMember] = useState<MemberProfile | null>(null);
   const displayChargeText = chargeAmount ? `${chargeLabel} ${chargeAmount}` : chargeLabel;
   const hasActionGrid = Boolean(
     (paymentMethods && paymentMethods.length > 0) || (quickActions && quickActions.length > 0),
   );
+  const handlePrimaryAction = () => {
+    if (isPaid) {
+      onResetOrder?.();
+      return;
+    }
+
+    const selectedMethod = paymentMethods?.find(
+      (method) => method.id === selectedPaymentMethod,
+    );
+
+    if (selectedMethod && !selectedMethod.disabled) {
+      setOpenPaymentMethodId(selectedMethod.id);
+      return;
+    }
+
+    onCharge?.();
+  };
 
   return (
     <section aria-label="Payment actions" className={`shrink-0 ${className}`}>
@@ -59,7 +90,6 @@ export function PaymentActions({
                 isSelected={selectedPaymentMethod === method.id}
                 onPress={() => {
                   onSelectPaymentMethod?.(method.id);
-                  setOpenPaymentMethodId(method.id);
                 }}
               />
             ))}
@@ -69,10 +99,19 @@ export function PaymentActions({
                 key={action.id}
                 action={action}
                 disabled={disabled}
-                isSelected={openPaymentMethodId === action.id}
+                isSelected={
+                  openPaymentMethodId === action.id ||
+                  (action.id === "promotion" && Boolean(appliedPromotion)) ||
+                  (action.id === "member" && Boolean(appliedMember))
+                }
                 onPress={() => {
                   onQuickAction?.(action.id);
-                  if (action.id === "brandWallet") {
+                  if (
+                    action.id === "brandWallet" ||
+                    action.id === "digitalWallet" ||
+                    action.id === "promotion" ||
+                    action.id === "member"
+                  ) {
                     setOpenPaymentMethodId(action.id);
                   }
                 }}
@@ -88,7 +127,7 @@ export function PaymentActions({
               size="lg"
               type="button"
               variant={isPaid ? "secondary" : "primary"}
-              onPress={onCharge}
+              onPress={handlePrimaryAction}
               className="w-full"
             >
               {({ isPending }) =>
@@ -112,6 +151,7 @@ export function PaymentActions({
                 onOpenChange={(isOpen) =>
                   setOpenPaymentMethodId(isOpen ? method.id : null)
                 }
+                onPaymentSuccess={onCharge}
               />
             ) : method.id === "bankCard" ? (
               <BankCardPaymentModal
@@ -121,6 +161,7 @@ export function PaymentActions({
                 onOpenChange={(isOpen) =>
                   setOpenPaymentMethodId(isOpen ? method.id : null)
                 }
+                onPaymentSuccess={onCharge}
               />
             ) : method.id === "khqr" ? (
               <KHQRPaymentModal
@@ -130,6 +171,7 @@ export function PaymentActions({
                 onOpenChange={(isOpen) =>
                   setOpenPaymentMethodId(isOpen ? method.id : null)
                 }
+                onPaymentSuccess={onCharge}
               />
             ) : (
               <PaymentMethodDrawer
@@ -153,6 +195,46 @@ export function PaymentActions({
                   setOpenPaymentMethodId(isOpen ? action.id : null)
                 }
               />
+            ) : action.id === "digitalWallet" ? (
+              <DigitalWalletPaymentModal
+                key={action.id}
+                isOpen={openPaymentMethodId === action.id}
+                method={action}
+                onOpenChange={(isOpen) =>
+                  setOpenPaymentMethodId(isOpen ? action.id : null)
+                }
+                onPaymentSuccess={onCharge}
+              />
+            ) : action.id === "promotion" ? (
+              <PromotionModal
+                key={action.id}
+                isOpen={openPaymentMethodId === action.id}
+                onOpenChange={(isOpen) =>
+                  setOpenPaymentMethodId(isOpen ? action.id : null)
+                }
+                subtotal={
+                  typeof subtotal === "number" && subtotal > 0
+                    ? subtotal
+                    : typeof chargeAmount === "number"
+                      ? chargeAmount
+                      : 22.5
+                }
+                appliedPromotion={appliedPromotion}
+                onApplyPromotion={onApplyPromotion}
+                onRemovePromotion={onRemovePromotion}
+                promotions={promotions}
+                formatCurrency={formatCurrency}
+              />
+            ) : action.id === "member" ? (
+              <MemberModal
+                key={action.id}
+                appliedMember={appliedMember}
+                isOpen={openPaymentMethodId === action.id}
+                onApplyMember={setAppliedMember}
+                onOpenChange={(isOpen) =>
+                  setOpenPaymentMethodId(isOpen ? action.id : null)
+                }
+              />
             ) : null,
           )}
         </div>
@@ -164,7 +246,7 @@ export function PaymentActions({
           isDisabled={disabled || isCharging}
           isPending={isCharging}
           variant={isPaid ? "secondary" : "primary"}
-          onPress={onCharge}
+          onPress={handlePrimaryAction}
           className="font-semibold"
         >
           {({ isPending }) => (
@@ -182,6 +264,14 @@ export function PaymentActions({
           )}
         </Button>
       )}
+
+      {appliedMember ? (
+        <AppliedMemberSummary
+          member={appliedMember}
+          onChange={() => setOpenPaymentMethodId("member")}
+          onRemove={() => setAppliedMember(null)}
+        />
+      ) : null}
 
       {isPaid && paidMessage ? (
         <div
@@ -250,4 +340,53 @@ function ActionButton({
       <span>{action.label}</span>
     </Button>
   );
+}
+
+function AppliedMemberSummary({
+  member,
+  onChange,
+  onRemove,
+}: {
+  member: MemberProfile;
+  onChange: () => void;
+  onRemove: () => void;
+}) {
+  return (
+    <Surface
+      className="mt-2 flex items-center gap-3 p-3"
+      variant="secondary"
+    >
+      <Avatar size="sm">
+        <Avatar.Fallback>{getMemberInitials(member.name)}</Avatar.Fallback>
+      </Avatar>
+
+      <div className="min-w-0 flex-1">
+        <p className="text-xs text-muted">Member</p>
+        <p className="truncate text-sm font-medium">
+          {member.name} · {member.tier.replace(/\s+Member$/, "")}
+        </p>
+        <p className="text-xs text-muted">
+          {member.points.toLocaleString("en-US")} points
+        </p>
+      </div>
+
+      <div className="flex shrink-0 gap-1">
+        <Button size="sm" variant="ghost" onPress={onChange}>
+          Change
+        </Button>
+        <Button size="sm" variant="ghost" onPress={onRemove}>
+          Remove
+        </Button>
+      </div>
+    </Surface>
+  );
+}
+
+function getMemberInitials(name: string) {
+  return name
+    .split(" ")
+    .map((part) => part[0])
+    .join("")
+    .slice(0, 2)
+    .toUpperCase();
 }

@@ -20,6 +20,7 @@ interface BankCardPaymentModalProps {
   method: PaymentMethodOption;
   isOpen: boolean;
   onOpenChange: (isOpen: boolean) => void;
+  onPaymentSuccess?: () => void;
 }
 
 type CardOptionId = "visa" | "mastercard" | `custom-${string}`;
@@ -56,6 +57,7 @@ export function BankCardPaymentModal({
   isOpen,
   method,
   onOpenChange,
+  onPaymentSuccess,
 }: BankCardPaymentModalProps) {
   const [cardOptions, setCardOptions] =
     useState<PaymentCardOption[]>(initialCardOptions);
@@ -73,6 +75,7 @@ export function BankCardPaymentModal({
       description: `Payment received: $${AMOUNT_DUE.toFixed(2)}`,
     });
 
+    onPaymentSuccess?.();
     onOpenChange(false);
   };
 

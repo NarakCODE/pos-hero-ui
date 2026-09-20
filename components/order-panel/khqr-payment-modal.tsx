@@ -7,6 +7,7 @@ interface KHQRPaymentModalProps {
   method: PaymentMethodOption;
   isOpen: boolean;
   onOpenChange: (isOpen: boolean) => void;
+  onPaymentSuccess?: () => void;
 }
 
 const QR_CODE_IMAGE_URL =
@@ -33,7 +34,13 @@ export function KHQRPaymentModal({
   isOpen,
   method,
   onOpenChange,
+  onPaymentSuccess,
 }: KHQRPaymentModalProps) {
+  const handleComplete = () => {
+    onPaymentSuccess?.();
+    onOpenChange(false);
+  };
+
   return (
     <Modal.Backdrop isOpen={isOpen} onOpenChange={onOpenChange}>
       <Modal.Container size="cover">
@@ -127,10 +134,26 @@ export function KHQRPaymentModal({
             </div>
           </Modal.Body>
 
-          <Modal.Footer>
-            <Button fullWidth size="lg" slot="close" variant="secondary">
+          <Modal.Footer className="w-full flex-col gap-2 sm:flex-row">
+            <Button
+              className="sm:flex-1"
+              fullWidth
+              size="lg"
+              slot="close"
+              variant="secondary"
+            >
               Close
             </Button>
+            {onPaymentSuccess ? (
+              <Button
+                className="sm:flex-1"
+                fullWidth
+                size="lg"
+                onPress={handleComplete}
+              >
+                Mark as paid
+              </Button>
+            ) : null}
           </Modal.Footer>
         </Modal.Dialog>
       </Modal.Container>

@@ -22,6 +22,7 @@ import {
 import {
   OrderPanel,
   OrderPanelFooter,
+  type AppliedPromotion,
   type OrderPanelItem,
 } from "@/components/order-panel";
 import { Button, SearchField, Tabs } from "@heroui/react";
@@ -63,6 +64,8 @@ export default function SalesPage() {
     useState<PaymentMethodId>("cash");
   const [orderType, setOrderType] = useState<"takeaway" | "dineIn">("takeaway");
   const [orderChannel, setOrderChannel] = useState<OrderChannel>("Wownow");
+  const [appliedPromotion, setAppliedPromotion] =
+    useState<AppliedPromotion | null>(null);
   const [isPaid, setIsPaid] = useState(false);
 
   const categoryOptions: Array<{ id: CategoryId; label: string }> = useMemo(
@@ -149,13 +152,27 @@ export default function SalesPage() {
     const product = getProduct(item.productId);
     return total + (product?.price ?? 0) * item.quantity;
   }, 0);
-  const discount = subtotal * 0.05;
-  const tax = (subtotal - discount) * 0.1;
-  const total = subtotal - discount + tax;
+  const promoDiscount = appliedPromotion
+    ? appliedPromotion.type === "percentage"
+      ? (subtotal * appliedPromotion.value) / 100
+      : Math.min(appliedPromotion.value, subtotal)
+    : 0;
+  const memberDiscount = subtotal * 0.05;
+  const discount = appliedPromotion ? promoDiscount : memberDiscount;
+  const tax = Math.max(0, (subtotal - discount) * 0.1);
+  const total = Math.max(0, subtotal - discount + tax);
   const itemCount = orderItems.reduce(
     (count, item) => count + item.quantity,
     0,
   );
+
+  const currentAppliedPromotion: AppliedPromotion | null = useMemo(() => {
+    if (!appliedPromotion) return null;
+    return {
+      ...appliedPromotion,
+      discountAmount: Number(promoDiscount.toFixed(2)),
+    };
+  }, [appliedPromotion, promoDiscount]);
 
   const panelItems: OrderPanelItem[] = useMemo(() => {
     return orderItems.flatMap((item) => {
@@ -268,12 +285,14 @@ export default function SalesPage() {
 
   const handleClearTicket = () => {
     setOrderItems([]);
+    setAppliedPromotion(null);
     setIsPaid(false);
   };
 
   return (
     <POSLayout
       showSearch={false}
+      rightPanelLabel={t("ticketTitle")}
       rightPanel={
         <OrderPanel
           className="h-full rounded-none border-0"
@@ -314,6 +333,9 @@ export default function SalesPage() {
           subtotal={subtotal}
           subtotalLabel={t("ticketSummary.subtotal")}
           discount={discount}
+          appliedPromotion={currentAppliedPromotion}
+          onApplyPromotion={setAppliedPromotion}
+          onRemovePromotion={() => setAppliedPromotion(null)}
           discountLabel={t("summary.discount")}
           totalDiscountLabel={t("ticketSummary.totalDiscount")}
           tax={tax}
@@ -356,6 +378,11 @@ export default function SalesPage() {
               shiftLabel={t("ticketSummary.shift")}
               shiftInfo={`${t("cashier")} · ${t("shiftOpen")}`}
               dateTimeLabel={t("ticketSummary.dateTime")}
+              signOutTriggerLabel={t("signOut")}
+              signOutHeader={t("signOutDialog.header")}
+              signOutBody={t("signOutDialog.body")}
+              signOutCancelLabel={t("signOutDialog.cancel")}
+              signOutConfirmLabel={t("signOutDialog.confirm")}
             />
           }
         />
@@ -371,7 +398,7 @@ export default function SalesPage() {
           className="flex min-h-0 flex-1 flex-col overflow-hidden gap-0"
         >
           {/* 1. Tab Categories Section */}
-          <div className="shrink-0 border-b border-border/70 bg-background px-3.5 py-2 sm:px-4 sm:py-2.5">
+          <div className="shrink-0 bg-background px-3.5 py-2 sm:px-4 sm:py-2.5">
             <Tabs.ListContainer>
               <Tabs.List aria-label={t("categoryLabel")}>
                 {categoryOptions.map((item) => (
@@ -389,7 +416,7 @@ export default function SalesPage() {
           </div>
 
           {/* 2. Search Menu Items Bar (below tab categories section) */}
-          <div className="flex shrink-0 items-center gap-2 border-b border-border/60 bg-surface-secondary/20 px-3.5 py-2 sm:px-4">
+          <div className="flex shrink-0 items-center gap-2 px-3.5 sm:px-4">
             <SearchField
               aria-label={t("searchLabel")}
               className="flex-1"

@@ -11,9 +11,9 @@ export const orderChannels = [
 
 export type OrderChannel = (typeof orderChannels)[number];
 
-const defaultOrderChannelAvatarSrc =
+export const defaultOrderChannelAvatarSrc =
   "https://heroui-assets.nyc3.cdn.digitaloceanspaces.com/avatars/blue.jpg";
-const orderChannelAvatarSrcByChannel: Partial<Record<OrderChannel, string>> = {
+export const orderChannelAvatarSrcByChannel: Record<string, string> = {
   "E-GetS":
     "https://www.e-gets.com/images/common/logo-egets.png",
   Foodpanda: "https://img.icons8.com/color/1200/foodpanda.jpg",
@@ -23,15 +23,22 @@ const orderChannelAvatarSrcByChannel: Partial<Record<OrderChannel, string>> = {
     "https://media.licdn.com/dms/image/v2/D560BAQEOZJiZ1czI1g/company-logo_200_200/company-logo_200_200/0/1681972958993/u_life_kh_super_app_co_ltd_logo?e=2147483647&v=beta&t=Vx4Yylwr809AZKtHMDS6Ib89Gj0cQ0o3Y_NTz5nWxB4",
 };
 
-const orderChannelFallbacks: Record<OrderChannel, string> = {
+export const orderChannelFallbacks: Record<string, string> = {
   "E-GetS": "EG",
   Foodpanda: "FO",
   GrabFood: "GR",
   Wownow: "WO",
 };
 
-const getOrderChannelAvatarSrc = (channel: OrderChannel) =>
-  orderChannelAvatarSrcByChannel[channel] ?? defaultOrderChannelAvatarSrc;
+export const getOrderChannelAvatarSrc = (channel: string): string | undefined => {
+  const normalized = channel.toLowerCase();
+  if (normalized === "foodpanda") return orderChannelAvatarSrcByChannel.Foodpanda;
+  if (normalized === "grabfood") return orderChannelAvatarSrcByChannel.GrabFood;
+  if (normalized === "wownow") return orderChannelAvatarSrcByChannel.Wownow;
+  if (normalized === "e-gets" || normalized === "egets")
+    return orderChannelAvatarSrcByChannel["E-GetS"];
+  return orderChannelAvatarSrcByChannel[channel];
+};
 
 interface OrderChannelSelectProps {
   value: OrderChannel;

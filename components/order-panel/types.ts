@@ -78,6 +78,60 @@ export interface OrderItemsTableProps {
   };
 }
 
+export interface Promotion {
+  id: string;
+  name: string;
+  code?: string;
+  description: string;
+  type: "percentage" | "fixed";
+  value: number;
+  minSpend?: number;
+  isAvailable?: boolean;
+  expiryDate?: string;
+}
+
+export interface AppliedPromotion {
+  id: string;
+  name: string;
+  code?: string;
+  type: "percentage" | "fixed";
+  value: number;
+  discountAmount: number;
+  description?: string;
+}
+
+export interface PromotionModalProps {
+  isOpen: boolean;
+  onOpenChange: (isOpen: boolean) => void;
+  subtotal: number;
+  appliedPromotion?: AppliedPromotion | null;
+  onApplyPromotion?: (promotion: AppliedPromotion) => void;
+  onRemovePromotion?: () => void;
+  promotions?: Promotion[];
+  formatCurrency?: (amount: number) => string;
+  className?: string;
+}
+
+export interface MemberProfile {
+  id: string;
+  name: string;
+  tier: string;
+  points: number;
+  availableBenefit: string;
+  phone: string;
+  memberId: string;
+  scanCode: string;
+}
+
+export interface MemberModalProps {
+  isOpen: boolean;
+  onOpenChange: (isOpen: boolean) => void;
+  appliedMember?: MemberProfile | null;
+  members?: readonly MemberProfile[];
+  onApplyMember?: (member: MemberProfile) => void;
+  className?: string;
+}
+
 export interface BillingSummaryRow {
   label: string;
   value: ReactNode;
@@ -111,6 +165,9 @@ export interface BillingSummaryProps {
   changeSecondaryAmount?: ReactNode;
   formatCurrency?: (amount: number) => string;
   customRows?: BillingSummaryRow[];
+  appliedPromotion?: AppliedPromotion | null;
+  onRemovePromotion?: () => void;
+  onOpenPromotionModal?: () => void;
   className?: string;
 }
 
@@ -136,18 +193,49 @@ export interface PaymentActionsProps {
   onResetOrder?: () => void;
   resetLabel?: string;
   actionsSlot?: ReactNode;
+  appliedPromotion?: AppliedPromotion | null;
+  onApplyPromotion?: (promotion: AppliedPromotion) => void;
+  onRemovePromotion?: () => void;
+  subtotal?: number;
+  promotions?: Promotion[];
+  formatCurrency?: (amount: number) => string;
   className?: string;
 }
 
+export interface SignOutAlertDialogProps {
+  body?: ReactNode;
+  cancelLabel?: ReactNode;
+  className?: string;
+  confirmLabel?: ReactNode;
+  header?: ReactNode;
+  isOpen?: boolean;
+  onConfirm?: () => void;
+  onOpenChange?: (isOpen: boolean) => void;
+  onSignOut?: () => void;
+  status?: "default" | "accent" | "success" | "warning" | "danger";
+  trigger?: ReactNode;
+  triggerClassName?: string;
+}
+
 export interface OrderPanelFooterProps {
+  className?: string;
+  dateTime?: ReactNode;
+  dateTimeLabel?: ReactNode;
+  locale?: string;
+  onSignOut?: () => void;
+  shiftInfo?: ReactNode;
+  shiftLabel?: ReactNode;
+  showSignOut?: boolean;
+  signOutBody?: ReactNode;
+  signOutCancelLabel?: ReactNode;
+  signOutConfirmLabel?: ReactNode;
+  signOutHeader?: ReactNode;
+  signOutStatus?: "default" | "accent" | "success" | "warning" | "danger";
+  signOutTrigger?: ReactNode;
+  signOutTriggerClassName?: string;
+  signOutTriggerLabel?: ReactNode;
   systemLabel?: ReactNode;
   systemStatus?: ReactNode;
-  shiftLabel?: ReactNode;
-  shiftInfo?: ReactNode;
-  dateTimeLabel?: ReactNode;
-  dateTime?: ReactNode;
-  locale?: string;
-  className?: string;
 }
 
 export interface OrderPanelProps {
@@ -222,6 +310,10 @@ export interface OrderPanelProps {
   changeSecondaryAmount?: ReactNode;
   formatCurrency?: (amount: number) => string;
   customBillingRows?: BillingSummaryRow[];
+  appliedPromotion?: AppliedPromotion | null;
+  onApplyPromotion?: (promotion: AppliedPromotion) => void;
+  onRemovePromotion?: () => void;
+  promotions?: Promotion[];
 
   // Payment Props
   paymentMethods?: PaymentMethodOption[];

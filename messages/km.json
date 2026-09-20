@@ -45,11 +45,161 @@
     "description": "អ្នកបានចូលទៅកាន់កន្លែងធ្វើការ RakPOS របស់អ្នក។",
     "signOut": "ចាកចេញ"
   },
+  "OrdersPage": {
+    "toolbar": {
+      "searchLabel": "ស្វែងរកការបញ្ជាទិញ",
+      "searchPlaceholder": "ស្វែងរកការបញ្ជាទិញ...",
+      "channelLabel": "ប្រភពបញ្ជាទិញ",
+      "dateLabel": "កាលបរិច្ឆេទ / វេន",
+      "statusLabel": "ស្ថានភាពបញ្ជាទិញ",
+      "paymentStatusLabel": "ស្ថានភាពបង់ប្រាក់",
+      "filters": "តម្រង",
+      "reset": "កំណត់ឡើងវិញ",
+      "clearAll": "សម្អាតទាំងអស់",
+      "batchActions": "សកម្មភាពជាក្រុម",
+      "selected": "បានជ្រើស {count}",
+      "batchPrint": "បោះពុម្ពជាក្រុម",
+      "batchSettle": "ទូទាត់ជាក្រុម",
+      "exportCsv": "នាំចេញ CSV"
+    },
+    "channels": {
+      "all": "គ្រប់ប្រភព",
+      "pos": "ក្នុងហាង / POS",
+      "dineIn": "ញ៉ាំនៅហាង",
+      "takeAway": "យកទៅ",
+      "wownow": "WowNow",
+      "foodpanda": "Foodpanda",
+      "grabfood": "GrabFood",
+      "nham24": "NHAM24"
+    },
+    "dateFilters": {
+      "today": "ថ្ងៃនេះ",
+      "morning": "វេនព្រឹក",
+      "afternoon": "វេនរសៀល",
+      "evening": "វេនល្ងាច",
+      "custom": "ជួរកាលបរិច្ឆេទផ្ទាល់ខ្លួន"
+    },
+    "statuses": {
+      "all": "ទាំងអស់",
+      "new": "ថ្មី",
+      "inProgress": "កំពុងដំណើរការ",
+      "onHold": "ផ្អាក",
+      "completed": "បានបញ្ចប់",
+      "rejected": "បានបដិសេធ",
+      "refund": "សងប្រាក់",
+      "void": "មោឃៈ",
+      "expired": "ផុតកំណត់",
+      "cancelled": "បានបោះបង់"
+    },
+    "paymentStatuses": {
+      "all": "ការទូទាត់ទាំងអស់",
+      "paid": "បានបង់",
+      "pending": "កំពុងរង់ចាំ",
+      "refunded": "បានសងប្រាក់"
+    },
+    "loyaltyTiers": {
+      "vip": "VIP",
+      "gold": "មាស",
+      "silver": "ប្រាក់",
+      "member": "សមាជិក"
+    },
+    "table": {
+      "label": "តារាងទិន្នន័យបញ្ជាទិញ",
+      "selectAll": "ជ្រើសរើសការបញ្ជាទិញទាំងអស់",
+      "selectOrder": "ជ្រើសរើសការបញ្ជាទិញ {order}",
+      "no": "ល.រ.",
+      "orderId": "លេខបញ្ជាទិញ",
+      "tableTicket": "តុ / បង្កាន់ដៃ",
+      "customer": "អតិថិជន",
+      "channel": "ប្រភពបញ្ជាទិញ",
+      "payment": "ការបង់ប្រាក់",
+      "totalBill": "វិក្កយបត្រសរុប",
+      "dateTime": "កាលបរិច្ឆេទ និងពេលវេលា",
+      "pickupTime": "ពេលយកទំនិញ",
+      "endTime": "ពេលបញ្ចប់",
+      "status": "ស្ថានភាព",
+      "items": "សង្ខេបទំនិញ",
+      "quantity": "ចំនួន",
+      "total": "ទឹកប្រាក់សរុប",
+      "paymentStatus": "ស្ថានភាពបង់ប្រាក់",
+      "orderStatus": "ស្ថានភាពបញ្ជាទិញ",
+      "created": "បានបង្កើត",
+      "actions": "សកម្មភាព",
+      "moreItems": "បន្ថែម {count} មុខទៀត",
+      "empty": "គ្មានការបញ្ជាទិញដែលត្រូវនឹងតម្រងដែលបានជ្រើសទេ។"
+    },
+    "details": {
+      "title": "ព័ត៌មានលម្អិតសម្រាប់ {order}",
+      "itemsTitle": "ទំនិញ និងជម្រើស",
+      "paymentTitle": "ព័ត៌មានបង់ប្រាក់",
+      "timelineTitle": "ពេលវេលាបញ្ជាទិញ",
+      "tender": "វិធីបង់ប្រាក់",
+      "received": "ប្រាក់ទទួល",
+      "change": "ប្រាក់អាប់",
+      "ordered": "បានបញ្ជាទិញ",
+      "kitchenSent": "បានផ្ញើទៅផ្ទះបាយ",
+      "completed": "បានបញ្ចប់"
+    },
+    "actions": {
+      "viewDetails": "មើលព័ត៌មានលម្អិត {order}",
+      "copyOrder": "ចម្លងលេខបញ្ជាទិញ {order}",
+      "copiedOrder": "បានចម្លងលេខបញ្ជាទិញ {order}",
+      "printReceipt": "បោះពុម្ពបង្កាន់ដៃ {order}",
+      "more": "សកម្មភាពបន្ថែមសម្រាប់ {order}",
+      "expandOrder": "ពង្រីកការបញ្ជាទិញ {order}",
+      "collapseOrder": "បង្រួមការបញ្ជាទិញ {order}"
+    },
+    "batch": {
+      "printMessage": "បានផ្ញើការបញ្ជាទិញ {count} ទៅបោះពុម្ព។",
+      "settleMessage": "បានទូទាត់ការបញ្ជាទិញ {count}។",
+      "exportMessage": "បាននាំចេញការបញ្ជាទិញ {count} ទៅ CSV។"
+    },
+    "pagination": {
+      "showing": "កំពុងបង្ហាញ {from}–{to} នៃការបញ្ជាទិញ {total}",
+      "rows": "ជួរ",
+      "previous": "ទំព័រមុន",
+      "next": "ទំព័របន្ទាប់"
+    },
+    "summary": {
+      "label": "សង្ខេបការបញ្ជាទិញ",
+      "revenue": "ចំណូលសរុប",
+      "active": "បញ្ជាទិញសកម្ម",
+      "completed": "បានបញ្ចប់"
+    },
+    "aside": {
+      "eyebrow": "ព័ត៌មានលម្អិតបញ្ជាទិញ",
+      "title": "ព័ត៌មានលម្អិត និងសកម្មភាព",
+      "tableTicket": "លេខតុ/បង្កាន់ដៃ",
+      "sequence": "ល.រ.",
+      "status": "ស្ថានភាព",
+      "orderChannel": "ប្រភពបញ្ជាទិញ",
+      "product": "ផលិតផល",
+      "price": "តម្លៃ",
+      "quantity": "ចំនួន",
+      "amount": "ទឹកប្រាក់",
+      "remarkTitle": "កំណត់សម្គាល់",
+      "remark": "សូមដាក់ទឹកកកទាំងអស់នៅខាងក្រៅភេសជ្ជៈ",
+      "tenderInfo": "ព័ត៌មានបង់ប្រាក់",
+      "totals": "សរុប",
+      "subtotal": "សរុបរង",
+      "discount": "បញ្ចុះតម្លៃសរុប",
+      "vat": "VAT (10%)",
+      "grandTotal": "សរុប",
+      "accept": "យល់ព្រម",
+      "reject": "បដិសេធ"
+    }
+  },
   "SalesMenu": {
     "brandName": "RakPOS",
     "cashier": "សុខា",
     "shiftOpen": "វេនកំពុងដំណើរការ",
     "signOut": "ចាកចេញ",
+    "signOutDialog": {
+      "body": "អ្នកនឹងត្រូវចូលគណនីម្តងទៀតដើម្បីចូលប្រើគណនីរបស់អ្នក។ ការផ្លាស់ប្តូរដែលមិនទាន់រក្សាទុកនឹងត្រូវបាត់បង់។",
+      "cancel": "បន្តនៅក្នុងគណនី",
+      "confirm": "ចាកចេញ",
+      "header": "តើអ្នកពិតជាចង់ចាកចេញពីគណនី?"
+    },
     "catalogEyebrow": "ម៉ឺនុយ",
     "catalogTitle": "ជ្រើសរើសផលិតផល",
     "searchLabel": "ស្វែងរកផលិតផល",
@@ -204,6 +354,88 @@
         "eyebrow": "ប្រតិបត្តិការ",
         "emptyTitle": "ឧបករណ៍ប្រតិបត្តិការផ្សេងៗ",
         "emptyDescription": "ការគ្រប់គ្រងថតប្រាក់ របាយការណ៍បិទវេន និងការផ្លាស់ប្តូរវេនបុគ្គលិក។"
+      }
+    },
+    "rightPanel": {
+      "orders": {
+        "eyebrow": "កន្លែងធ្វើការបញ្ជាទិញ",
+        "title": "សកម្មភាពបញ្ជាទិញ",
+        "summaryTitle": "បន្តដំណើរការបញ្ជាទិញ",
+        "summary": "ពិនិត្យបញ្ជាទិញដែលកំពុងដំណើរការនៅទីនេះ ហើយត្រឡប់ទៅការលក់នៅពេលអ្នកត្រៀមបង្កើត ឬបន្តបញ្ជាទិញ។",
+        "metricOneLabel": "បញ្ជាទិញបើក",
+        "metricOneValue": "0",
+        "metricTwoLabel": "រង់ចាំបង់ប្រាក់",
+        "metricTwoValue": "0",
+        "detailsTitle": "ស្ថានភាពជួរ",
+        "detailOneLabel": "ជួរបញ្ជាទិញ",
+        "detailOneValue": "ទំនេរ",
+        "detailTwoLabel": "សកម្មភាពចុងក្រោយ",
+        "detailTwoValue": "គ្មានសកម្មភាព",
+        "action": "បើកការលក់"
+      },
+      "table": {
+        "eyebrow": "ប្រតិបត្តិការផ្ទៃហាង",
+        "title": "ទិដ្ឋភាពផ្ទៃហាង",
+        "summaryTitle": "គ្រប់គ្រងកន្លែងអង្គុយ",
+        "summary": "ប្រើកន្លែងធ្វើការតុ ដើម្បីចាប់ផ្តើមបញ្ជាទិញញ៉ាំនៅហាង និងមើលស្ថានភាពតុរបស់ក្រុមការងារ។",
+        "metricOneLabel": "តុទំនេរ",
+        "metricOneValue": "0",
+        "metricTwoLabel": "តុមានភ្ញៀវ",
+        "metricTwoValue": "0",
+        "detailsTitle": "ស្ថានភាពផ្ទៃហាង",
+        "detailOneLabel": "តំបន់អង្គុយ",
+        "detailOneValue": "មិនទាន់កំណត់",
+        "detailTwoLabel": "បញ្ជាទិញបើក",
+        "detailTwoValue": "0",
+        "action": "ចាប់ផ្តើមបញ្ជាទិញ"
+      },
+      "customer": {
+        "eyebrow": "កន្លែងធ្វើការភាពស្មោះត្រង់",
+        "title": "សកម្មភាពអតិថិជន",
+        "summaryTitle": "រក្សាព័ត៌មានអតិថិជននៅជិត",
+        "summary": "ស្វែងរកគណនីអតិថិជន ពិន្ទុរង្វាន់ និងប្រវត្តិទិញ ដោយមិនចាកចេញពីប្លង់ POS បច្ចុប្បន្ន។",
+        "metricOneLabel": "សមាជិក",
+        "metricOneValue": "0",
+        "metricTwoLabel": "រង្វាន់មាន",
+        "metricTwoValue": "0",
+        "detailsTitle": "ស្ថានភាពអតិថិជន",
+        "detailOneLabel": "គណនី",
+        "detailOneValue": "ត្រៀមបន្ថែម",
+        "detailTwoLabel": "ស្វែងរកសមាជិក",
+        "detailTwoValue": "អាចប្រើបាន",
+        "action": "មើលបញ្ជីអតិថិជន"
+      },
+      "settings": {
+        "eyebrow": "ស្ថានភាពឧបករណ៍",
+        "title": "សុខភាពម៉ាស៊ីនលក់",
+        "summaryTitle": "រក្សាម៉ាស៊ីនលក់ឱ្យត្រៀមរួច",
+        "summary": "ពិនិត្យការកំណត់ម៉ាស៊ីន និងការរៀបចំការបង់ប្រាក់ ខណៈពេលដែលរក្សាការរុករក POS សំខាន់នៅដដែល។",
+        "metricOneLabel": "ស្ថានភាពម៉ាស៊ីន",
+        "metricOneValue": "ត្រៀមរួច",
+        "metricTwoLabel": "វិធីបង់ប្រាក់",
+        "metricTwoValue": "4",
+        "detailsTitle": "ការកំណត់រចនាសម្ព័ន្ធ",
+        "detailOneLabel": "ម៉ាស៊ីនបោះពុម្ព",
+        "detailOneValue": "មិនបានភ្ជាប់",
+        "detailTwoLabel": "ធ្វើសមកាលកម្មចុងក្រោយ",
+        "detailTwoValue": "មិនមាន",
+        "action": "បើកការកំណត់"
+      },
+      "more": {
+        "eyebrow": "ប្រតិបត្តិការ",
+        "title": "ឧបករណ៍វេន",
+        "summaryTitle": "រក្សាប្រតិបត្តិការឱ្យនៅជាមួយគ្នា",
+        "summary": "ចូលប្រើរបាយការណ៍វេន ការងារថតប្រាក់ និងឧបករណ៍ប្រតិបត្តិការផ្សេងៗពីកន្លែងធ្វើការនេះ។",
+        "metricOneLabel": "ស្ថានភាពវេន",
+        "metricOneValue": "បើក",
+        "metricTwoLabel": "ថតប្រាក់",
+        "metricTwoValue": "ត្រៀមរួច",
+        "detailsTitle": "ទិដ្ឋភាពវេន",
+        "detailOneLabel": "អ្នកគិតប្រាក់បច្ចុប្បន្ន",
+        "detailOneValue": "សុខា",
+        "detailTwoLabel": "បានចាប់ផ្តើម",
+        "detailTwoValue": "ថ្ងៃនេះ",
+        "action": "បើកឧបករណ៍"
       }
     }
   }

@@ -17,6 +17,7 @@ interface CashPaymentModalProps {
   method: PaymentMethodOption;
   isOpen: boolean;
   onOpenChange: (isOpen: boolean) => void;
+  onPaymentSuccess?: () => void;
 }
 
 const AMOUNT_DUE = 22.5;
@@ -42,6 +43,7 @@ export function CashPaymentModal({
   isOpen,
   method,
   onOpenChange,
+  onPaymentSuccess,
 }: CashPaymentModalProps) {
   const [cashReceived, setCashReceived] = useState("");
 
@@ -84,6 +86,7 @@ export function CashPaymentModal({
     toast.success("Cash payment completed", {
       description: `Payment received: $${receivedAmount.toFixed(2)}`,
     });
+    onPaymentSuccess?.();
     onOpenChange(false);
   };
 

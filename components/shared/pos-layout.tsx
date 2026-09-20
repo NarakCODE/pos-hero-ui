@@ -12,6 +12,7 @@ interface POSLayoutProps {
   searchPlaceholder?: string;
   showSearch?: boolean;
   headerTitle?: string;
+  rightPanelLabel?: string;
   className?: string;
 }
 
@@ -24,12 +25,13 @@ export function POSLayout({
   searchPlaceholder,
   searchQuery,
   showSearch = true,
+  rightPanelLabel = "Right panel",
 }: POSLayoutProps) {
   return (
     <div
       className={`flex h-screen h-dvh w-full flex-col overflow-hidden bg-background text-foreground ${className}`}
     >
-      {/* Upper Area: Left Main Workstation + Right Order Panel */}
+      {/* Upper Area: Left Main Workstation + Right Context Panel */}
       <div className="flex min-h-0 flex-1 w-full overflow-hidden">
         {/* Left Main Workstation */}
         <section
@@ -53,10 +55,10 @@ export function POSLayout({
           </main>
         </section>
 
-        {/* Right Side: Order Panel */}
+        {/* Right Side: Dynamic Context Panel */}
         {rightPanel ? (
           <aside
-            aria-label="Order summary panel"
+            aria-label={rightPanelLabel}
             className="hidden h-full shrink-0 flex-col overflow-hidden bg-background lg:flex lg:w-[40%]"
           >
             {rightPanel}

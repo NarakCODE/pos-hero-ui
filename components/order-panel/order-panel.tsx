@@ -1,15 +1,19 @@
 "use client";
 
+import { useState } from "react";
 import { BillingSummary } from "./billing-summary";
 import { OrderHeader } from "./order-header";
 import { OrderItemsTable } from "./order-items-table";
+import { OrderPanelFooter, SignOutAlertDialog } from "./order-panel-footer";
 import { PaymentActions } from "./payment-actions";
-import type { OrderPanelProps } from "./types";
+import { PromotionModal } from "./promotion-modal";
+import type { AppliedPromotion, OrderPanelProps } from "./types";
 
 const defaultFormatCurrency = (amount: number) => `$${amount.toFixed(2)}`;
 
 export function OrderPanel({
   actionsSlot,
+  appliedPromotion,
   ariaLabel = "Order ticket",
   changeAmount,
   changeLabel,
@@ -47,9 +51,11 @@ export function OrderPanel({
   onCharge,
   onClearTicket,
   onHoldOrder,
+  onApplyPromotion,
   onPrintReceipt,
   onQuickAction,
   onRemoveItem,
+  onRemovePromotion,
   onResetOrder,
   onSelectPaymentMethod,
   onUpdateQuantity,
@@ -62,6 +68,7 @@ export function OrderPanel({
   paymentMethod,
   paymentMethods,
   paymentTitle,
+  promotions,
   quickActions,
   printLabel,
   receivedAmount,
@@ -90,6 +97,11 @@ export function OrderPanel({
   totalLabel,
   viewMode = "table",
 }: OrderPanelProps) {
+  const [localPromotion, setLocalPromotion] = useState<AppliedPromotion | null>(null);
+  const currentPromotion = appliedPromotion !== undefined ? appliedPromotion : localPromotion;
+  const handleApplyPromotion = onApplyPromotion ?? setLocalPromotion;
+  const handleRemovePromotion = onRemovePromotion ?? (() => setLocalPromotion(null));
+
   const containerClasses = className
     ? `flex h-full min-h-0 min-w-0 flex-col overflow-hidden bg-background p-3 sm:p-4 ${className}`
     : "flex h-full min-h-0 min-w-0 flex-col overflow-hidden rounded-2xl border border-border bg-background p-3 sm:p-4";
@@ -110,12 +122,13 @@ export function OrderPanel({
     itemCount !== undefined
       ? itemCount
       : items.reduce((acc, item) => acc + item.quantity, 0);
-  const calculatedDiscount = discount ?? 0;
+  const promoDiscount = currentPromotion ? currentPromotion.discountAmount : 0;
+  const calculatedDiscount = (discount ?? 0) + promoDiscount;
   const calculatedTax = tax ?? 0;
   const calculatedTotal =
     total !== undefined
       ? total
-      : calculatedSubtotal - calculatedDiscount + calculatedTax + (serviceCharge ?? 0);
+      : Math.max(0, calculatedSubtotal - calculatedDiscount + calculatedTax + (serviceCharge ?? 0));
   const formattedChargeAmount =
     chargeAmount !== undefined ? chargeAmount : formatCurrency(calculatedTotal);
 
@@ -187,6 +200,8 @@ export function OrderPanel({
         changeSecondaryAmount={changeSecondaryAmount}
         formatCurrency={formatCurrency}
         customRows={customBillingRows}
+        appliedPromotion={currentPromotion}
+        onRemovePromotion={handleRemovePromotion}
         className="mt-3"
       />
 
@@ -212,6 +227,12 @@ export function OrderPanel({
         onResetOrder={onResetOrder}
         resetLabel={resetLabel}
         actionsSlot={actionsSlot}
+        appliedPromotion={currentPromotion}
+        onApplyPromotion={handleApplyPromotion}
+        onRemovePromotion={handleRemovePromotion}
+        subtotal={calculatedSubtotal}
+        promotions={promotions}
+        formatCurrency={formatCurrency}
         className="mt-3"
       />
 
@@ -224,3 +245,6 @@ OrderPanel.Header = OrderHeader;
 OrderPanel.ItemsTable = OrderItemsTable;
 OrderPanel.BillingSummary = BillingSummary;
 OrderPanel.PaymentActions = PaymentActions;
+OrderPanel.Footer = OrderPanelFooter;
+OrderPanel.SignOutAlertDialog = SignOutAlertDialog;
+OrderPanel.PromotionModal = PromotionModal;

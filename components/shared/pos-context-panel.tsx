@@ -6,11 +6,11 @@ import { useRouter } from "next/navigation";
 import type { IconComponent } from "reicon-react";
 import {
   More2,
-  Note2,
   Profile,
   Settings,
   Shop,
 } from "reicon-react";
+import { IconClipboardList, type TablerIcon } from "@tabler/icons-react";
 
 export type POSContextPanelKind =
   | "orders"
@@ -19,13 +19,15 @@ export type POSContextPanelKind =
   | "settings"
   | "more";
 
+type ContextPanelIcon = IconComponent | TablerIcon;
+
 interface POSContextPanelConfig {
-  icon: IconComponent;
+  icon: ContextPanelIcon;
   href: string;
 }
 
 const panelConfig: Record<POSContextPanelKind, POSContextPanelConfig> = {
-  orders: { href: "/sales", icon: Note2 },
+  orders: { href: "/sales", icon: IconClipboardList },
   table: { href: "/sales", icon: Shop },
   customer: { href: "/customer", icon: Profile },
   settings: { href: "/settings", icon: Settings },

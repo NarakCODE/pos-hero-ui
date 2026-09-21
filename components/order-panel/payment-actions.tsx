@@ -286,14 +286,26 @@ export function PaymentActions({
       {onPrintReceipt || onHoldOrder || onResetOrder || actionsSlot ? (
         <div className="flex items-center gap-2 pt-2">
           {onPrintReceipt ? (
-            <Button type="button" variant="outline" size="sm" fullWidth onPress={onPrintReceipt} className="text-xs">
+            <Button
+              fullWidth
+              size="lg"
+              type="button"
+              variant="secondary"
+              onPress={onPrintReceipt}
+            >
               <Printer aria-hidden="true" size={14} />
               <span>{printLabel}</span>
             </Button>
           ) : null}
 
           {onHoldOrder && !isPaid ? (
-            <Button type="button" variant="outline" size="sm" fullWidth onPress={onHoldOrder} className="text-xs">
+            <Button
+              fullWidth
+              size="lg"
+              type="button"
+              variant="secondary"
+              onPress={onHoldOrder}
+            >
               <Clock aria-hidden="true" size={14} />
               <span>{holdLabel}</span>
             </Button>

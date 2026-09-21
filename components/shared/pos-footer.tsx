@@ -8,26 +8,29 @@ import type { IconComponent } from "reicon-react";
 import {
   Logout,
   More2,
-  Note2,
   Profile,
   Receipt2,
   Settings,
   Shop,
 } from "reicon-react";
+import { IconClipboardList } from "@tabler/icons-react";
+import type { TablerIcon } from "@tabler/icons-react";
 import { authSessionStorageKey } from "@/config/auth";
 import { SignOutAlertDialog } from "@/components/order-panel";
 
 type NavigationId = "sales" | "orders" | "table" | "customer" | "settings" | "more";
 
+type NavigationIcon = IconComponent | TablerIcon;
+
 interface NavigationItem {
   id: NavigationId;
   href: string;
-  icon: IconComponent;
+  icon: NavigationIcon;
 }
 
 const navigationItems: NavigationItem[] = [
   { id: "sales", href: "/sales", icon: Receipt2 },
-  { id: "orders", href: "/orders", icon: Note2 },
+  { id: "orders", href: "/orders", icon: IconClipboardList },
   { id: "table", href: "/table", icon: Shop },
   { id: "customer", href: "/customer", icon: Profile },
   { id: "settings", href: "/settings", icon: Settings },
@@ -82,7 +85,7 @@ export function POSFooter({ className = "" }: { className?: string }) {
   return (
     <footer
       aria-label="POS Navigation"
-      className={`sticky bottom-0 z-30 shrink-0 border-t border-border bg-background px-[var(--pos-content-padding)] py-2 shadow-xs transition-colors sm:py-2.5 ${className}`}
+      className={`sticky bottom-0 z-30 shrink-0 border-t border-border bg-card px-[var(--pos-content-padding)] py-2 shadow-xs transition-colors sm:py-2.5 ${className}`}
     >
       <div className="flex min-w-0 items-center gap-3">
         <SignOutAlertDialog

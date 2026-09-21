@@ -1,16 +1,13 @@
 import { getTranslations } from "next-intl/server";
-import { CustomerWorkspace } from "@/components/customer/customer-workspace";
-import { POSLayout } from "@/components/shared/pos-layout";
+import { CustomerPageClient } from "@/components/customer/customer-workspace";
 
 export default async function CustomerPage() {
   const t = await getTranslations("SalesMenu");
 
   return (
-    <POSLayout
-      showSearch={false}
+    <CustomerPageClient
       headerTitle={t("pages.customer.title")}
-    >
-      <CustomerWorkspace />
-    </POSLayout>
+      rightPanelLabel={t("pages.customer.profilePanelLabel")}
+    />
   );
 }

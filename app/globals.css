@@ -4,6 +4,8 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 @theme inline {
+  --color-card: var(--surface);
+  --color-card-foreground: var(--surface-foreground);
   --font-khmer: var(--font-kantumruy-pro), "Noto Sans Khmer", sans-serif;
   --font-sans: var(--font-inter), sans-serif;
   --font-mono: var(--font-geist-mono);

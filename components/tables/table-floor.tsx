@@ -132,7 +132,7 @@ export function TableFloor() {
         </Tabs.ListContainer>
       </Tabs>
 
-      <div className="flex shrink-0 items-center gap-2 px-[var(--pos-content-padding)] py-3">
+      <div className="flex shrink-0 items-center gap-2 px-(--pos-content-padding) py-3">
         <SearchField
           aria-label={t("pages.table.searchLabel")}
           className="min-w-0 flex-1"
@@ -160,7 +160,7 @@ export function TableFloor() {
         />
       </div>
 
-      <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain scrollbar-thin px-[var(--pos-content-padding)] pb-[var(--pos-content-padding)]">
+      <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain scrollbar-thin px-(--pos-content-padding) pb-(--pos-content-padding)">
         {filteredTables.length > 0 ? (
           <div className="grid grid-cols-3 gap-3">
             {filteredTables.map((table) => (
@@ -210,14 +210,11 @@ function TableCard({
 }) {
   const t = useTranslations("SalesMenu");
   const hasSession = table.status === "inProgress" || table.status === "dirty";
+  const showSessionLayout = hasSession || table.status === "available";
 
   return (
     <Card<"button">
-      className={`group min-h-44 w-full text-start transition-[background-color,border-color,box-shadow] duration-150 ${
-        isSelected
-          ? "border-accent bg-accent/5 shadow-sm ring-2 ring-accent/20"
-          : "hover:bg-default-hover hover:shadow-sm"
-      } focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus`}
+      className="group min-h-44 w-full text-start transition-[background-color,box-shadow] duration-150 hover:bg-default-hover hover:shadow-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
       render={(props) => (
         <button
           {...props}
@@ -245,40 +242,46 @@ function TableCard({
       </Card.Header>
 
       <Card.Content className="p-4 pt-5">
-        {hasSession ? (
+        {showSessionLayout ? (
           <>
             <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 text-xs text-muted">
               <span className="inline-flex items-center gap-1.5">
                 <Profile aria-hidden="true" size={14} />
-                {table.server}
+                {table.server ?? "--"}
               </span>
               <span className="inline-flex items-center gap-1.5">
                 <Profile aria-hidden="true" size={14} />
-                {t("pages.table.sessionGuests", {
-                  count: table.guestCount ?? 0,
-                })}
+                {table.guestCount === undefined
+                  ? "--"
+                  : t("pages.table.sessionGuests", {
+                      count: table.guestCount,
+                    })}
               </span>
               <span className="inline-flex items-center gap-1.5">
                 <Receipt2 aria-hidden="true" size={14} />
-                {t("pages.table.sessionItems", {
-                  count: table.itemCount ?? 0,
-                })}
+                {table.itemCount === undefined
+                  ? "0"
+                  : t("pages.table.sessionItems", {
+                      count: table.itemCount,
+                    })}
               </span>
             </div>
 
             <div className="mt-3 flex items-end justify-between gap-3 border-t border-border/60 pt-3">
               <span className="inline-flex items-center gap-1.5 text-xs text-muted">
                 <Clock aria-hidden="true" size={14} />
-                {t("pages.table.sessionStarted", {
-                  time: table.orderTime ?? "—",
-                })}
+                {table.orderTime === undefined
+                  ? "--"
+                  : t("pages.table.sessionStarted", {
+                      time: table.orderTime,
+                    })}
               </span>
               <div className="text-end">
                 <p className="text-[10px] font-medium text-muted">
                   {t("pages.table.sessionTotal")}
                 </p>
                 <p className="text-base font-bold tabular-nums text-foreground">
-                  {table.runningTotal}
+                  {table.runningTotal ?? "0"}
                 </p>
               </div>
             </div>
@@ -290,9 +293,7 @@ function TableCard({
               time: table.reservationTime ?? "—",
             })}
           </span>
-        ) : (
-          <p className="text-sm text-muted">{t("pages.table.availableHint")}</p>
-        )}
+        ) : null}
       </Card.Content>
     </Card>
   );

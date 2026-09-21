@@ -239,7 +239,7 @@ export function OrdersDataGrid({
         onStatusFilterChange={updateStatusFilter}
       />
 
-      <div className="flex min-h-0 flex-1 p-[var(--pos-content-padding)]">
+      <div className="flex min-h-0 flex-1 p-(--pos-content-padding)">
         <Table className="min-h-0 flex-1" variant="secondary">
           <Table.ScrollContainer className="min-h-0 flex-1 overflow-auto overscroll-contain">
             <Table.Content
@@ -336,7 +336,7 @@ export function OrdersDataGrid({
         </Table>
       </div>
 
-      <div className="shrink-0 px-[var(--pos-content-padding)] pb-[var(--pos-content-padding)]">
+      <div className="shrink-0 px-(--pos-content-padding) pb-(--pos-content-padding)">
         <TablePagination
           page={safePage}
           pageSize={pageSize}
@@ -405,7 +405,7 @@ function OrdersToolbar({
         </Tabs.ListContainer>
       </Tabs>
 
-      <div className="flex w-full shrink-0 items-center gap-2 px-[var(--pos-content-padding)] py-3">
+      <div className="flex w-full shrink-0 items-center gap-2 px-(--pos-content-padding) py-3">
         <SearchField
           aria-label={t("toolbar.searchLabel")}
           className="flex-1"
@@ -431,7 +431,7 @@ function OrdersToolbar({
               <Sliders aria-hidden="true" size={18} />
               {activeFilterCount > 0 ? (
                 <Chip
-                  className="absolute -end-1 -top-1"
+                  className="absolute -inset-e-1 -top-1"
                   color="accent"
                   size="sm"
                   variant="soft"
@@ -442,7 +442,7 @@ function OrdersToolbar({
             </Button>
 
             <Popover.Content
-              className="w-[340px] max-w-[95vw] rounded-2xl border-0 bg-surface p-0 shadow-2xl sm:w-[420px]"
+              className="w-85 max-w-[95vw] rounded-2xl border-0 bg-surface p-0 shadow-2xl sm:w-105"
               placement="bottom end"
             >
               <Popover.Dialog className="flex w-full flex-col p-0 text-start outline-none">

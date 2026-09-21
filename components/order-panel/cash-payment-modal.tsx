@@ -9,7 +9,7 @@ import {
   TextField,
   toast,
 } from "@heroui/react";
-import { Backspace, Banknote } from "reicon-react";
+import { IconBackspace, IconCash } from "@tabler/icons-react";
 
 import type { PaymentMethodOption } from "./types";
 
@@ -156,7 +156,7 @@ export function CashPaymentModal({
 
                 <InputGroup fullWidth variant="secondary">
                   <InputGroup.Prefix>
-                    <Banknote aria-hidden="true" className="size-5" />
+                    <IconCash aria-hidden="true" className="size-5" />
                   </InputGroup.Prefix>
 
                   <InputGroup.Input
@@ -222,7 +222,7 @@ export function CashPaymentModal({
                     variant="danger-soft"
                     onPress={handleBackspace}
                   >
-                    <Backspace aria-hidden="true" className="size-5" />
+                    <IconBackspace aria-hidden="true" className="size-5" />
                   </Button>
                 </div>
               </div>

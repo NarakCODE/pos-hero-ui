@@ -11,7 +11,7 @@ The current project focuses on the cashier experience: product ordering, payment
 - HeroUI v3.2.6
 - Tailwind CSS v4
 - `next-intl` for English and Khmer localization
-- `reicon-react` for application icons
+- `@tabler/icons-react` for application icons
 - `next-themes` for light and dark mode
 - `pnpm` 10.26.1
 
@@ -138,7 +138,7 @@ Translation catalogs live in `messages/en.json` and `messages/km.json`. New UI c
 
 - Use HeroUI v3 compound components and semantic variants such as `primary`, `secondary`, `ghost`, and `danger`.
 - Use `onPress` for HeroUI interactive controls.
-- Use `reicon-react` for application icons and mark decorative icons with `aria-hidden="true"`.
+- Use `@tabler/icons-react` for application icons and mark decorative icons with `aria-hidden="true"`.
 - Prefer shared layout primitives in `components/shared` for page structure.
 - Keep settings and other dense workstation controls usable with touch targets, wrapping labels, and responsive layouts.
 - Use theme tokens such as `bg-background`, `bg-surface`, `text-foreground`, `text-muted`, and `border-border` instead of hard-coded interface colors.

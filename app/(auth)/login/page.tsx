@@ -9,7 +9,7 @@ import {
   Label,
   TextField,
 } from "@heroui/react";
-import { Eye, EyeOff } from "reicon-react";
+import { IconEye, IconEyeOff } from "@tabler/icons-react";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -166,9 +166,9 @@ export default function LoginPage() {
                   onPress={() => setShowPassword((value) => !value)}
                 >
                   {showPassword ? (
-                    <EyeOff aria-hidden="true" className="size-4" />
+                    <IconEyeOff aria-hidden="true" className="size-4" />
                   ) : (
-                    <Eye aria-hidden="true" className="size-4" />
+                    <IconEye aria-hidden="true" className="size-4" />
                   )}
                 </Button>
               </InputGroup.Suffix>

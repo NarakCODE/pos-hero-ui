@@ -1,8 +1,8 @@
-import { ShoppingCart } from "reicon-react";
+import Image from "next/image";
 
 export type LogoProps = {
   showText?: boolean;
-  size?: "sm" | "md" | "lg";
+  size?: "sm" | "md" | "lg" | "xl";
   name?: string;
   className?: string;
 };
@@ -23,6 +23,11 @@ const logoSizes = {
     text: "text-xl",
     gap: "gap-3",
   },
+  xl: {
+    icon: 56,
+    text: "text-3xl",
+    gap: "gap-4",
+  },
 };
 
 export function Logo({
@@ -38,11 +43,13 @@ export function Logo({
       className={`inline-flex items-center ${config.gap} ${className}`}
       aria-label={name}
     >
-      <span className="flex shrink-0 items-center justify-center">
-        <ShoppingCart
-          size={config.icon}
-          weight="Filled"
-          aria-hidden="true"
+      <span className="flex shrink-0 items-center justify-center overflow-hidden rounded-full">
+        <Image
+          src="/rakpos-logo.png"
+          alt={showText ? "" : name}
+          width={config.icon}
+          height={config.icon}
+          className="rounded-full object-cover"
         />
       </span>
 

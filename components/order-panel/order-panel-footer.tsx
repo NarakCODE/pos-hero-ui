@@ -3,7 +3,12 @@
 import { isValidElement, useEffect, useState, type ReactNode } from "react";
 import { AlertDialog, Button } from "@heroui/react";
 import { useRouter } from "next/navigation";
-import { AlertTriangle, Clock, Logout6, Wifi } from "reicon-react";
+import {
+  IconAlertTriangle,
+  IconClock,
+  IconLogout,
+  IconWifi,
+} from "@tabler/icons-react";
 import { authSessionStorageKey } from "@/config/auth";
 import type { OrderPanelFooterProps, SignOutAlertDialogProps } from "./types";
 
@@ -61,7 +66,7 @@ export function SignOutAlertDialog({
             <AlertDialog.CloseTrigger />
             <AlertDialog.Header className="items-center text-center">
               <AlertDialog.Icon status={status}>
-                <AlertTriangle
+                <IconAlertTriangle
                   aria-hidden="true"
                   className="size-5"
                   size={20}
@@ -224,7 +229,7 @@ export function OrderPanelFooter({
       <div className="flex items-center justify-between gap-2">
         <div className="grid min-w-0 flex-1 grid-cols-3 items-start gap-2">
           <FooterStatus
-            icon={<Wifi aria-hidden="true" size={13} />}
+            icon={<IconWifi aria-hidden="true" size={13} />}
             label={systemLabel}
           >
             {systemStatus}
@@ -243,7 +248,7 @@ export function OrderPanelFooter({
           </FooterStatus>
 
           <FooterStatus
-            icon={<Clock aria-hidden="true" size={13} />}
+            icon={<IconClock aria-hidden="true" size={13} />}
             label={dateTimeLabel}
           >
             {dateTime ?? (currentDateTime || "—")}
@@ -266,7 +271,7 @@ export function OrderPanelFooter({
                     variant="danger-soft"
                     className={`h-7 px-2.5 text-[11px] font-medium ${signOutTriggerClassName ?? ""}`}
                   >
-                    <Logout6 aria-hidden="true" size={24} />
+                    <IconLogout aria-hidden="true" size={24} />
 
                     <span>{signOutTriggerLabel}</span>
                   </Button>

@@ -1,14 +1,14 @@
 "use client";
 
 import type { ReactNode } from "react";
-import type { IconComponent } from "reicon-react";
+import type { TablerIcon } from "@tabler/icons-react";
 
 interface POSPagePlaceholderProps {
   title: string;
   eyebrow?: string;
   emptyTitle: string;
   emptyDescription: string;
-  icon: IconComponent;
+  icon: TablerIcon;
   action?: ReactNode;
   headerAction?: ReactNode;
   className?: string;

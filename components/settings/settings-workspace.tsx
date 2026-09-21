@@ -10,34 +10,37 @@ import {
   SearchField,
   Select,
   Surface,
+  Spinner,
   Switch,
   Tabs,
   TextField,
 } from "@heroui/react";
 import { useTranslations } from "next-intl";
-import { useState } from "react";
-import type { IconComponent } from "reicon-react";
+import { useState, useTransition } from "react";
+import { POSAside } from "@/components/shared/pos-aside";
+import { POSLayout } from "@/components/shared/pos-layout";
 import {
-  ArchiveBox,
-  Barcode,
-  Box,
-  Building,
-  CardPos,
-  DeviceMessage,
-  DollarCircle,
-  Global,
-  Lock,
-  Monitor,
-  Monitor3,
-  Printer,
-  Profile,
-  Profile2user,
-  Receipt2,
-  Router,
-  Setting2,
-  Shop,
-  TickCircle,
-} from "reicon-react";
+  IconArchive,
+  IconBarcode,
+  IconBox,
+  IconBuilding,
+  IconBuildingStore,
+  IconCircleCheck,
+  IconCoin,
+  IconCreditCard,
+  IconDeviceDesktop,
+  IconDeviceTablet,
+  IconDevices,
+  IconLock,
+  IconPrinter,
+  IconReceipt,
+  IconRouter,
+  IconSettings,
+  IconUser,
+  IconUsers,
+  IconWorld,
+  type TablerIcon,
+} from "@tabler/icons-react";
 
 type SettingsCategory =
   | "company"
@@ -99,84 +102,84 @@ const settingsCategories: ReadonlyArray<{
 const settingsTiles: ReadonlyArray<{
   id: SettingsTileId;
   category: SettingsCategory;
-  icon: IconComponent;
+  icon: TablerIcon;
   labelKey: string;
   descriptionKey: string;
 }> = [
   {
     id: "company",
     category: "company",
-    icon: Building,
+    icon: IconBuilding,
     labelKey: "tileCompany",
     descriptionKey: "tileCompanyDescription",
   },
   {
     id: "store",
     category: "company",
-    icon: Shop,
+    icon: IconBuildingStore,
     labelKey: "tileStore",
     descriptionKey: "tileStoreDescription",
   },
   {
     id: "stations",
     category: "company",
-    icon: DeviceMessage,
+    icon: IconDevices,
     labelKey: "tileStations",
     descriptionKey: "tileStationsDescription",
   },
   {
     id: "currency",
     category: "company",
-    icon: DollarCircle,
+    icon: IconCoin,
     labelKey: "tileCurrency",
     descriptionKey: "tileCurrencyDescription",
   },
   {
     id: "staff",
     category: "userManagement",
-    icon: Profile2user,
+    icon: IconUsers,
     labelKey: "tileStaff",
     descriptionKey: "tileStaffDescription",
   },
   {
     id: "menu",
     category: "menuProducts",
-    icon: Receipt2,
+    icon: IconReceipt,
     labelKey: "tileMenu",
     descriptionKey: "tileMenuDescription",
   },
   {
     id: "products",
     category: "menuProducts",
-    icon: Box,
+    icon: IconBox,
     labelKey: "tileProducts",
     descriptionKey: "tileProductsDescription",
   },
   {
     id: "inventory",
     category: "inventory",
-    icon: ArchiveBox,
+    icon: IconArchive,
     labelKey: "tileInventory",
     descriptionKey: "tileInventoryDescription",
   },
   {
     id: "customer",
     category: "customer",
-    icon: Profile,
+    icon: IconUser,
     labelKey: "tileCustomer",
     descriptionKey: "tileCustomerDescription",
   },
   {
     id: "reports",
     category: "reports",
-    icon: Receipt2,
+    icon: IconReceipt,
     labelKey: "tileReports",
     descriptionKey: "tileReportsDescription",
   },
   {
     id: "integrations",
     category: "integrations",
-    icon: Global,
+    icon: IconWorld,
     labelKey: "tileIntegrations",
     descriptionKey: "tileIntegrationsDescription",
   },
@@ -197,6 +200,7 @@ export function SettingsWorkspace() {
   const [soundFeedback, setSoundFeedback] = useState(true);
   const [requirePin, setRequirePin] = useState(true);
   const [managerApproval, setManagerApproval] = useState(false);
+  const [isSaving, startSaving] = useTransition();
 
   const markChanged = () => setIsSaved(false);
   const updateStoreName = (value: string) => {
@@ -239,122 +243,65 @@ export function SettingsWorkspace() {
   );
 
   return (
-    <div className="flex min-h-0 min-w-0 w-full flex-1 flex-col overflow-hidden text-foreground">
-      <div className="grid min-h-0 flex-1 grid-cols-1 overflow-hidden lg:grid-cols-[minmax(0,1fr)_minmax(20rem,var(--app-layout-aside-width))]">
-        <section className="min-h-0 overflow-y-auto border-e border-border/60 bg-background">
-          <div className="flex min-w-0 flex-col">
-            <Tabs
-              className="min-w-0"
-              selectedKey={activeCategory}
-              variant="secondary"
-              onSelectionChange={(key) => {
-                setActiveCategory(String(key) as SettingsCategory);
-                setSelectedTile(null);
-              }}
-            >
-              <Tabs.ListContainer>
-                <Tabs.List aria-label={t("pages.settings.categoryLabel")}>
-                  {settingsCategories.map((category) => {
-                    return (
-                      <Tabs.Tab
-                        key={category.id}
-                        id={category.id}
-                        className="w-auto shrink-0 whitespace-nowrap"
-                      >
-                        <span>{t(`pages.settings.${category.labelKey}`)}</span>
-                        <Tabs.Indicator />
-                      </Tabs.Tab>
-                    );
-                  })}
-                </Tabs.List>
-              </Tabs.ListContainer>
-            </Tabs>
-
-            <div className="flex min-w-0 flex-col gap-4 px-[var(--pos-content-padding)] pb-[var(--pos-content-padding)] pt-3">
-              <SearchField
-                aria-label={t("pages.settings.searchLabel")}
-                className="w-full"
-                fullWidth
-                value={settingsSearch}
-                variant="secondary"
-                onChange={setSettingsSearch}
-              >
-                <SearchField.Group>
-                  <SearchField.SearchIcon />
-                  <SearchField.Input
-                    placeholder={t("pages.settings.searchPlaceholder")}
-                  />
-                  <SearchField.ClearButton />
-                </SearchField.Group>
-              </SearchField>
-
-              {visibleTiles.length > 0 ? (
-                <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-                  {visibleTiles.map((tile) => {
-                    const Icon = tile.icon;
-                    const isSelected = selectedTile === tile.id;
-
-                    return (
-                      <Card
-                        key={tile.id}
-                        aria-pressed={isSelected}
-                        role="button"
-                        tabIndex={0}
-                        variant={isSelected ? "default" : "secondary"}
-                        onClick={() => setSelectedTile(tile.id)}
-                        onKeyDown={(event) => {
-                          if (event.key === "Enter" || event.key === " ") {
-                            event.preventDefault();
-                            setSelectedTile(tile.id);
-                          }
-                        }}
-                      >
-                        <Card.Content>
-                          <span className="flex min-h-32 flex-col items-center justify-center gap-3 text-center">
-                            <Icon
-                              aria-hidden="true"
-                              className="size-8"
-                              size={32}
-                            />
-                            <span className="font-semibold">
-                              {t(`pages.settings.${tile.labelKey}`)}
-                            </span>
-                          </span>
-                        </Card.Content>
-                      </Card>
-                    );
-                  })}
-                </div>
-              ) : (
-                <Surface className="p-4 text-sm text-muted" variant="secondary">
-                  {t("pages.settings.noResults")}
-                </Surface>
-              )}
-            </div>
-          </div>
-        </section>
-
-        <section className="flex h-full min-h-0 flex-col bg-background">
-          <header className="flex shrink-0 items-center gap-2 p-[var(--pos-content-padding)]">
-            <h2 className="text-base font-semibold text-foreground sm:text-lg">
-              {selectedTileData
-                ? t(`pages.settings.${selectedTileData.labelKey}`)
-                : t("pages.settings.panelTitle")}
-            </h2>
-            {selectedTile ? (
-              <div className="ms-auto flex shrink-0 items-center">
-                <Chip color="success" size="sm" variant="soft">
-                  <TickCircle aria-hidden="true" size={15} />
-                  {isSaved
-                    ? t("pages.settings.saved")
-                    : t("pages.settings.registerReady")}
-                </Chip>
+    <POSLayout
+      showSearch={false}
+      headerTitle={t("pages.settings.title")}
+      rightPanelLabel={t("pages.settings.panelTitle")}
+      rightPanelClassName="overflow-hidden"
+      rightPanel={
+        <POSAside
+          ariaLabelledBy="settings-detail-title"
+          headerClassName="flex items-center gap-2 p-[var(--pos-content-padding)]"
+          mainClassName="flex min-h-0 flex-col overflow-hidden px-[var(--pos-content-padding)]"
+          footerClassName="px-[var(--pos-content-padding)] pb-[var(--pos-content-padding)] pt-3"
+          footer={
+            selectedTile ? (
+              <div className="flex justify-end">
+                <Button
+                  isDisabled={isSaved || isSaving}
+                  isPending={isSaving}
+                  size="lg"
+                  type="button"
+                  variant="primary"
+                  onPress={() => startSaving(() => setIsSaved(true))}
+                >
+                  {({ isPending }) =>
+                    isPending ? (
+                      <>
+                        <Spinner color="current" size="sm" />
+                        {t("pages.settings.saveChanges")}
+                      </>
+                    ) : (
+                      t("pages.settings.saveChanges")
+                    )}
+                </Button>
               </div>
-            ) : null}
-          </header>
-
-          <div className="flex min-h-0 flex-1 flex-col overflow-hidden px-[var(--pos-content-padding)] pb-[var(--pos-content-padding)]">
-            <div className="min-h-0 flex-1 overflow-y-auto">
+            ) : null
+          }
+          header={
+            <>
+              <h2
+                id="settings-detail-title"
+                className="text-base font-semibold text-foreground sm:text-lg"
+              >
+                {selectedTileData
+                  ? t(`pages.settings.${selectedTileData.labelKey}`)
+                  : t("pages.settings.panelTitle")}
+              </h2>
+              {selectedTile ? (
+                <div className="ms-auto flex shrink-0 items-center">
+                  <Chip color="success" size="sm" variant="soft">
+                    <IconCircleCheck aria-hidden="true" size={15} />
+                    {isSaved
+                      ? t("pages.settings.saved")
+                      : t("pages.settings.registerReady")}
+                  </Chip>
+                </div>
+              ) : null}
+            </>
+          }
+        >
+          <div className="min-h-0 flex-1 overflow-y-auto">
               {selectedTile === "company" || selectedTile === "store" ? (
                 <GeneralSettings
                   autoLock={autoLock}
@@ -409,32 +356,110 @@ export function SettingsWorkspace() {
               {!selectedTile ? (
                 <div className="flex min-h-full flex-col items-center justify-center p-8 text-center">
                   <div className="flex size-20 items-center justify-center rounded-3xl bg-default text-muted">
-                    <Setting2 aria-hidden="true" size={40} />
+                    <IconSettings aria-hidden="true" size={40} />
                   </div>
                   <h3 className="mt-5 text-lg font-semibold text-foreground">
                     {t("pages.settings.emptyTitle")}
                   </h3>
                 </div>
               ) : null}
-            </div>
-
-            {selectedTile ? (
-              <div className="flex shrink-0 justify-end pt-3">
-                <Button
-                  isDisabled={isSaved}
-                  size="lg"
-                  type="button"
-                  variant="primary"
-                  onPress={() => setIsSaved(true)}
-                >
-                  {t("pages.settings.saveChanges")}
-                </Button>
-              </div>
-            ) : null}
           </div>
-        </section>
-      </div>
-    </div>
+        </POSAside>
+      }
+    >
+      <section className="min-h-0 flex-1 overflow-y-auto bg-background">
+        <div className="flex min-w-0 flex-col">
+          <Tabs
+            className="min-w-0"
+            selectedKey={activeCategory}
+            variant="secondary"
+            onSelectionChange={(key) => {
+              setActiveCategory(String(key) as SettingsCategory);
+              setSelectedTile(null);
+            }}
+          >
+            <Tabs.ListContainer>
+              <Tabs.List aria-label={t("pages.settings.categoryLabel")}>
+                {settingsCategories.map((category) => {
+                  return (
+                    <Tabs.Tab
+                      key={category.id}
+                      id={category.id}
+                      className="w-auto shrink-0 whitespace-nowrap"
+                    >
+                      <span>{t(`pages.settings.${category.labelKey}`)}</span>
+                      <Tabs.Indicator />
+                    </Tabs.Tab>
+                  );
+                })}
+              </Tabs.List>
+            </Tabs.ListContainer>
+          </Tabs>
+
+          <div className="flex min-w-0 flex-col gap-4 px-[var(--pos-content-padding)] pb-[var(--pos-content-padding)] pt-3">
+            <SearchField
+              aria-label={t("pages.settings.searchLabel")}
+              className="w-full"
+              fullWidth
+              value={settingsSearch}
+              variant="secondary"
+              onChange={setSettingsSearch}
+            >
+              <SearchField.Group>
+                <SearchField.SearchIcon />
+                <SearchField.Input
+                  placeholder={t("pages.settings.searchPlaceholder")}
+                />
+                <SearchField.ClearButton />
+              </SearchField.Group>
+            </SearchField>
+
+            {visibleTiles.length > 0 ? (
+              <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+                {visibleTiles.map((tile) => {
+                  const Icon = tile.icon;
+                  const isSelected = selectedTile === tile.id;
+
+                  return (
+                    <Card
+                      key={tile.id}
+                      aria-pressed={isSelected}
+                      role="button"
+                      tabIndex={0}
+                      variant={isSelected ? "default" : "secondary"}
+                      onClick={() => setSelectedTile(tile.id)}
+                      onKeyDown={(event) => {
+                        if (event.key === "Enter" || event.key === " ") {
+                          event.preventDefault();
+                          setSelectedTile(tile.id);
+                        }
+                      }}
+                    >
+                      <Card.Content>
+                        <span className="flex min-h-32 flex-col items-center justify-center gap-3 text-center">
+                          <Icon
+                            aria-hidden="true"
+                            className="size-8"
+                            size={32}
+                          />
+                          <span className="font-semibold">
+                            {t(`pages.settings.${tile.labelKey}`)}
+                          </span>
+                        </span>
+                      </Card.Content>
+                    </Card>
+                  );
+                })}
+              </div>
+            ) : (
+              <Surface className="p-4 text-sm text-muted" variant="secondary">
+                {t("pages.settings.noResults")}
+              </Surface>
+            )}
+          </div>
+        </div>
+      </section>
+    </POSLayout>
   );
 }
 
@@ -469,7 +494,7 @@ function SettingsPlaceholder() {
         className="flex min-h-40 items-center justify-center p-6"
         variant="secondary"
       >
-        <Setting2 aria-hidden="true" className="text-muted" size={28} />
+        <IconSettings aria-hidden="true" className="text-muted" size={28} />
       </Surface>
     </SettingsSection>
   );
@@ -601,55 +626,55 @@ function DeviceSettings() {
     <SettingsSection>
       <div className="grid gap-3">
         <DeviceRow
-          icon={Printer}
+          icon={IconPrinter}
           label={t("pages.settings.receiptPrinter")}
           status={t("pages.settings.connected")}
           statusColor="success"
         />
         <DeviceRow
-          icon={Monitor}
+          icon={IconDeviceDesktop}
           label={t("pages.settings.customerDisplay")}
           status={t("pages.settings.notConnected")}
           statusColor="default"
         />
         <DeviceRow
-          icon={DeviceMessage}
+          icon={IconDevices}
           label={t("pages.settings.cashDrawer")}
           status={t("pages.settings.connected")}
           statusColor="success"
         />
         <DeviceRow
-          icon={Monitor3}
+          icon={IconDeviceTablet}
           label={t("pages.settings.kitchenDisplay")}
           status={t("pages.settings.connected")}
           statusColor="success"
         />
         <DeviceRow
-          icon={Barcode}
+          icon={IconBarcode}
           label={t("pages.settings.barcodeScanner")}
           status={t("pages.settings.connected")}
           statusColor="success"
         />
         <DeviceRow
-          icon={CardPos}
+          icon={IconCreditCard}
           label={t("pages.settings.paymentTerminal")}
           status={t("pages.settings.notConnected")}
           statusColor="default"
         />
         <DeviceRow
-          icon={Printer}
+          icon={IconPrinter}
           label={t("pages.settings.kitchenPrinter")}
           status={t("pages.settings.connected")}
           statusColor="success"
         />
         <DeviceRow
-          icon={Printer}
+          icon={IconPrinter}
           label={t("pages.settings.labelPrinter")}
           status={t("pages.settings.notConnected")}
           statusColor="default"
         />
         <DeviceRow
-          icon={Router}
+          icon={IconRouter}
           label={t("pages.settings.storeNetwork")}
           status={t("pages.settings.connected")}
           statusColor="success"
@@ -657,7 +682,7 @@ function DeviceSettings() {
       </div>
 
       <div className="flex items-start gap-3 rounded-xl bg-surface-secondary/65 p-4 text-sm">
-        <Global
+        <IconWorld
           aria-hidden="true"
           className="mt-0.5 shrink-0 text-accent"
           size={18}
@@ -754,7 +779,7 @@ function RoleCard({ label, value }: { label: string; value: string }) {
     >
       <div className="flex min-w-0 items-center gap-3">
         <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-default text-muted">
-          <Lock aria-hidden="true" size={19} />
+          <IconLock aria-hidden="true" size={19} />
         </div>
         <p className="font-semibold text-foreground">{label}</p>
       </div>
@@ -771,7 +796,7 @@ function DeviceRow({
   status,
   statusColor,
 }: {
-  icon: IconComponent;
+  icon: TablerIcon;
   label: string;
   status: string;
   statusColor: "success" | "default";

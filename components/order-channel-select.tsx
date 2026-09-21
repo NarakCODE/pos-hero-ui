@@ -14,8 +14,7 @@ export type OrderChannel = (typeof orderChannels)[number];
 export const defaultOrderChannelAvatarSrc =
   "https://heroui-assets.nyc3.cdn.digitaloceanspaces.com/avatars/blue.jpg";
 export const orderChannelAvatarSrcByChannel: Record<string, string> = {
-  "E-GetS":
-    "https://www.e-gets.com/images/common/logo-egets.png",
+  "E-GetS": "https://www.e-gets.com/images/common/logo-egets.png",
   Foodpanda: "https://img.icons8.com/color/1200/foodpanda.jpg",
   GrabFood:
     "https://toppng.com/uploads/preview/grab-logo-11550724942n0ghhh9o1u.png",
@@ -30,9 +29,12 @@ export const orderChannelFallbacks: Record<string, string> = {
   Wownow: "WO",
 };
 
-export const getOrderChannelAvatarSrc = (channel: string): string | undefined => {
+export const getOrderChannelAvatarSrc = (
+  channel: string,
+): string | undefined => {
   const normalized = channel.toLowerCase();
-  if (normalized === "foodpanda") return orderChannelAvatarSrcByChannel.Foodpanda;
+  if (normalized === "foodpanda")
+    return orderChannelAvatarSrcByChannel.Foodpanda;
   if (normalized === "grabfood") return orderChannelAvatarSrcByChannel.GrabFood;
   if (normalized === "wownow") return orderChannelAvatarSrcByChannel.Wownow;
   if (normalized === "e-gets" || normalized === "egets")
@@ -50,7 +52,7 @@ interface OrderChannelSelectProps {
 }
 
 export function OrderChannelSelect({
-  className = "w-full",
+  className = "w-36",
   label = "Order Channel",
   onChange,
   size = "sm",
@@ -63,7 +65,6 @@ export function OrderChannelSelect({
     <Select
       aria-label={label ?? "Order channel"}
       className={className}
-      fullWidth
       value={value}
       variant={variant}
       onChange={(nextValue) => {

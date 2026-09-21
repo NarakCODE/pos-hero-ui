@@ -14,10 +14,8 @@
   },
   "AuthShell": {
     "brandName": "RakPOS",
-    "eyebrow": "Point-of-sale workspace",
     "headline": "Keep your day moving.",
     "description": "A focused home for the work that keeps your store running.",
-    "footer": "Built for clear, calm operations.",
     "legal": "© 2026 RakPOS"
   },
   "AuthLogin": {
@@ -227,11 +225,10 @@
     "modifiersTitle": "Customize your item",
     "modifiers": {
       "size": "Size",
-      "extraSmall": "XS (8oz)",
-      "small": "Small (12oz)",
-      "medium": "Medium (16oz)",
-      "large": "Large (20oz)",
-      "extraLarge": "XL (24oz)",
+      "extraSmall": "XS",
+      "small": "Small",
+      "medium": "Medium",
+      "large": "Large",
       "ice": "Ice Level",
       "regularIce": "Normal Ice",
       "lessIce": "Less Ice",

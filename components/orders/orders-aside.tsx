@@ -1,14 +1,15 @@
 "use client";
 
-import { Button, Chip } from "@heroui/react";
+import { Button, Chip, Spinner } from "@heroui/react";
 import { useTranslations } from "next-intl";
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import {
   type FulfillmentStatus,
   orderRecords,
   type OrderRecord,
 } from "./orders-data";
-import { Check, X } from "reicon-react";
+import { IconCheck, IconX } from "@tabler/icons-react";
+import { POSAside } from "@/components/shared/pos-aside";
 
 interface OrdersAsideProps {
   selectedOrderId: string | null;
@@ -25,6 +26,10 @@ export function OrdersAside({ selectedOrderId }: OrdersAsideProps) {
     orderId: string;
     status: FulfillmentStatus;
   } | null>(null);
+  const [pendingAction, setPendingAction] = useState<"accept" | "reject" | null>(
+    null,
+  );
+  const [isPending, startTransition] = useTransition();
 
   if (!selectedOrder) {
     return null;
@@ -36,12 +41,67 @@ export function OrdersAside({ selectedOrderId }: OrdersAsideProps) {
       : selectedOrder.fulfillmentStatus;
   const vat = selectedOrder.totalUsd * 0.1;
 
+  const handleAction = (action: "accept" | "reject") => {
+    setPendingAction(action);
+    startTransition(() => {
+      setLocalAction({
+        orderId: selectedOrder.id,
+        status: action === "accept" ? "inProgress" : "rejected",
+      });
+    });
+  };
+
   return (
-    <section
-      aria-labelledby="orders-aside-title"
-      className="flex h-full min-h-0 flex-col bg-background"
-    >
-      <header className="shrink-0 p-[var(--pos-content-padding)]">
+    <POSAside
+      ariaLabelledBy="orders-aside-title"
+      headerClassName="p-[var(--pos-content-padding)]"
+      mainClassName="flex min-h-0 flex-col px-[var(--pos-content-padding)]"
+      footerClassName="px-[var(--pos-content-padding)] pb-[var(--pos-content-padding)] pt-3"
+      footer={
+        <div className="grid grid-cols-2 gap-2">
+          <Button
+            fullWidth
+            className="border border-success/20 bg-success-soft text-success hover:border-success/30 hover:bg-success/15"
+            isDisabled={isPending}
+            isPending={isPending && pendingAction === "accept"}
+            size="lg"
+            type="button"
+            variant="ghost"
+            onPress={() => handleAction("accept")}
+          >
+            {({ isPending: buttonPending }) =>
+              buttonPending ? (
+                <Spinner color="current" size="sm" />
+              ) : (
+                <>
+                  <IconCheck size={24} />
+                  {t("aside.accept")}
+                </>
+              )}
+          </Button>
+          <Button
+            fullWidth
+            isDisabled={isPending}
+            isPending={isPending && pendingAction === "reject"}
+            size="lg"
+            type="button"
+            variant="danger-soft"
+            onPress={() => handleAction("reject")}
+          >
+            {({ isPending: buttonPending }) =>
+              buttonPending ? (
+                <Spinner color="current" size="sm" />
+              ) : (
+                <>
+                  <IconX size={24} />
+                  {t("aside.reject")}
+                </>
+              )}
+          </Button>
+        </div>
+      }
+      header={
+        <>
         <div className="mb-4">
           <p className="text-[10px] font-semibold tracking-[0.16em] text-muted">
             {t("aside.eyebrow")}
@@ -85,163 +145,132 @@ export function OrdersAside({ selectedOrderId }: OrdersAsideProps) {
             </p>
           </div>
         </div>
-      </header>
+        </>
+      }
+    >
 
-      <div className="flex min-h-0 flex-1 flex-col px-[var(--pos-content-padding)] pb-[var(--pos-content-padding)]">
-        <section
-          aria-labelledby="orders-items-title"
-          className="flex min-h-0 flex-1 flex-col border-y border-border/70"
-        >
-          <div className="grid shrink-0 grid-cols-[minmax(0,1fr)_4rem_3rem_5rem] gap-2 bg-surface-secondary/50 px-2 py-2.5 text-xs font-semibold text-muted">
-            <h3 id="orders-items-title">
-              {t("aside.product")} x{selectedOrder.totalQuantity}
-            </h3>
-            <span className="text-end">{t("aside.price")}</span>
-            <span className="text-center">{t("aside.quantity")}</span>
-            <span className="text-end">{t("aside.amount")}</span>
-          </div>
-
-          <div
-            aria-label={t("details.itemsTitle")}
-            className="min-h-0 flex-1 overflow-y-auto overscroll-contain"
-          >
-            <div className="divide-y divide-border/60">
-              {selectedOrder.items.map((item) => (
-                <div
-                  key={`${selectedOrder.id}-${item.name}`}
-                  className="grid grid-cols-[minmax(0,1fr)_4rem_3rem_5rem] items-start gap-2 px-2 py-3 text-sm"
-                >
-                  <div className="min-w-0">
-                    <p className="truncate font-semibold leading-5 text-foreground">
-                      {item.name}
-                    </p>
-                    <p className="truncate ps-3 text-[11px] leading-4 text-muted">
-                      {item.modifiers}
-                    </p>
-                    {item.addOns?.map((addOn) => (
-                      <p
-                        key={`${selectedOrder.id}-${item.name}-${addOn}`}
-                        className="truncate ps-3 text-[11px] leading-4 text-accent"
-                      >
-                        +${addOn}
-                      </p>
-                    ))}
-                  </div>
-                  <span className="text-end tabular-nums text-muted">
-                    {item.price}
-                  </span>
-                  <span className="text-center tabular-nums text-foreground">
-                    {item.quantity}
-                  </span>
-                  <span className="text-end font-medium tabular-nums text-foreground">
-                    {lineTotal(item.price, item.quantity)}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        <section
-          aria-labelledby="orders-remark-title"
-          className="mt-3 shrink-0 rounded-xl bg-surface-secondary/60 px-3 py-3"
-        >
-          <h3
-            id="orders-remark-title"
-            className="text-xs font-semibold text-foreground"
-          >
-            {t("aside.remarkTitle")}
+      <section
+        aria-labelledby="orders-items-title"
+        className="flex min-h-0 flex-1 flex-col border-y border-border/70"
+      >
+        <div className="grid shrink-0 grid-cols-[minmax(0,1fr)_4rem_3rem_5rem] gap-2 bg-surface-secondary/50 px-2 py-2.5 text-xs font-semibold text-muted">
+          <h3 id="orders-items-title">
+            {t("aside.product")} x{selectedOrder.totalQuantity}
           </h3>
-          <p className="mt-1 text-sm leading-5 text-muted">
-            {t("aside.remark")}
-          </p>
-        </section>
+          <span className="text-end">{t("aside.price")}</span>
+          <span className="text-center">{t("aside.quantity")}</span>
+          <span className="text-end">{t("aside.amount")}</span>
+        </div>
 
-        <section
-          aria-labelledby="orders-billing-title"
-          className="mt-3 grid shrink-0 grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] gap-4 border-y border-border/70 py-3"
+        <div
+          aria-label={t("details.itemsTitle")}
+          className="min-h-0 flex-1 overflow-y-auto overscroll-contain"
         >
-          <div className="min-w-0">
-            <h3
-              id="orders-billing-title"
-              className="mb-2 text-xs font-semibold text-foreground"
-            >
-              {t("aside.tenderInfo")}
-            </h3>
-            <div className="flex flex-col gap-2">
-              <BillingRow
-                label={t("details.tender")}
-                value={selectedOrder.tender}
-              />
-              <BillingRow
-                label={t("details.received")}
-                value={formatDualCurrencyFromString(selectedOrder.received)}
-              />
-              <BillingRow
-                label={t("details.change")}
-                value={formatDualCurrencyFromString(selectedOrder.change)}
-              />
-            </div>
-          </div>
-
-          <div className="min-w-0 border-s border-border/70 ps-4">
-            <h3 className="mb-2 text-xs font-semibold text-foreground">
-              {t("aside.totals")}
-            </h3>
-            <div className="flex flex-col gap-2">
-              <BillingRow
-                label={t("aside.subtotal")}
-                value={formatUsd(selectedOrder.totalUsd)}
-              />
-              <BillingRow label={t("aside.discount")} value={formatUsd(0)} />
-              <BillingRow label={t("aside.vat")} value={formatUsd(vat)} />
-              <div className="mt-1 flex items-end justify-between gap-3 border-t border-border/70 pt-2">
-                <span className="text-base font-bold text-foreground">
-                  {t("aside.grandTotal")}
+          <div className="divide-y divide-border/60">
+            {selectedOrder.items.map((item) => (
+              <div
+                key={`${selectedOrder.id}-${item.name}`}
+                className="grid grid-cols-[minmax(0,1fr)_4rem_3rem_5rem] items-start gap-2 px-2 py-3 text-sm"
+              >
+                <div className="min-w-0">
+                  <p className="truncate font-semibold leading-5 text-foreground">
+                    {item.name}
+                  </p>
+                  <p className="truncate ps-3 text-[11px] leading-4 text-muted">
+                    {item.modifiers}
+                  </p>
+                  {item.addOns?.map((addOn) => (
+                    <p
+                      key={`${selectedOrder.id}-${item.name}-${addOn}`}
+                      className="truncate ps-3 text-[11px] leading-4 text-accent"
+                    >
+                      +${addOn}
+                    </p>
+                  ))}
+                </div>
+                <span className="text-end tabular-nums text-muted">
+                  {item.price}
                 </span>
-                <span className="text-end text-2xl font-bold tracking-tight tabular-nums text-foreground">
-                  {formatDualCurrency(
-                    selectedOrder.totalUsd,
-                    selectedOrder.totalKhr,
-                  )}
+                <span className="text-center tabular-nums text-foreground">
+                  {item.quantity}
+                </span>
+                <span className="text-end font-medium tabular-nums text-foreground">
+                  {lineTotal(item.price, item.quantity)}
                 </span>
               </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section
+        aria-labelledby="orders-remark-title"
+        className="mt-3 shrink-0 rounded-xl bg-surface-secondary/60 px-3 py-3"
+      >
+        <h3
+          id="orders-remark-title"
+          className="text-xs font-semibold text-foreground"
+        >
+          {t("aside.remarkTitle")}
+        </h3>
+        <p className="mt-1 text-sm leading-5 text-muted">
+          {t("aside.remark")}
+        </p>
+      </section>
+
+      <section
+        aria-labelledby="orders-billing-title"
+        className="mt-3 grid shrink-0 grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] gap-4 border-y border-border/70 py-3"
+      >
+        <div className="min-w-0">
+          <h3
+            id="orders-billing-title"
+            className="mb-2 text-xs font-semibold text-foreground"
+          >
+            {t("aside.tenderInfo")}
+          </h3>
+          <div className="flex flex-col gap-2">
+            <BillingRow
+              label={t("details.tender")}
+              value={selectedOrder.tender}
+            />
+            <BillingRow
+              label={t("details.received")}
+              value={formatDualCurrencyFromString(selectedOrder.received)}
+            />
+            <BillingRow
+              label={t("details.change")}
+              value={formatDualCurrencyFromString(selectedOrder.change)}
+            />
+          </div>
+        </div>
+
+        <div className="min-w-0 border-s border-border/70 ps-4">
+          <h3 className="mb-2 text-xs font-semibold text-foreground">
+            {t("aside.totals")}
+          </h3>
+          <div className="flex flex-col gap-2">
+            <BillingRow
+              label={t("aside.subtotal")}
+              value={formatUsd(selectedOrder.totalUsd)}
+            />
+            <BillingRow label={t("aside.discount")} value={formatUsd(0)} />
+            <BillingRow label={t("aside.vat")} value={formatUsd(vat)} />
+            <div className="mt-1 flex items-end justify-between gap-3 border-t border-border/70 pt-2">
+              <span className="text-base font-bold text-foreground">
+                {t("aside.grandTotal")}
+              </span>
+              <span className="text-end text-2xl font-bold tracking-tight tabular-nums text-foreground">
+                {formatDualCurrency(
+                  selectedOrder.totalUsd,
+                  selectedOrder.totalKhr,
+                )}
+              </span>
             </div>
           </div>
-        </section>
-
-        <div className="grid shrink-0 grid-cols-2 gap-2 pt-3">
-          <Button
-            fullWidth
-            className="border border-success/20 bg-success-soft text-success hover:bg-success/15 hover:border-success/30"
-            size="lg"
-            type="button"
-            variant="ghost"
-            onPress={() =>
-              setLocalAction({
-                orderId: selectedOrder.id,
-                status: "inProgress",
-              })
-            }
-          >
-            <Check size={24} />
-            {t("aside.accept")}
-          </Button>
-          <Button
-            fullWidth
-            size="lg"
-            type="button"
-            variant="danger-soft"
-            onPress={() =>
-              setLocalAction({ orderId: selectedOrder.id, status: "rejected" })
-            }
-          >
-            <X size={24} />
-            {t("aside.reject")}
-          </Button>
         </div>
-      </div>
-    </section>
+      </section>
+    </POSAside>
   );
 }
 

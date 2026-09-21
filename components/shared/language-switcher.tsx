@@ -6,7 +6,7 @@ import {  Label, ListBox, Select } from "@heroui/react";
 import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { Globe } from "reicon-react";
+import { IconWorld } from "@tabler/icons-react";
 import { isLocale, type Locale, locales } from "@/config/i18n";
 
 const languageOptions: Array<{
@@ -48,7 +48,7 @@ export function LanguageSwitcher({
     >
       <Label className="sr-only">{t("label")}</Label>
       <Select.Trigger className="flex items-center gap-2">
-        <Globe aria-hidden="true" className="size-4 shrink-0 text-muted" />
+        <IconWorld aria-hidden="true" className="size-4 shrink-0 text-muted" />
         <Select.Value />
         <Select.Indicator />
       </Select.Trigger>

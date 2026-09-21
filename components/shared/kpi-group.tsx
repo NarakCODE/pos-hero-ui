@@ -1,7 +1,7 @@
 "use client";
 
 import { Chip, Surface } from "@heroui/react";
-import { ArrowDown, ArrowUp } from "reicon-react";
+import { IconArrowDown, IconArrowUp } from "@tabler/icons-react";
 
 export interface KpiTrend {
   direction: "up" | "down";
@@ -75,9 +75,9 @@ export function KpiGroup({
                   variant="soft"
                 >
                   {kpi.trend.direction === "up" ? (
-                    <ArrowUp aria-hidden="true" className="size-3.5" />
+                    <IconArrowUp aria-hidden="true" className="size-3.5" />
                   ) : (
-                    <ArrowDown aria-hidden="true" className="size-3.5" />
+                    <IconArrowDown aria-hidden="true" className="size-3.5" />
                   )}
                   <span>{kpi.trend.value}</span>
                 </Chip>

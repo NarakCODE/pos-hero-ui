@@ -1,18 +1,19 @@
 "use client";
 
-import { Button, Chip, ListBox, Select, Table } from "@heroui/react";
+import { Button, Chip, ListBox, Select, Spinner, Table } from "@heroui/react";
 import { useTranslations } from "next-intl";
-import { useState } from "react";
-import type { IconComponent } from "reicon-react";
+import { useState, useTransition } from "react";
 import {
-  ArrangeSquare2,
-  ArrowSwapHorizontal,
-  Bill,
-  Edit2,
-  Link2,
-  ProfileAdd,
-  ReceiptAdd,
-} from "reicon-react";
+  IconArrowsJoin,
+  IconArrowsLeftRight,
+  IconArrowsSplit,
+  IconEdit,
+  IconReceipt,
+  IconReceipt2,
+  IconUserPlus,
+  type TablerIcon,
+} from "@tabler/icons-react";
+import { POSAside } from "@/components/shared/pos-aside";
 
 type TableAsideAction =
   | "editOrder"
@@ -75,33 +76,33 @@ const channelOptions: ReadonlyArray<{
 
 const primaryActions: ReadonlyArray<{
   id: TableAsideAction;
-  icon: IconComponent;
+  icon: TablerIcon;
   labelKey: string;
 }> = [
-  { id: "editOrder", icon: Edit2, labelKey: "asideEditOrder" },
-  { id: "payRequest", icon: Bill, labelKey: "asidePayRequest" },
-  { id: "addGuest", icon: ProfileAdd, labelKey: "asideAddGuest" },
+  { id: "editOrder", icon: IconEdit, labelKey: "asideEditOrder" },
+  { id: "payRequest", icon: IconReceipt, labelKey: "asidePayRequest" },
+  { id: "addGuest", icon: IconUserPlus, labelKey: "asideAddGuest" },
 ];
 
 const billingActions: ReadonlyArray<{
   id: TableAsideAction;
-  icon: IconComponent;
+  icon: TablerIcon;
   labelKey: string;
 }> = [
-  { id: "addBill", icon: ReceiptAdd, labelKey: "asideAddBill" },
-  { id: "mergeBill", icon: Link2, labelKey: "asideMergeBill" },
-  { id: "splitBill", icon: ArrangeSquare2, labelKey: "asideSplitBill" },
+  { id: "addBill", icon: IconReceipt2, labelKey: "asideAddBill" },
+  { id: "mergeBill", icon: IconArrowsJoin, labelKey: "asideMergeBill" },
+  { id: "splitBill", icon: IconArrowsSplit, labelKey: "asideSplitBill" },
 ];
 
 const tableActions: ReadonlyArray<{
   id: TableAsideAction;
-  icon: IconComponent;
+  icon: TablerIcon;
   labelKey: string;
 }> = [
-  { id: "mergeTable", icon: ArrangeSquare2, labelKey: "asideMergeTable" },
+  { id: "mergeTable", icon: IconArrowsJoin, labelKey: "asideMergeTable" },
   {
     id: "moveTable",
-    icon: ArrowSwapHorizontal,
+    icon: IconArrowsLeftRight,
     labelKey: "asideMoveTable",
   },
 ];
@@ -112,21 +113,37 @@ export function TableAside() {
   const [activeAction, setActiveAction] = useState<TableAsideAction | null>(
     null,
   );
+  const [pendingAction, setPendingAction] = useState<TableAsideAction | null>(
+    null,
+  );
+  const [isPending, startTransition] = useTransition();
   const itemCount = tableOrderItems.reduce(
     (total, item) => total + item.quantity,
     0,
   );
 
   const handleAction = (action: TableAsideAction) => {
-    setActiveAction(action);
+    setPendingAction(action);
+    startTransition(() => setActiveAction(action));
   };
 
   return (
-    <section
-      aria-labelledby="table-aside-title"
-      className="flex h-full min-h-0 flex-col overflow-hidden bg-background"
-    >
-      <header className="shrink-0 px-[var(--pos-content-padding)] pb-4 pt-[var(--pos-content-padding)]">
+    <POSAside
+      ariaLabelledBy="table-aside-title"
+      headerClassName="px-[var(--pos-content-padding)] pb-4 pt-[var(--pos-content-padding)]"
+      mainClassName="flex min-h-0 flex-col px-[var(--pos-content-padding)]"
+      footerClassName="px-[var(--pos-content-padding)] pb-[var(--pos-content-padding)] pt-3"
+      footer={
+        <TableAsideFooter
+          activeAction={activeAction}
+          isPending={isPending}
+          onAction={handleAction}
+          pendingAction={pendingAction}
+          t={t}
+        />
+      }
+      header={
+        <>
         <h2 id="table-aside-title" className="sr-only">
           {t("pages.table.asideAriaLabel")}
         </h2>
@@ -185,9 +202,11 @@ export function TableAside() {
             </div>
           </div>
         </div>
-      </header>
+        </>
+      }
+    >
 
-      <div className="flex min-h-0 flex-1 flex-col px-[var(--pos-content-padding)] pb-[var(--pos-content-padding)]">
+      <div className="flex min-h-0 flex-1 flex-col">
         <section
           aria-labelledby="table-aside-items-title"
           className="flex min-h-0 flex-1 flex-col"
@@ -339,68 +358,89 @@ export function TableAside() {
           </div>
         </section>
 
-        <div className="mt-3 grid shrink-0 grid-cols-3 gap-2">
-          {primaryActions.map((action) => (
+      </div>
+    </POSAside>
+  );
+}
+
+function TableAsideFooter({
+  activeAction,
+  isPending,
+  onAction,
+  pendingAction,
+  t,
+}: {
+  activeAction: TableAsideAction | null;
+  isPending: boolean;
+  onAction: (action: TableAsideAction) => void;
+  pendingAction: TableAsideAction | null;
+  t: ReturnType<typeof useTranslations<"SalesMenu">>;
+}) {
+  return (
+    <div className="flex flex-col gap-3">
+      <div className="grid grid-cols-3 gap-2">
+        {primaryActions.map((action) => (
+          <ActionButton
+            key={action.id}
+            action={action}
+            isActive={activeAction === action.id}
+            isPending={isPending && pendingAction === action.id}
+            onPress={onAction}
+            t={t}
+          />
+        ))}
+      </div>
+
+      <section aria-labelledby="table-aside-management-title">
+        <h3
+          id="table-aside-management-title"
+          className="mb-2 text-xs font-semibold text-muted"
+        >
+          {t("pages.table.asideManagement")}
+        </h3>
+        <div className="grid grid-cols-3 gap-2">
+          {billingActions.map((action) => (
             <ActionButton
               key={action.id}
               action={action}
               isActive={activeAction === action.id}
-              onPress={handleAction}
+              isPending={isPending && pendingAction === action.id}
+              onPress={onAction}
               t={t}
             />
           ))}
         </div>
-
-        <section
-          aria-labelledby="table-aside-management-title"
-          className="mt-3 shrink-0"
-        >
-          <h3
-            id="table-aside-management-title"
-            className="mb-2 text-xs font-semibold text-muted"
-          >
-            {t("pages.table.asideManagement")}
-          </h3>
-          <div className="grid grid-cols-3 gap-2">
-            {billingActions.map((action) => (
-              <ActionButton
-                key={action.id}
-                action={action}
-                isActive={activeAction === action.id}
-                onPress={handleAction}
-                t={t}
-              />
-            ))}
-          </div>
-          <div className="mt-2 grid grid-cols-2 gap-2">
-            {tableActions.map((action) => (
-              <ActionButton
-                key={action.id}
-                action={action}
-                isActive={activeAction === action.id}
-                onPress={handleAction}
-                t={t}
-              />
-            ))}
-          </div>
-        </section>
-      </div>
-    </section>
+        <div className="mt-2 grid grid-cols-2 gap-2">
+          {tableActions.map((action) => (
+            <ActionButton
+              key={action.id}
+              action={action}
+              isActive={activeAction === action.id}
+              isPending={isPending && pendingAction === action.id}
+              onPress={onAction}
+              t={t}
+            />
+          ))}
+        </div>
+      </section>
+    </div>
   );
 }
 
 function ActionButton({
   action,
   isActive,
+  isPending,
   onPress,
   t,
 }: {
   action: {
     id: TableAsideAction;
-    icon: IconComponent;
+    icon: TablerIcon;
     labelKey: string;
   };
   isActive: boolean;
+  isPending: boolean;
   onPress: (action: TableAsideAction) => void;
   t: ReturnType<typeof useTranslations<"SalesMenu">>;
 }) {
@@ -410,13 +450,22 @@ function ActionButton({
     <Button
       aria-pressed={isActive}
       fullWidth
+      isDisabled={isPending}
+      isPending={isPending}
       size="lg"
       type="button"
       variant="secondary"
       onPress={() => onPress(action.id)}
     >
-      <Icon aria-hidden="true" size={16} />
-      <span className="truncate">{t(`pages.table.${action.labelKey}`)}</span>
+      {({ isPending: buttonPending }) =>
+        buttonPending ? (
+          <Spinner color="current" size="sm" />
+        ) : (
+          <>
+            <Icon aria-hidden="true" size={16} />
+            <span className="truncate">{t(`pages.table.${action.labelKey}`)}</span>
+          </>
+        )}
     </Button>
   );
 }

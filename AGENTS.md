@@ -21,18 +21,17 @@ Use TypeScript and React function components. Match the existing two-space inden
 
 ## Icon Library Guidelines
 
-Use `reicon-react` as the default icon library for application UI icons.
+Use `@tabler/icons-react` as the default icon library for application UI icons.
 
-- Import icons with named imports from `reicon-react`, for example `import { Home, Search, Settings } from "reicon-react";`.
-- Do not use wildcard imports such as `import * as Icons from "reicon-react"` because they defeat tree-shaking.
-- Use direct imports from `reicon-react/icons/<IconName>` only when a specific production bundle optimization requires them.
-- Prefer the default `Outline` weight for standard navigation and actions. Use `weight="Filled"` selectively for active or selected states.
+- Import icons with named imports from `@tabler/icons-react`, for example `import { IconHome, IconSearch, IconSettings } from "@tabler/icons-react"`.
+- Do not use wildcard imports such as `import * as Icons from "@tabler/icons-react"` because they defeat tree-shaking.
+- Use the `Icon`-prefixed Tabler names and keep imports statically analyzable.
 - Use `currentColor` inheritance and Tailwind text-color utilities instead of hard-coded icon colors unless a design explicitly requires a fixed color.
 - Use `size={20}` as the default application icon size, `18` for compact controls, and `24` for larger touch-oriented actions when appropriate.
 - For decorative icons next to visible text, add `aria-hidden="true"`.
 - For icon-only buttons, put the accessible `aria-label` on the button and mark the icon `aria-hidden="true"`.
 - Keep icon styling consistent with HeroUI components and avoid adding custom wrappers when the HeroUI component already supports icon content.
-- Reuse Reicon before introducing another icon package. Do not mix icon libraries in the same feature without a clear technical reason.
+- Reuse Tabler before introducing another icon package. Do not mix icon libraries in the same feature without a clear technical reason.
 
 ## Testing Guidelines
 

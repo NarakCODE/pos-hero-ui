@@ -18,17 +18,18 @@ import type { Key, Selection, SortDescriptor } from "@heroui/react";
 import { useTranslations } from "next-intl";
 import { useMemo, useState } from "react";
 import {
-  Banknote,
-  Calendar,
-  Call,
-  Cart,
-  Edit2,
-  More2,
-  Profile,
-  Sliders,
-  Sms,
-} from "reicon-react";
+  IconAdjustmentsHorizontal,
+  IconCalendar,
+  IconCash,
+  IconDots,
+  IconEdit,
+  IconMessage,
+  IconPhone,
+  IconShoppingCart,
+  IconUser,
+} from "@tabler/icons-react";
 import { POSLayout } from "@/components/shared/pos-layout";
+import { POSAside } from "@/components/shared/pos-aside";
 import {
   customerRecords,
   type CustomerRecord,
@@ -298,7 +299,7 @@ export function CustomerWorkspace({
                 renderEmptyState={() => (
                   <div className="flex flex-col items-center justify-center p-10 text-center">
                     <div className="flex size-12 items-center justify-center rounded-2xl bg-default text-muted">
-                      <Profile aria-hidden="true" size={24} />
+                      <IconUser aria-hidden="true" size={24} />
                     </div>
                     <p className="mt-4 text-sm font-semibold text-foreground">
                       {t("pages.customer.noResultsTitle")}
@@ -406,7 +407,7 @@ function CustomerToolbar({
             isIconOnly
             variant="secondary"
           >
-            <Sliders aria-hidden="true" size={18} />
+            <IconAdjustmentsHorizontal aria-hidden="true" size={18} />
             {activeFilterCount > 0 ? (
               <Chip
                 className="absolute -end-1 -top-1"
@@ -613,20 +614,23 @@ export function CustomerAside({
   }
 
   return (
-    <section
-      aria-labelledby="customer-aside-title"
-      className="flex h-full min-h-0 flex-col bg-background"
+    <POSAside
+      ariaLabelledBy="customer-aside-title"
+      footerClassName="p-[var(--pos-content-padding)] pt-0"
+      footer={<CustomerAsideFooter t={t} />}
+      headerClassName="p-[var(--pos-content-padding)]"
+      header={
+        <div className="flex items-center gap-2">
+          <IconUser aria-hidden="true" className="text-muted" size={20} />
+          <h2
+            id="customer-aside-title"
+            className="text-base font-bold tracking-tight text-foreground"
+          >
+            {t("pages.customer.profileTitle")}
+          </h2>
+        </div>
+      }
     >
-      <header className="flex shrink-0 items-center gap-2 p-[var(--pos-content-padding)]">
-        <Profile aria-hidden="true" className="text-muted" size={20} />
-        <h2
-          id="customer-aside-title"
-          className="text-base font-bold tracking-tight text-foreground"
-        >
-          {t("pages.customer.profileTitle")}
-        </h2>
-      </header>
-
       <div className="min-h-0 flex-1 overflow-y-auto px-[var(--pos-content-padding)] pb-[var(--pos-content-padding)]">
         <div className="flex items-start justify-between gap-3">
           <div className="flex min-w-0 items-center gap-3">
@@ -706,83 +710,92 @@ export function CustomerAside({
         </Disclosure>
       </div>
 
-      <div className="shrink-0 p-[var(--pos-content-padding)] pt-0">
-        <div className="grid grid-cols-3 gap-2">
-          <Button
-            className="min-w-0 rounded-full px-2 text-xs"
-            fullWidth
-            size="lg"
-            type="button"
-            variant="secondary"
-          >
-            <Cart aria-hidden="true" size={17} />
-            {t("pages.customer.startOrder")}
-          </Button>
-          <Button
-            className="min-w-0 rounded-full px-2 text-xs"
-            fullWidth
-            size="lg"
-            type="button"
-            variant="secondary"
-          >
-            <Edit2 aria-hidden="true" size={17} />
-            {t("pages.customer.editCustomer")}
-          </Button>
-          <Button
-            className="min-w-0 rounded-full px-2 text-xs"
-            fullWidth
-            size="lg"
-            type="button"
-            variant="secondary"
-          >
-            <Banknote aria-hidden="true" size={17} />
-            {t("pages.customer.payBack")}
-          </Button>
-        </div>
+    </POSAside>
+  );
+}
 
-        <div className="mt-3 flex items-center gap-2 rounded-xl bg-surface-secondary/60 p-2">
-          <Button
-            className="min-w-0 flex-1 rounded-full"
-            size="lg"
-            type="button"
-            variant="secondary"
-          >
-            <Calendar aria-hidden="true" size={18} />
-            {t("pages.customer.reservation")}
-          </Button>
-          <Button
-            aria-label={t("pages.customer.callCustomer")}
-            className="shrink-0 rounded-full"
-            isIconOnly
-            size="lg"
-            type="button"
-            variant="ghost"
-          >
-            <Call aria-hidden="true" size={18} />
-          </Button>
-          <Button
-            aria-label={t("pages.customer.messageCustomer")}
-            className="shrink-0 rounded-full"
-            isIconOnly
-            size="lg"
-            type="button"
-            variant="ghost"
-          >
-            <Sms aria-hidden="true" size={18} />
-          </Button>
-          <Button
-            aria-label={t("pages.customer.moreActions")}
-            className="shrink-0 rounded-full"
-            isIconOnly
-            size="lg"
-            type="button"
-            variant="ghost"
-          >
-            <More2 aria-hidden="true" size={18} />
-          </Button>
-        </div>
+function CustomerAsideFooter({
+  t,
+}: {
+  t: ReturnType<typeof useTranslations<"SalesMenu">>;
+}) {
+  return (
+    <div>
+      <div className="grid grid-cols-3 gap-2">
+        <Button
+          className="min-w-0 rounded-full px-2 text-xs"
+          fullWidth
+          size="lg"
+          type="button"
+          variant="secondary"
+        >
+          <IconShoppingCart aria-hidden="true" size={17} />
+          {t("pages.customer.startOrder")}
+        </Button>
+        <Button
+          className="min-w-0 rounded-full px-2 text-xs"
+          fullWidth
+          size="lg"
+          type="button"
+          variant="secondary"
+        >
+          <IconEdit aria-hidden="true" size={17} />
+          {t("pages.customer.editCustomer")}
+        </Button>
+        <Button
+          className="min-w-0 rounded-full px-2 text-xs"
+          fullWidth
+          size="lg"
+          type="button"
+          variant="secondary"
+        >
+          <IconCash aria-hidden="true" size={17} />
+          {t("pages.customer.payBack")}
+        </Button>
       </div>
-    </section>
+
+      <div className="mt-3 flex items-center gap-2 rounded-xl bg-surface-secondary/60 p-2">
+        <Button
+          className="min-w-0 flex-1 rounded-full"
+          size="lg"
+          type="button"
+          variant="secondary"
+        >
+          <IconCalendar aria-hidden="true" size={18} />
+          {t("pages.customer.reservation")}
+        </Button>
+        <Button
+          aria-label={t("pages.customer.callCustomer")}
+          className="shrink-0 rounded-full"
+          isIconOnly
+          size="lg"
+          type="button"
+          variant="ghost"
+        >
+          <IconPhone aria-hidden="true" size={18} />
+        </Button>
+        <Button
+          aria-label={t("pages.customer.messageCustomer")}
+          className="shrink-0 rounded-full"
+          isIconOnly
+          size="lg"
+          type="button"
+          variant="ghost"
+        >
+          <IconMessage aria-hidden="true" size={18} />
+        </Button>
+        <Button
+          aria-label={t("pages.customer.moreActions")}
+          className="shrink-0 rounded-full"
+          isIconOnly
+          size="lg"
+          type="button"
+          variant="ghost"
+        >
+          <IconDots aria-hidden="true" size={18} />
+        </Button>
+      </div>
+    </div>
   );
 }
 

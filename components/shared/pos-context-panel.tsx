@@ -1,16 +1,18 @@
 "use client";
 
-import { Button, Surface } from "@heroui/react";
+import { Button, Spinner, Surface } from "@heroui/react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
-import type { IconComponent } from "reicon-react";
+import { useTransition } from "react";
 import {
-  More2,
-  Profile,
-  Settings,
-  Shop,
-} from "reicon-react";
-import { IconClipboardList, type TablerIcon } from "@tabler/icons-react";
+  IconBuildingStore,
+  IconClipboardList,
+  IconDots,
+  IconSettings,
+  IconUser,
+  type TablerIcon,
+} from "@tabler/icons-react";
+import { POSAside } from "./pos-aside";
 
 export type POSContextPanelKind =
   | "orders"
@@ -19,7 +21,7 @@ export type POSContextPanelKind =
   | "settings"
   | "more";
 
-type ContextPanelIcon = IconComponent | TablerIcon;
+type ContextPanelIcon = TablerIcon;
 
 interface POSContextPanelConfig {
   icon: ContextPanelIcon;
@@ -28,40 +30,68 @@ interface POSContextPanelConfig {
 
 const panelConfig: Record<POSContextPanelKind, POSContextPanelConfig> = {
   orders: { href: "/sales", icon: IconClipboardList },
-  table: { href: "/sales", icon: Shop },
-  customer: { href: "/customer", icon: Profile },
-  settings: { href: "/settings", icon: Settings },
-  more: { href: "/more", icon: More2 },
+  table: { href: "/sales", icon: IconBuildingStore },
+  customer: { href: "/customer", icon: IconUser },
+  settings: { href: "/settings", icon: IconSettings },
+  more: { href: "/more", icon: IconDots },
 };
 
 export function POSContextPanel({ kind }: { kind: POSContextPanelKind }) {
   const t = useTranslations("SalesMenu");
   const router = useRouter();
+  const [isPending, startTransition] = useTransition();
   const { href, icon: Icon } = panelConfig[kind];
   const translationKey = `rightPanel.${kind}` as const;
 
-  return (
-    <section
-      aria-labelledby={`${kind}-context-panel-title`}
-      className="flex h-full min-h-0 flex-col gap-4 overflow-y-auto p-4 sm:p-5"
-    >
-      <div className="flex items-center gap-3">
-        <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-accent/10 text-accent">
-          <Icon aria-hidden="true" size={22} />
-        </div>
-        <div className="min-w-0">
-          <p className="text-xs font-semibold uppercase tracking-wider text-muted">
-            {t(`${translationKey}.eyebrow`)}
-          </p>
-          <h2
-            id={`${kind}-context-panel-title`}
-            className="truncate text-lg font-semibold text-foreground"
-          >
-            {t(`${translationKey}.title`)}
-          </h2>
-        </div>
-      </div>
+  const handleNavigate = () => {
+    startTransition(() => router.push(href));
+  };
 
+  return (
+    <POSAside
+      ariaLabelledBy={`${kind}-context-panel-title`}
+      headerClassName="p-[var(--pos-content-padding)]"
+      mainClassName="flex flex-col gap-4 overflow-y-auto px-[var(--pos-content-padding)] pb-[var(--pos-content-padding)]"
+      footerClassName="px-[var(--pos-content-padding)] pb-[var(--pos-content-padding)]"
+      header={
+        <div className="flex items-center gap-3">
+          <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-accent/10 text-accent">
+            <Icon aria-hidden="true" size={22} />
+          </div>
+          <div className="min-w-0">
+            <p className="text-xs font-semibold uppercase tracking-wider text-muted">
+              {t(`${translationKey}.eyebrow`)}
+            </p>
+            <h2
+              id={`${kind}-context-panel-title`}
+              className="truncate text-lg font-semibold text-foreground"
+            >
+              {t(`${translationKey}.title`)}
+            </h2>
+          </div>
+        </div>
+      }
+      footer={
+        <Button
+          fullWidth
+          isPending={isPending}
+          size="lg"
+          type="button"
+          variant="secondary"
+          onPress={handleNavigate}
+        >
+          {({ isPending: buttonPending }) =>
+            buttonPending ? (
+              <>
+                <Spinner color="current" size="sm" />
+                {t(`${translationKey}.action`)}
+              </>
+            ) : (
+              t(`${translationKey}.action`)
+            )}
+        </Button>
+      }
+    >
       <Surface className="flex flex-col gap-2 p-4" variant="secondary">
         <p className="text-sm font-semibold text-foreground">
           {t(`${translationKey}.summaryTitle`)}
@@ -112,17 +142,6 @@ export function POSContextPanel({ kind }: { kind: POSContextPanelKind }) {
         </div>
       </Surface>
 
-      <div className="mt-auto pt-2">
-        <Button
-          fullWidth
-          size="lg"
-          type="button"
-          variant="secondary"
-          onPress={() => router.push(href)}
-        >
-          {t(`${translationKey}.action`)}
-        </Button>
-      </div>
-    </section>
+    </POSAside>
   );
 }

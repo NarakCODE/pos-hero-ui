@@ -4,37 +4,34 @@ import { Button } from "@heroui/react";
 import { useLocale, useTranslations } from "next-intl";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import type { IconComponent } from "reicon-react";
 import {
-  Logout,
-  More2,
-  Profile,
-  Receipt2,
-  Settings,
-  Shop,
-} from "reicon-react";
-import { IconClipboardList } from "@tabler/icons-react";
-import type { TablerIcon } from "@tabler/icons-react";
+  IconCashRegister,
+  IconClipboardList,
+  IconDots,
+  IconLogout,
+  IconSettings,
+  IconTable,
+  IconUsers,
+  type TablerIcon,
+} from "@tabler/icons-react";
 import { authSessionStorageKey } from "@/config/auth";
 import { SignOutAlertDialog } from "@/components/order-panel";
 
 type NavigationId = "sales" | "orders" | "table" | "customer" | "settings" | "more";
 
-type NavigationIcon = IconComponent | TablerIcon;
-
 interface NavigationItem {
   id: NavigationId;
   href: string;
-  icon: NavigationIcon;
+  icon: TablerIcon;
 }
 
 const navigationItems: NavigationItem[] = [
-  { id: "sales", href: "/sales", icon: Receipt2 },
+  { id: "sales", href: "/sales", icon: IconCashRegister },
   { id: "orders", href: "/orders", icon: IconClipboardList },
-  { id: "table", href: "/table", icon: Shop },
-  { id: "customer", href: "/customer", icon: Profile },
-  { id: "settings", href: "/settings", icon: Settings },
-  { id: "more", href: "/more", icon: More2 },
+  { id: "table", href: "/table", icon: IconTable },
+  { id: "customer", href: "/customer", icon: IconUsers },
+  { id: "settings", href: "/settings", icon: IconSettings },
+  { id: "more", href: "/more", icon: IconDots },
 ];
 
 export function POSFooter({ className = "" }: { className?: string }) {
@@ -102,7 +99,7 @@ export function POSFooter({ className = "" }: { className?: string }) {
               aria-label={t("signOut")}
               className="shrink-0"
             >
-              <Logout aria-hidden="true" size={15} />
+              <IconLogout aria-hidden="true" size={15} />
               <span className="hidden text-xs sm:inline">{t("signOut")}</span>
             </Button>
           }

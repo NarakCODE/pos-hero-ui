@@ -2,18 +2,20 @@
 
 import { useLocale, useTranslations } from "next-intl";
 import { useCallback, useMemo, useState } from "react";
-import type { IconComponent } from "reicon-react";
 import {
-  Add,
-  Card,
-  Profile,
-  Scan,
-  Send2,
-  Tag,
-  Wallet,
-  Wallet2,
-  Wallet3,
-} from "reicon-react";
+  IconCreditCard,
+  IconLetterLSmall,
+  IconLetterMSmall,
+  IconLetterSSmall,
+  IconLetterXSmall,
+  IconPlus,
+  IconQrcode,
+  IconSend,
+  IconTag,
+  IconUser,
+  IconWallet,
+  type TablerIcon,
+} from "@tabler/icons-react";
 import { ProductCard } from "@/components/product-card";
 import {
   OrderChannelSelect,
@@ -24,7 +26,7 @@ import {
   type AppliedPromotion,
   type OrderPanelItem,
 } from "@/components/order-panel";
-import { Button, SearchField, Tabs } from "@heroui/react";
+import { Button, ScrollShadow, SearchField, Tabs } from "@heroui/react";
 import { POSLayout } from "@/components/shared/pos-layout";
 import { defaultLocale, isLocale, type Locale } from "@/config/i18n";
 
@@ -44,6 +46,35 @@ import {
   type SweetnessId,
   sweetnessIds,
 } from "./data";
+
+const productImages = [
+  "/products/product-1.png",
+  "/products/product-2.png",
+  "/products/product-3.png",
+  "/products/product-4.png",
+  "/products/product-5.png",
+  "/products/product-6.png",
+  "/products/product-7.png",
+  "/products/product-8.png",
+  "/products/product-9.png",
+  "/products/product-10.png",
+  "/products/product-11.png",
+] as const;
+
+function getProductImage(productId: string): string {
+  let hash = 14;
+  for (let i = 0; i < productId.length; i++) {
+    hash = Math.imul(hash ^ productId.charCodeAt(i), 16777619);
+  }
+  return productImages[Math.abs(hash) % productImages.length];
+}
+
+const sizeIconById: Record<SizeId, TablerIcon> = {
+  extraSmall: IconLetterXSmall,
+  small: IconLetterSSmall,
+  medium: IconLetterMSmall,
+  large: IconLetterLSmall,
+};
 
 export default function SalesPage() {
   const t = useTranslations("SalesMenu");
@@ -72,8 +103,13 @@ export default function SalesPage() {
     [t],
   );
 
-  const sizeOptions: Array<{ id: SizeId; label: string }> = useMemo(
-    () => sizeIds.map((id) => ({ id, label: t(`modifiers.${id}`) })),
+  const sizeOptions: Array<{ id: SizeId; label: string; icon: TablerIcon }> = useMemo(
+    () =>
+      sizeIds.map((id) => ({
+        id,
+        label: t(`modifiers.${id}`),
+        icon: sizeIconById[id],
+      })),
     [t],
   );
 
@@ -266,20 +302,20 @@ export default function SalesPage() {
 
   const paymentOptions: Array<{
     id: PaymentMethodId;
-    icon: IconComponent;
+    icon: TablerIcon;
     label: string;
   }> = [
-    { id: "cash", icon: Wallet, label: t("payment.cash") },
-    { id: "bankCard", icon: Card, label: t("payment.bankCard") },
-    { id: "khqr", icon: Scan, label: t("payment.khqr") },
+    { id: "cash", icon: IconWallet, label: t("payment.cash") },
+    { id: "bankCard", icon: IconCreditCard, label: t("payment.bankCard") },
+    { id: "khqr", icon: IconQrcode, label: t("payment.khqr") },
   ];
 
   const quickActions = [
-    { id: "brandWallet", icon: Wallet3, label: t("payment.brandWallet") },
-    { id: "digitalWallet", icon: Wallet2, label: t("payment.digitalWallet") },
-    { id: "promotion", icon: Tag, label: t("payment.promotion") },
-    { id: "member", icon: Profile, label: t("payment.member") },
-    { id: "sendKitchen", icon: Send2, label: t("payment.sendKitchen") },
+    { id: "brandWallet", icon: IconWallet, label: t("payment.brandWallet") },
+    { id: "digitalWallet", icon: IconWallet, label: t("payment.digitalWallet") },
+    { id: "promotion", icon: IconTag, label: t("payment.promotion") },
+    { id: "member", icon: IconUser, label: t("payment.member") },
+    { id: "sendKitchen", icon: IconSend, label: t("payment.sendKitchen") },
   ];
 
   const handleClearTicket = () => {
@@ -309,7 +345,6 @@ export default function SalesPage() {
           orderChannelLabel={t("ticketSummary.orderChannel")}
           orderChannel={
             <OrderChannelSelect
-              className="w-full"
               label={null}
               onChange={setOrderChannel}
               value={orderChannel}
@@ -427,7 +462,7 @@ export default function SalesPage() {
               variant="secondary"
               className="shrink-0"
             >
-              <Add aria-hidden="true" size={20} />
+              <IconPlus aria-hidden="true" size={20} />
             </Button>
           </div>
 
@@ -448,7 +483,7 @@ export default function SalesPage() {
                         addToTicketLabel={t("addToTicket", {
                           name: productName,
                         })}
-                        image={product.image}
+                        image={getProductImage(product.id)}
                         name={productName}
                         onClick={() => addProduct(product)}
                         price={formatCurrency(product.price)}
@@ -477,17 +512,25 @@ export default function SalesPage() {
                 <span className="w-20 shrink-0 truncate text-xs font-medium text-muted">
                   {t("modifiers.size")}:
                 </span>
-                <div className="grid min-w-0 flex-1 grid-cols-2 gap-1.5 sm:grid-cols-3 lg:grid-cols-4">
-                  {sizeOptions.map((option) => (
-                    <ChoiceButton
-                      key={option.id}
-                      active={selectedSize === option.id}
-                      onPress={() => setSelectedSize(option.id)}
-                    >
-                      {option.label}
-                    </ChoiceButton>
-                  ))}
-                </div>
+                <ScrollShadow
+                  className="min-w-0 flex-1 pb-1"
+                  hideScrollBar
+                  orientation="horizontal"
+                >
+                  <div className="flex w-max min-w-full flex-row gap-1.5">
+                    {sizeOptions.map((option) => (
+                      <div key={option.id} className="w-32 shrink-0">
+                        <ChoiceButton
+                          active={selectedSize === option.id}
+                          icon={option.icon}
+                          onPress={() => setSelectedSize(option.id)}
+                        >
+                          {option.label}
+                        </ChoiceButton>
+                      </div>
+                    ))}
+                  </div>
+                </ScrollShadow>
               </div>
 
               {/* Sweetness */}
@@ -495,17 +538,24 @@ export default function SalesPage() {
                 <span className="w-20 shrink-0 truncate text-xs font-medium text-muted">
                   {t("modifiers.sweetness")}:
                 </span>
-                <div className="grid min-w-0 flex-1 grid-cols-2 gap-1.5 sm:grid-cols-3 lg:grid-cols-4">
-                  {sweetnessOptions.map((option) => (
-                    <ChoiceButton
-                      key={option.id}
-                      active={selectedSweetness === option.id}
-                      onPress={() => setSelectedSweetness(option.id)}
-                    >
-                      {option.label}
-                    </ChoiceButton>
-                  ))}
-                </div>
+                <ScrollShadow
+                  className="min-w-0 flex-1 pb-1"
+                  hideScrollBar
+                  orientation="horizontal"
+                >
+                  <div className="flex w-max min-w-full flex-row gap-1.5">
+                    {sweetnessOptions.map((option) => (
+                      <div key={option.id} className="w-32 shrink-0">
+                        <ChoiceButton
+                          active={selectedSweetness === option.id}
+                          onPress={() => setSelectedSweetness(option.id)}
+                        >
+                          {option.label}
+                        </ChoiceButton>
+                      </div>
+                    ))}
+                  </div>
+                </ScrollShadow>
               </div>
 
               {/* Add-ons */}
@@ -513,17 +563,24 @@ export default function SalesPage() {
                 <span className="w-20 shrink-0 truncate text-xs font-medium text-muted">
                   {t("modifiers.addOns")}:
                 </span>
-                <div className="grid min-w-0 flex-1 grid-cols-2 gap-1.5 sm:grid-cols-3 lg:grid-cols-4">
-                  {addOnOptions.map((option) => (
-                    <ChoiceButton
-                      key={option.id}
-                      active={selectedAddOns.includes(option.id)}
-                      onPress={() => toggleAddOn(option.id)}
-                    >
-                      {option.label}
-                    </ChoiceButton>
-                  ))}
-                </div>
+                <ScrollShadow
+                  className="min-w-0 flex-1 pb-1"
+                  hideScrollBar
+                  orientation="horizontal"
+                >
+                  <div className="flex w-max min-w-full flex-row gap-1.5">
+                    {addOnOptions.map((option) => (
+                      <div key={option.id} className="w-32 shrink-0">
+                        <ChoiceButton
+                          active={selectedAddOns.includes(option.id)}
+                          onPress={() => toggleAddOn(option.id)}
+                        >
+                          {option.label}
+                        </ChoiceButton>
+                      </div>
+                    ))}
+                  </div>
+                </ScrollShadow>
               </div>
             </div>
           </div>
@@ -536,10 +593,12 @@ export default function SalesPage() {
 function ChoiceButton({
   active,
   children,
+  icon: Icon,
   onPress,
 }: {
   active: boolean;
   children: React.ReactNode;
+  icon?: TablerIcon;
   onPress: () => void;
 }) {
   return (
@@ -550,6 +609,7 @@ function ChoiceButton({
       onPress={onPress}
       aria-pressed={active}
     >
+      {Icon ? <Icon aria-hidden="true" size={20} /> : null}
       {children}
     </Button>
   );

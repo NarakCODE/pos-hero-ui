@@ -9,7 +9,10 @@ import {
   Select,
 } from "@heroui/react";
 import { useTranslations } from "next-intl";
-import { RotateRight, Sliders } from "reicon-react";
+import {
+  IconAdjustmentsHorizontal,
+  IconRefresh,
+} from "@tabler/icons-react";
 import type { TableStatus } from "./table-data";
 
 export type TableStatusFilter = "all" | TableStatus;
@@ -61,7 +64,7 @@ export function TableFiltersPopover({
         isIconOnly
         variant="secondary"
       >
-        <Sliders aria-hidden="true" size={18} />
+        <IconAdjustmentsHorizontal aria-hidden="true" size={18} />
         {activeFilterCount > 0 ? (
           <Chip
             className="absolute -end-1 -top-1"
@@ -103,7 +106,7 @@ export function TableFiltersPopover({
                 variant="ghost"
                 onPress={onResetFilters}
               >
-                <RotateRight aria-hidden="true" className="mr-1" size={14} />
+                <IconRefresh aria-hidden="true" className="mr-1" size={14} />
                 {t("pages.table.filterReset")}
               </Button>
             ) : null}

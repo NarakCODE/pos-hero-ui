@@ -2,7 +2,7 @@
 
 import { InputGroup, TextField } from "@heroui/react";
 import { useTranslations } from "next-intl";
-import { Search } from "reicon-react";
+import { IconSearch } from "@tabler/icons-react";
 import { LanguageSwitcher } from "@/components/shared/language-switcher";
 import { Logo } from "@/components/shared/logo";
 import { ThemeSwitcher } from "@/components/shared/theme-switcher";
@@ -53,7 +53,7 @@ export function POSHeader({
             >
               <InputGroup fullWidth variant="secondary" className="h-9">
                 <InputGroup.Prefix>
-                  <Search aria-hidden="true" size={16} className="text-muted" />
+                  <IconSearch aria-hidden="true" size={16} className="text-muted" />
                 </InputGroup.Prefix>
                 <InputGroup.Input
                   placeholder={searchPlaceholder ?? t("searchPlaceholder")}

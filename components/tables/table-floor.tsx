@@ -3,7 +3,7 @@
 import { Card, Chip, SearchField, Tabs } from "@heroui/react";
 import { useTranslations } from "next-intl";
 import { useMemo, useState } from "react";
-import { Clock, Profile, Receipt2 } from "reicon-react";
+import { IconClock, IconReceipt, IconUser } from "@tabler/icons-react";
 import {
   TableFiltersPopover,
   type TableServerFilter,
@@ -246,11 +246,11 @@ function TableCard({
           <>
             <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 text-xs text-muted">
               <span className="inline-flex items-center gap-1.5">
-                <Profile aria-hidden="true" size={14} />
+                <IconUser aria-hidden="true" size={14} />
                 {table.server ?? "--"}
               </span>
               <span className="inline-flex items-center gap-1.5">
-                <Profile aria-hidden="true" size={14} />
+                <IconUser aria-hidden="true" size={14} />
                 {table.guestCount === undefined
                   ? "--"
                   : t("pages.table.sessionGuests", {
@@ -258,7 +258,7 @@ function TableCard({
                     })}
               </span>
               <span className="inline-flex items-center gap-1.5">
-                <Receipt2 aria-hidden="true" size={14} />
+                <IconReceipt aria-hidden="true" size={14} />
                 {table.itemCount === undefined
                   ? "0"
                   : t("pages.table.sessionItems", {
@@ -269,7 +269,7 @@ function TableCard({
 
             <div className="mt-3 flex items-end justify-between gap-3 border-t border-border/60 pt-3">
               <span className="inline-flex items-center gap-1.5 text-xs text-muted">
-                <Clock aria-hidden="true" size={14} />
+                <IconClock aria-hidden="true" size={14} />
                 {table.orderTime === undefined
                   ? "--"
                   : t("pages.table.sessionStarted", {
@@ -288,7 +288,7 @@ function TableCard({
           </>
         ) : table.status === "reserved" ? (
           <span className="inline-flex items-center gap-1.5 text-sm text-muted">
-            <Clock aria-hidden="true" size={15} />
+            <IconClock aria-hidden="true" size={15} />
             {t("pages.table.reservationAt", {
               time: table.reservationTime ?? "—",
             })}

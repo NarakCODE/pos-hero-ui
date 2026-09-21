@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { POSAside } from "@/components/shared/pos-aside";
 import { BillingSummary } from "./billing-summary";
 import { OrderHeader } from "./order-header";
 import { OrderItemsTable } from "./order-items-table";
@@ -103,14 +104,19 @@ export function OrderPanel({
   const handleRemovePromotion = onRemovePromotion ?? (() => setLocalPromotion(null));
 
   const containerClasses = className
-    ? `flex h-full min-h-0 min-w-0 flex-col overflow-hidden bg-background p-[var(--pos-content-padding)] ${className}`
-    : "flex h-full min-h-0 min-w-0 flex-col overflow-hidden rounded-2xl border border-border bg-background p-[var(--pos-content-padding)]";
+    ? `overflow-hidden p-[var(--pos-content-padding)] ${className}`
+    : "overflow-hidden rounded-2xl border border-border p-[var(--pos-content-padding)]";
 
   if (children) {
     return (
-      <section id={id} aria-label={ariaLabel} className={containerClasses}>
+      <POSAside
+        id={id}
+        ariaLabel={ariaLabel}
+        className={containerClasses}
+        mainClassName="overflow-y-auto"
+      >
         {children}
-      </section>
+      </POSAside>
     );
   }
 
@@ -133,111 +139,117 @@ export function OrderPanel({
     chargeAmount !== undefined ? chargeAmount : formatCurrency(calculatedTotal);
 
   return (
-    <section id={id} aria-label={ariaLabel} className={containerClasses}>
-      <OrderHeader
-        orderNumber={orderNumber}
-        title={title}
-        eyebrow={eyebrow}
-        tableTicketNumber={tableTicketNumber}
-        tableTicketLabel={tableTicketLabel}
-        sequenceNumber={sequenceNumber}
-        sequenceLabel={sequenceLabel}
-        status={status}
-        statusLabel={statusLabel}
-        orderChannel={orderChannel}
-        orderChannelLabel={orderChannelLabel}
-        orderType={orderType}
-        tableNumber={tableNumber}
-        customerName={customerName}
-        timestamp={timestamp}
-        onChangeOrderType={onChangeOrderType}
-        changeButtonLabel={changeButtonLabel}
-        onClearTicket={onClearTicket}
-        clearButtonLabel={clearButtonLabel}
-        canClear={items.length > 0}
-        actions={headerActions}
-      />
-
-      <div className="mt-3 flex min-h-0 flex-1 flex-col overflow-hidden">
-        <OrderItemsTable
-          items={items}
-          onUpdateQuantity={onUpdateQuantity}
-          onRemoveItem={onRemoveItem}
-          formatCurrency={formatCurrency}
-          emptyTitle={emptyTitle}
-          emptyDescription={emptyDescription}
-          emptyIcon={emptyIcon}
-          viewMode={viewMode}
-          decreaseAriaLabel={decreaseAriaLabel}
-          increaseAriaLabel={increaseAriaLabel}
-          removeAriaLabel={removeAriaLabel}
-          labels={itemTableLabels}
+    <POSAside
+      id={id}
+      ariaLabel={ariaLabel}
+      className={containerClasses}
+      mainClassName="mt-3 flex min-h-0 flex-col overflow-hidden"
+      footerClassName="mt-3 flex shrink-0 flex-col gap-3"
+      header={
+        <OrderHeader
+          orderNumber={orderNumber}
+          title={title}
+          eyebrow={eyebrow}
+          tableTicketNumber={tableTicketNumber}
+          tableTicketLabel={tableTicketLabel}
+          sequenceNumber={sequenceNumber}
+          sequenceLabel={sequenceLabel}
+          status={status}
+          statusLabel={statusLabel}
+          orderChannel={orderChannel}
+          orderChannelLabel={orderChannelLabel}
+          orderType={orderType}
+          tableNumber={tableNumber}
+          customerName={customerName}
+          timestamp={timestamp}
+          onChangeOrderType={onChangeOrderType}
+          changeButtonLabel={changeButtonLabel}
+          onClearTicket={onClearTicket}
+          clearButtonLabel={clearButtonLabel}
+          canClear={items.length > 0}
+          actions={headerActions}
         />
-      </div>
+      }
+      footer={
+        <>
+          <BillingSummary
+            subtotal={calculatedSubtotal}
+            subtotalLabel={subtotalLabel}
+            discount={calculatedDiscount}
+            discountRate={discountRate}
+            discountLabel={discountLabel}
+            totalDiscountLabel={totalDiscountLabel}
+            tax={tax !== undefined ? tax : calculatedTax}
+            taxRate={taxRate}
+            taxLabel={taxLabel}
+            serviceCharge={serviceCharge}
+            serviceChargeLabel={serviceChargeLabel}
+            total={calculatedTotal}
+            totalLabel={totalLabel}
+            itemCount={calculatedItemCount}
+            itemsLabel={itemsLabel}
+            paymentLabel={paymentLabel}
+            paymentMethod={paymentMethod}
+            receivedLabel={receivedLabel}
+            receivedAmount={receivedAmount}
+            changeLabel={changeLabel}
+            changeAmount={changeAmount}
+            changeSecondaryAmount={changeSecondaryAmount}
+            formatCurrency={formatCurrency}
+            customRows={customBillingRows}
+            appliedPromotion={currentPromotion}
+            onRemovePromotion={handleRemovePromotion}
+          />
 
-      <BillingSummary
-        subtotal={calculatedSubtotal}
-        subtotalLabel={subtotalLabel}
-        discount={calculatedDiscount}
-        discountRate={discountRate}
-        discountLabel={discountLabel}
-        totalDiscountLabel={totalDiscountLabel}
-        tax={tax !== undefined ? tax : calculatedTax}
-        taxRate={taxRate}
-        taxLabel={taxLabel}
-        serviceCharge={serviceCharge}
-        serviceChargeLabel={serviceChargeLabel}
-        total={calculatedTotal}
-        totalLabel={totalLabel}
-        itemCount={calculatedItemCount}
-        itemsLabel={itemsLabel}
-        paymentLabel={paymentLabel}
-        paymentMethod={paymentMethod}
-        receivedLabel={receivedLabel}
-        receivedAmount={receivedAmount}
-        changeLabel={changeLabel}
-        changeAmount={changeAmount}
-        changeSecondaryAmount={changeSecondaryAmount}
+          <PaymentActions
+            paymentMethods={paymentMethods}
+            quickActions={quickActions}
+            selectedPaymentMethod={selectedPaymentMethod}
+            onSelectPaymentMethod={onSelectPaymentMethod}
+            onQuickAction={onQuickAction}
+            paymentTitle={paymentTitle}
+            chargeAmount={formattedChargeAmount}
+            chargeLabel={chargeLabel}
+            completeLabel={completeLabel}
+            onCharge={onCharge}
+            isCharging={isCharging}
+            isPaid={isPaid}
+            paidMessage={paidMessage}
+            disabled={items.length === 0}
+            onPrintReceipt={onPrintReceipt}
+            printLabel={printLabel}
+            onHoldOrder={onHoldOrder}
+            holdLabel={holdLabel}
+            onResetOrder={onResetOrder}
+            resetLabel={resetLabel}
+            actionsSlot={actionsSlot}
+            appliedPromotion={currentPromotion}
+            onApplyPromotion={handleApplyPromotion}
+            onRemovePromotion={handleRemovePromotion}
+            subtotal={calculatedSubtotal}
+            promotions={promotions}
+            formatCurrency={formatCurrency}
+          />
+
+          {footer ? <div>{footer}</div> : null}
+        </>
+      }
+    >
+      <OrderItemsTable
+        items={items}
+        onUpdateQuantity={onUpdateQuantity}
+        onRemoveItem={onRemoveItem}
         formatCurrency={formatCurrency}
-        customRows={customBillingRows}
-        appliedPromotion={currentPromotion}
-        onRemovePromotion={handleRemovePromotion}
-        className="mt-3"
+        emptyTitle={emptyTitle}
+        emptyDescription={emptyDescription}
+        emptyIcon={emptyIcon}
+        viewMode={viewMode}
+        decreaseAriaLabel={decreaseAriaLabel}
+        increaseAriaLabel={increaseAriaLabel}
+        removeAriaLabel={removeAriaLabel}
+        labels={itemTableLabels}
       />
-
-      <PaymentActions
-        paymentMethods={paymentMethods}
-        quickActions={quickActions}
-        selectedPaymentMethod={selectedPaymentMethod}
-        onSelectPaymentMethod={onSelectPaymentMethod}
-        onQuickAction={onQuickAction}
-        paymentTitle={paymentTitle}
-        chargeAmount={formattedChargeAmount}
-        chargeLabel={chargeLabel}
-        completeLabel={completeLabel}
-        onCharge={onCharge}
-        isCharging={isCharging}
-        isPaid={isPaid}
-        paidMessage={paidMessage}
-        disabled={items.length === 0}
-        onPrintReceipt={onPrintReceipt}
-        printLabel={printLabel}
-        onHoldOrder={onHoldOrder}
-        holdLabel={holdLabel}
-        onResetOrder={onResetOrder}
-        resetLabel={resetLabel}
-        actionsSlot={actionsSlot}
-        appliedPromotion={currentPromotion}
-        onApplyPromotion={handleApplyPromotion}
-        onRemovePromotion={handleRemovePromotion}
-        subtotal={calculatedSubtotal}
-        promotions={promotions}
-        formatCurrency={formatCurrency}
-        className="mt-3"
-      />
-
-      {footer ? <div className="mt-3 shrink-0">{footer}</div> : null}
-    </section>
+    </POSAside>
   );
 }
 

@@ -14,13 +14,12 @@ export default async function AuthLayout({
   return (
     <div className="min-h-screen bg-background text-foreground">
       <div className="grid min-h-screen lg:grid-cols-[minmax(0,1fr)_minmax(26rem,34rem)]">
-        <aside className="relative hidden overflow-hidden border-e border-border bg-surface-secondary lg:flex">
+        <aside className="relative hidden overflow-hidden border-e border-border bg-black lg:flex">
           <div
             aria-hidden="true"
             className="pointer-events-none absolute inset-0 bg-cover bg-center bg-no-repeat"
             style={{
-              backgroundImage:
-                "url('https://cdn.dribbble.com/userupload/48496345/file/b0f4d60d18e90707c0a93d16592d36c5.jpg?resize=1600x1600&vertical=center')",
+              backgroundImage: "url('/login-bg.png')",
               WebkitMaskImage:
                 "linear-gradient(to right, black 0%, black 64%, rgba(0, 0, 0, 0.9) 74%, transparent 100%)",
               maskImage:
@@ -29,7 +28,7 @@ export default async function AuthLayout({
           />
           <div
             aria-hidden="true"
-            className="pointer-events-none absolute inset-0 bg-gradient-to-r from-black/55 via-black/25 to-transparent"
+            className="pointer-events-none absolute inset-0 bg-gradient-to-r from-black/75 via-black/45 to-black/20"
           />
           <div
             aria-hidden="true"
@@ -40,28 +39,23 @@ export default async function AuthLayout({
             className="pointer-events-none absolute -bottom-28 -start-16 size-72 rounded-full border border-white/20"
           />
 
-          <div className="relative z-10 flex min-h-screen w-full flex-col justify-between p-10 text-white xl:p-14">
+          <div className="relative z-10 flex min-h-screen w-full flex-col items-start justify-center p-10 text-start text-white xl:p-14">
             <Link
               href="/"
               aria-label={brandName}
               className="w-fit rounded-lg focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
             >
-              <Logo name={brandName} size="lg" />
+              <Logo name={brandName} size="xl" />
             </Link>
 
-            <div className="max-w-lg">
-              <p className="mb-4 text-sm font-medium uppercase tracking-[0.2em] text-white/80">
-                {t("eyebrow")}
-              </p>
+            <div className="mt-4 w-full max-w-lg">
               <h1 className="max-w-xl text-4xl font-semibold leading-tight tracking-tight text-white xl:text-5xl">
                 {t("headline")}
               </h1>
-              <p className="mt-6 max-w-md text-lg leading-8 text-white/80">
+              <p className="mt-3 max-w-md text-lg leading-8 text-white/80">
                 {t("description")}
               </p>
             </div>
-
-            <p className="text-sm text-white/70">{t("footer")}</p>
           </div>
         </aside>
 

@@ -70,7 +70,7 @@ export function POSLayout({
       mainClassName={`flex flex-col bg-background ${
         rightPanel ? "border-e border-border" : ""
       } ${mainClassName ?? ""}`}
-      asideClassName={`flex-col bg-background ${rightPanelClassName ?? ""}`}
+      asideClassName={`flex-col bg-surface ${rightPanelClassName ?? ""}`}
     >
       <POSHeader
         searchQuery={searchQuery}

@@ -1,7 +1,11 @@
 "use client";
 
 import { Button, Modal, Surface } from "@heroui/react";
-import { AlertTriangle, CheckCircle, Wallet3 } from "reicon-react";
+import {
+  IconAlertTriangle,
+  IconCircleCheck,
+  IconWallet,
+} from "@tabler/icons-react";
 import type { ReactNode } from "react";
 import { useRef, useState } from "react";
 
@@ -82,7 +86,7 @@ export function BrandWalletPaymentModal({
             <div className="flex flex-col gap-5">
               <div className="grid gap-3 sm:grid-cols-3">
                 <BalanceCard
-                  icon={<Wallet3 aria-hidden="true" size={18} />}
+                  icon={<IconWallet aria-hidden="true" size={18} />}
                   label="Available balance"
                   value={formatCurrency(walletBalance)}
                 />
@@ -166,7 +170,7 @@ function PaymentStatus({ state }: { state: PaymentState }) {
   if (state === "success") {
     return (
       <div className="flex items-start gap-3 rounded-xl bg-success-soft p-4 text-success-soft-foreground">
-        <CheckCircle aria-hidden="true" className="mt-0.5 shrink-0" size={20} />
+        <IconCircleCheck aria-hidden="true" className="mt-0.5 shrink-0" size={20} />
         <div>
           <p className="font-medium">Payment successful</p>
           <p className="mt-1 text-sm">The order has been paid from Brand Wallet.</p>
@@ -178,7 +182,7 @@ function PaymentStatus({ state }: { state: PaymentState }) {
   if (state === "insufficient") {
     return (
       <div className="flex items-start gap-3 rounded-xl bg-danger-soft p-4 text-danger-soft-foreground">
-        <AlertTriangle aria-hidden="true" className="mt-0.5 shrink-0" size={20} />
+        <IconAlertTriangle aria-hidden="true" className="mt-0.5 shrink-0" size={20} />
         <div>
           <p className="font-medium">Insufficient balance</p>
           <p className="mt-1 text-sm">

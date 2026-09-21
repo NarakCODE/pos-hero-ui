@@ -2,7 +2,7 @@
 
 import { Button, Chip, Separator } from "@heroui/react";
 import type { ReactNode } from "react";
-import { Clock } from "reicon-react";
+import { IconClock } from "@tabler/icons-react";
 import type { OrderHeaderProps } from "./types";
 
 export function OrderHeader({
@@ -49,7 +49,7 @@ export function OrderHeader({
   const hasMetadata = metadataItems.some((value) => value !== undefined && value !== null);
 
   return (
-    <header className={`shrink-0 ${className}`}>
+    <div className={`shrink-0 ${className}`}>
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           {eyebrow ? (
@@ -109,13 +109,13 @@ export function OrderHeader({
 
       {timestamp ? (
         <div className="mt-2 flex items-center gap-1 text-[11px] text-muted">
-          <Clock aria-hidden="true" size={13} />
+            <IconClock aria-hidden="true" size={13} />
           <span>{timestamp}</span>
         </div>
       ) : null}
 
       <Separator className="mt-4" />
-    </header>
+    </div>
   );
 }
 
@@ -133,7 +133,11 @@ function MetadataItem({
   }
 
   return (
-    <div className={`min-w-0 ${align === "end" ? "text-end" : "text-start"}`}>
+    <div
+      className={`flex min-w-0 flex-col ${
+        align === "end" ? "items-end text-end" : "items-start text-start"
+      }`}
+    >
       <p className="text-[10px] font-medium tracking-wider text-muted">{label}</p>
       <div className="mt-0.5 min-w-0 text-sm font-semibold text-foreground">{value}</div>
     </div>

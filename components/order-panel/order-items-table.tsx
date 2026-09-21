@@ -1,7 +1,12 @@
 "use client";
 
 import { Button, ScrollShadow, Table } from "@heroui/react";
-import { Add, Coffee, Minus, Trash3 } from "reicon-react";
+import {
+  IconCoffee,
+  IconMinus,
+  IconPlus,
+  IconTrash,
+} from "@tabler/icons-react";
 import type { OrderItemsTableProps, OrderPanelItem } from "./types";
 
 const defaultFormatCurrency = (amount: number) => `$${amount.toFixed(2)}`;
@@ -34,7 +39,7 @@ export function OrderItemsTable({
         className={`flex flex-1 flex-col items-center justify-center rounded-xl border border-dashed border-border px-5 py-10 text-center ${className}`}
       >
         <div className="flex size-12 items-center justify-center rounded-full bg-surface-secondary text-muted">
-          {emptyIcon || <Coffee aria-hidden="true" size={24} />}
+          {emptyIcon || <IconCoffee aria-hidden="true" size={24} />}
         </div>
         <p className="mt-3 text-sm font-semibold text-foreground">
           {emptyTitle}
@@ -138,7 +143,7 @@ export function OrderItemsTable({
                             size="sm"
                             variant="secondary"
                           >
-                            <Minus aria-hidden="true" />
+                            <IconMinus aria-hidden="true" />
                           </Button>
                           <span className="min-w-5 text-center font-semibold tabular-nums">
                             {item.quantity}
@@ -150,7 +155,7 @@ export function OrderItemsTable({
                             size="sm"
                             variant="secondary"
                           >
-                            <Add aria-hidden="true" />
+                            <IconPlus aria-hidden="true" />
                           </Button>
                         </div>
                       </Table.Cell>
@@ -166,7 +171,7 @@ export function OrderItemsTable({
                             size="sm"
                             variant="danger-soft"
                           >
-                            <Trash3 aria-hidden="true" />
+                            <IconTrash aria-hidden="true" />
                           </Button>
                         </div>
                       </Table.Cell>
@@ -234,7 +239,7 @@ export function OrderItemsTable({
                         size="sm"
                         variant="secondary"
                       >
-                        <Minus aria-hidden="true" />
+                        <IconMinus aria-hidden="true" />
                       </Button>
                       <span className="min-w-5 text-center text-sm font-semibold tabular-nums text-foreground">
                         {item.quantity}
@@ -246,7 +251,7 @@ export function OrderItemsTable({
                         size="sm"
                         variant="secondary"
                       >
-                        <Add aria-hidden="true" />
+                        <IconPlus aria-hidden="true" />
                       </Button>
                     </div>
 
@@ -257,7 +262,7 @@ export function OrderItemsTable({
                       size="sm"
                       variant="danger"
                     >
-                      <Trash3 aria-hidden="true" size={16} />
+                      <IconTrash aria-hidden="true" size={16} />
                     </Button>
                   </div>
                 </div>

@@ -17,7 +17,7 @@ export function ProductCard({
 }: ProductCardProps) {
   return (
     <Surface<"button">
-      className="flex min-h-24 w-full items-center gap-3 overflow-hidden rounded-xl border border-default p-2 text-start hover:bg-surface-secondary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+      className="flex w-full items-center gap-3 overflow-hidden rounded-xl border border-default p-2 text-start hover:bg-surface-secondary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
       render={(props) => (
         <button
           {...props}
@@ -28,11 +28,11 @@ export function ProductCard({
       )}
       variant="default"
     >
-      <div className="size-16 shrink-0 overflow-hidden rounded-lg bg-surface-secondary sm:size-[4.5rem]">
+      <div className="w-16 aspect-square shrink-0 overflow-hidden rounded-lg bg-surface-secondary sm:w-18">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           alt={name}
-          className="size-full object-cover"
+          className="h-full w-full object-cover"
           loading="lazy"
           src={image}
         />

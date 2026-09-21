@@ -11,7 +11,7 @@ import {
   TextField,
   toast,
 } from "@heroui/react";
-import { CreditCard, Plus } from "reicon-react";
+import { IconCreditCard, IconPlus } from "@tabler/icons-react";
 import { useState } from "react";
 
 import type { PaymentMethodOption } from "./types";
@@ -138,7 +138,7 @@ export function BankCardPaymentModal({
                     variant="ghost"
                     onPress={() => setIsAddPaymentOpen(true)}
                   >
-                    <Plus aria-hidden="true" size={16} />
+                    <IconPlus aria-hidden="true" size={16} />
                     Add payment
                   </Button>
                 </div>
@@ -147,7 +147,7 @@ export function BankCardPaymentModal({
                   {cardOptions.map((option) => (
                     <Radio key={option.value} value={option.value}>
                       <Radio.Content className="relative flex min-h-24 w-full items-start gap-3 rounded-xl border border-default bg-surface p-4 data-[selected=true]:bg-surface-secondary">
-                        <CreditCard
+                        <IconCreditCard
                           aria-hidden="true"
                           className="mt-0.5 shrink-0"
                           size={22}
@@ -296,7 +296,7 @@ function AddPaymentCardModal({
 
                 <InputGroup fullWidth variant="secondary">
                   <InputGroup.Prefix>
-                    <CreditCard aria-hidden="true" size={18} />
+                    <IconCreditCard aria-hidden="true" size={18} />
                   </InputGroup.Prefix>
 
                   <InputGroup.Input

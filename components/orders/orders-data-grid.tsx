@@ -18,11 +18,11 @@ import { useMemo, useState } from "react";
 import type { ReactNode } from "react";
 import { useTranslations } from "next-intl";
 import {
-  Receipt2,
-  RotateRight,
-  Send2,
-  Sliders,
-} from "reicon-react";
+  IconAdjustmentsHorizontal,
+  IconReceipt,
+  IconRefresh,
+  IconSend,
+} from "@tabler/icons-react";
 import { getOrderChannelAvatarSrc } from "@/components/order-channel-select";
 import {
   orderRecords,
@@ -428,7 +428,7 @@ function OrdersToolbar({
               isIconOnly
               variant="secondary"
             >
-              <Sliders aria-hidden="true" size={18} />
+              <IconAdjustmentsHorizontal aria-hidden="true" size={18} />
               {activeFilterCount > 0 ? (
                 <Chip
                   className="absolute -inset-e-1 -top-1"
@@ -469,7 +469,7 @@ function OrdersToolbar({
                       variant="ghost"
                       onPress={onResetFilters}
                     >
-                      <RotateRight
+                      <IconRefresh
                         aria-hidden="true"
                         className="mr-1 inline-block"
                         size={14}
@@ -506,7 +506,7 @@ function OrdersToolbar({
                                 />
                               ) : (
                                 <Avatar.Fallback>
-                                  <Receipt2 aria-hidden="true" size={12} />
+                                  <IconReceipt aria-hidden="true" size={12} />
                                 </Avatar.Fallback>
                               )}
                             </Avatar>
@@ -661,9 +661,9 @@ function OrderTableRows({
             ) : null}
             <Avatar.Fallback>
               {order.channel === "pos" ? (
-                <Receipt2 aria-hidden="true" size={16} />
+                <IconReceipt aria-hidden="true" size={16} />
               ) : (
-                <Send2 aria-hidden="true" size={16} />
+                <IconSend aria-hidden="true" size={16} />
               )}
             </Avatar.Fallback>
           </Avatar>

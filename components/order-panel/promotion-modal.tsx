@@ -10,15 +10,15 @@ import {
   toast,
 } from "@heroui/react";
 import {
-  AlertCircle,
-  AlertTriangle,
-  Check,
-  CheckCircle,
-  CloseCircle,
-  DiscountShape,
-  Search,
-  Trash,
-} from "reicon-react";
+  IconAlertCircle,
+  IconAlertTriangle,
+  IconCheck,
+  IconCircleCheck,
+  IconCircleX,
+  IconDiscount,
+  IconSearch,
+  IconTrash,
+} from "@tabler/icons-react";
 import type {
   AppliedPromotion,
   Promotion,
@@ -370,7 +370,7 @@ function PromotionModalDialog({
             {appliedPromotion ? (
               <div className="flex items-center gap-2">
                 <Chip color="success" size="sm" variant="soft">
-                  <CheckCircle aria-hidden="true" size={13} />
+                  <IconCircleCheck aria-hidden="true" size={13} />
                   <Chip.Label>{appliedPromotion.code || appliedPromotion.name} applied</Chip.Label>
                 </Chip>
                 {onRemovePromotion ? (
@@ -382,7 +382,7 @@ function PromotionModalDialog({
                     onPress={handleRemove}
                     className="size-7 text-muted hover:text-danger"
                   >
-                    <Trash aria-hidden="true" size={15} />
+                    <IconTrash aria-hidden="true" size={15} />
                   </Button>
                 ) : null}
               </div>
@@ -406,7 +406,7 @@ function PromotionModalDialog({
             {promotions.length > 3 ? (
               <InputGroup fullWidth variant="secondary" className="h-8 text-xs">
                 <InputGroup.Prefix>
-                  <Search aria-hidden="true" size={14} className="text-muted" />
+                  <IconSearch aria-hidden="true" size={14} className="text-muted" />
                 </InputGroup.Prefix>
                 <InputGroup.Input
                   placeholder="Search promotions..."
@@ -422,7 +422,7 @@ function PromotionModalDialog({
                       onClick={() => setSearchQuery("")}
                       className="text-muted hover:text-foreground"
                     >
-                      <CloseCircle aria-hidden="true" size={14} />
+                      <IconCircleX aria-hidden="true" size={14} />
                     </button>
                   </InputGroup.Suffix>
                 ) : null}
@@ -526,7 +526,7 @@ function PromotionModalDialog({
                 }`}
               >
                 <InputGroup.Prefix>
-                  <DiscountShape aria-hidden="true" size={18} className="text-muted" />
+                  <IconDiscount aria-hidden="true" size={18} className="text-muted" />
                 </InputGroup.Prefix>
 
                 <InputGroup.Input
@@ -561,7 +561,7 @@ function PromotionModalDialog({
                       }}
                       className="text-muted hover:text-foreground"
                     >
-                      <CloseCircle aria-hidden="true" size={16} />
+                      <IconCircleX aria-hidden="true" size={16} />
                     </button>
                   </InputGroup.Suffix>
                 ) : null}
@@ -590,15 +590,15 @@ function PromotionModalDialog({
                 }`}
               >
                 {errorType === "expired" ? (
-                  <AlertTriangle aria-hidden="true" size={14} className="shrink-0" />
+                    <IconAlertTriangle aria-hidden="true" size={14} className="shrink-0" />
                 ) : (
-                  <AlertCircle aria-hidden="true" size={14} className="shrink-0" />
+                    <IconAlertCircle aria-hidden="true" size={14} className="shrink-0" />
                 )}
                 <span>{errorMessage}</span>
               </div>
             ) : successMessage ? (
               <div className="flex items-center gap-1.5 text-xs font-medium text-success">
-                <Check aria-hidden="true" size={14} className="shrink-0" />
+                  <IconCheck aria-hidden="true" size={14} className="shrink-0" />
                 <span>{successMessage}</span>
               </div>
             ) : null}
@@ -653,7 +653,7 @@ function PromotionModalDialog({
             onPress={handleRemove}
             className="text-danger hover:bg-danger/10 sm:flex-1"
           >
-            <Trash aria-hidden="true" size={18} />
+            <IconTrash aria-hidden="true" size={18} />
             <span>Remove promotion</span>
           </Button>
         ) : null}

@@ -2,7 +2,13 @@
 
 import { Avatar, Button, Spinner, Surface } from "@heroui/react";
 import { useState } from "react";
-import { ArrowRight, Check, Clock, Printer, Refresh } from "reicon-react";
+import {
+  IconArrowRight,
+  IconCheck,
+  IconClock,
+  IconPrinter,
+  IconRefresh,
+} from "@tabler/icons-react";
 import { BankCardPaymentModal } from "./bank-card-payment-modal";
 import { BrandWalletPaymentModal } from "./brand-wallet-payment-modal";
 import { CashPaymentModal } from "./cash-payment-modal";
@@ -134,9 +140,9 @@ export function PaymentActions({
                 isPending ? (
                   <Spinner color="current" size="sm" />
                 ) : isPaid ? (
-                  <Check aria-hidden="true" size={20} />
+                  <IconCheck aria-hidden="true" size={20} />
                 ) : (
-                  <ArrowRight aria-hidden="true" size={22} />
+                  <IconArrowRight aria-hidden="true" size={22} />
                 )
               }
             </Button>
@@ -254,7 +260,7 @@ export function PaymentActions({
               {isPending ? <Spinner color="current" size="sm" /> : null}
               {isPaid ? (
                 <>
-                  <Check aria-hidden="true" size={18} />
+                  <IconCheck aria-hidden="true" size={18} />
                   <span>{completeLabel}</span>
                 </>
               ) : (
@@ -278,7 +284,7 @@ export function PaymentActions({
           role="status"
           className="mt-2 flex items-center justify-center gap-2 rounded-xl bg-success/10 px-3 py-2 text-center text-xs font-medium text-success"
         >
-          <Check aria-hidden="true" size={14} className="shrink-0" />
+          <IconCheck aria-hidden="true" size={14} className="shrink-0" />
           <span>{paidMessage}</span>
         </div>
       ) : null}
@@ -293,7 +299,7 @@ export function PaymentActions({
               variant="secondary"
               onPress={onPrintReceipt}
             >
-              <Printer aria-hidden="true" size={14} />
+              <IconPrinter aria-hidden="true" size={14} />
               <span>{printLabel}</span>
             </Button>
           ) : null}
@@ -306,14 +312,14 @@ export function PaymentActions({
               variant="secondary"
               onPress={onHoldOrder}
             >
-              <Clock aria-hidden="true" size={14} />
+              <IconClock aria-hidden="true" size={14} />
               <span>{holdLabel}</span>
             </Button>
           ) : null}
 
           {onResetOrder && isPaid ? (
             <Button type="button" variant="outline" size="sm" fullWidth onPress={onResetOrder} className="text-xs">
-              <Refresh aria-hidden="true" size={14} />
+              <IconRefresh aria-hidden="true" size={14} />
               <span>{resetLabel}</span>
             </Button>
           ) : null}

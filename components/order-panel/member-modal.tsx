@@ -9,7 +9,7 @@ import {
   Separator,
   Surface,
 } from "@heroui/react";
-import { ChevronRight, Scan } from "reicon-react";
+import { IconChevronRight, IconScan } from "@tabler/icons-react";
 import { useMemo, useState } from "react";
 
 import type { MemberModalProps, MemberProfile } from "./types";
@@ -180,7 +180,7 @@ function MemberModalDialog({
                     variant="ghost"
                     onPress={handleScanCode}
                   >
-                    <Scan aria-hidden="true" size={18} />
+                    <IconScan aria-hidden="true" size={18} />
                     <span className="hidden sm:inline">Scan code</span>
                   </Button>
                 </div>
@@ -285,7 +285,7 @@ function MemberResult({
             {formatPoints(member.points)} points
           </p>
         </div>
-        <ChevronRight
+        <IconChevronRight
           aria-hidden="true"
           className="shrink-0 text-muted"
           size={18}

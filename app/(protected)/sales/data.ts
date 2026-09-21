@@ -28,7 +28,7 @@ export type CategoryId =
   | "dessert"
   | "snack";
 
-export type SizeId = "extraSmall" | "small" | "medium" | "large" | "extraLarge";
+export type SizeId = "extraSmall" | "small" | "medium" | "large";
 export type IceId = "regularIce" | "lessIce" | "noIce" | "warm" | "hot";
 export type SweetnessId =
   | "noSugar"
@@ -95,7 +95,6 @@ export const sizeIds: readonly SizeId[] = [
   "small",
   "medium",
   "large",
-  "extraLarge",
 ] as const;
 
 export const iceIds: readonly IceId[] = [

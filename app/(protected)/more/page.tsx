@@ -1,7 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { More2 } from "reicon-react";
+import { IconDots } from "@tabler/icons-react";
 import { POSContextPanel } from "@/components/shared/pos-context-panel";
 import { POSLayout } from "@/components/shared/pos-layout";
 import { POSPagePlaceholder } from "@/components/shared/pos-page-placeholder";
@@ -20,7 +20,7 @@ export default function MorePage() {
         eyebrow={t("pages.more.eyebrow")}
         emptyTitle={t("pages.more.emptyTitle")}
         emptyDescription={t("pages.more.emptyDescription")}
-        icon={More2}
+        icon={IconDots}
       />
     </POSLayout>
   );

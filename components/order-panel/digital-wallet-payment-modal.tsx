@@ -10,7 +10,11 @@ import {
   Spinner,
   Surface,
 } from "@heroui/react";
-import { AlertTriangle, CheckCircle, Wallet3 } from "reicon-react";
+import {
+  IconAlertTriangle,
+  IconCircleCheck,
+  IconWallet,
+} from "@tabler/icons-react";
 import type { ReactNode } from "react";
 import { useEffect, useRef, useState } from "react";
 
@@ -430,7 +434,7 @@ function ProviderSelection({
 function ReadyPayment({ provider }: { provider: DigitalWalletProvider }) {
   return (
     <PaymentStateSurface className="flex min-h-32 items-center gap-4 p-5 sm:p-6">
-      <Wallet3 aria-hidden="true" size={22} />
+      <IconWallet aria-hidden="true" size={22} />
       <div>
         <p className="font-medium">{provider.label} is ready</p>
         <p className="mt-1 text-sm text-muted">
@@ -444,7 +448,7 @@ function ReadyPayment({ provider }: { provider: DigitalWalletProvider }) {
 function WalletAction({ provider }: { provider: DigitalWalletProvider }) {
   return (
     <PaymentStateSurface className="flex min-h-32 items-center gap-4 p-5 sm:p-6">
-      <Wallet3 aria-hidden="true" size={22} />
+      <IconWallet aria-hidden="true" size={22} />
       <div>
         <p className="font-medium">Continue with {provider.label}</p>
         <p className="mt-1 text-sm text-muted">
@@ -515,7 +519,7 @@ function SuccessState({
 }) {
   return (
     <PaymentStateSurface className="flex min-h-56 flex-col items-center justify-center gap-3 p-6 text-center sm:p-8">
-      <CheckCircle aria-hidden="true" className="text-success" size={40} />
+      <IconCircleCheck aria-hidden="true" className="text-success" size={40} />
       <div>
         <p className="text-lg font-semibold">Payment successful</p>
         <p className="mt-1 text-sm text-muted">
@@ -535,7 +539,7 @@ function FailureState({
 }) {
   return (
     <PaymentStateSurface className="flex min-h-32 items-start gap-4 p-5 sm:p-6">
-      <AlertTriangle
+      <IconAlertTriangle
         aria-hidden="true"
         className="mt-0.5 shrink-0 text-danger"
         size={22}
@@ -551,7 +555,7 @@ function FailureState({
 function ExpiredQrState({ provider }: { provider: DigitalWalletProvider }) {
   return (
     <PaymentStateSurface className="flex min-h-56 flex-col items-center justify-center gap-3 p-6 text-center sm:p-8">
-      <AlertTriangle aria-hidden="true" className="text-danger" size={32} />
+      <IconAlertTriangle aria-hidden="true" className="text-danger" size={32} />
       <div>
         <p className="font-medium">QR code expired</p>
         <p className="mt-1 text-sm text-muted">

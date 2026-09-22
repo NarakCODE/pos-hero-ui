@@ -56,7 +56,15 @@ const tableStatusColors: Record<TableStatus, "success" | "warning" | "danger"> =
     dirty: "danger",
   };
 
-export function TableFloor() {
+export interface TableFloorProps {
+  className?: string;
+  gridClassName?: string;
+}
+
+export function TableFloor({
+  className = "",
+  gridClassName = "grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4",
+}: TableFloorProps = {}) {
   const t = useTranslations("SalesMenu");
   const [selectedSection, setSelectedSection] = useState<TableSection>("all");
   const [searchQuery, setSearchQuery] = useState("");
@@ -106,7 +114,9 @@ export function TableFloor() {
   };
 
   return (
-    <div className="flex h-full min-h-0 min-w-0 flex-col overflow-hidden text-foreground">
+    <div
+      className={`flex h-full min-h-0 min-w-0 flex-col overflow-hidden text-foreground ${className}`}
+    >
       <Tabs
         align="start"
         className="min-w-0 shrink-0"
@@ -162,7 +172,7 @@ export function TableFloor() {
 
       <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain scrollbar-thin px-(--pos-content-padding) pb-(--pos-content-padding)">
         {filteredTables.length > 0 ? (
-          <div className="grid grid-cols-3 gap-3">
+          <div className={gridClassName}>
             {filteredTables.map((table) => (
               <TableCard
                 key={table.id}
@@ -214,7 +224,9 @@ function TableCard({
 
   return (
     <Card<"button">
-      className="group min-h-44 w-full text-start transition-[background-color,box-shadow] duration-150 hover:bg-default-hover hover:shadow-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+      className={`group min-h-44 w-full text-start transition-[background-color,box-shadow,border-color] duration-150 hover:bg-default-hover hover:shadow-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus ${
+        isSelected ? "border-accent ring-2 ring-accent/30" : ""
+      }`}
       render={(props) => (
         <button
           {...props}
@@ -228,15 +240,20 @@ function TableCard({
     >
       <Card.Header className="flex flex-row items-start justify-between gap-3 space-y-0 p-4 pb-0">
         <div className="min-w-0">
-          <Card.Title className="text-lg font-bold tracking-tight">
+          <Card.Title className="truncate text-lg font-bold tracking-tight">
             {table.label}
           </Card.Title>
-          <Card.Description className="mt-0.5 text-xs">
+          <Card.Description className="mt-0.5 truncate text-xs">
             {sectionLabel}
           </Card.Description>
         </div>
 
-        <Chip color={tableStatusColors[table.status]} size="sm" variant="soft">
+        <Chip
+          className="shrink-0"
+          color={tableStatusColors[table.status]}
+          size="sm"
+          variant="soft"
+        >
           {statusLabel}
         </Chip>
       </Card.Header>
@@ -246,37 +263,43 @@ function TableCard({
           <>
             <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 text-xs text-muted">
               <span className="inline-flex items-center gap-1.5">
-                <IconUser aria-hidden="true" size={14} />
-                {table.server ?? "--"}
+                <IconUser aria-hidden="true" className="shrink-0" size={14} />
+                <span className="truncate">{table.server ?? "--"}</span>
               </span>
               <span className="inline-flex items-center gap-1.5">
-                <IconUser aria-hidden="true" size={14} />
-                {table.guestCount === undefined
-                  ? "--"
-                  : t("pages.table.sessionGuests", {
-                      count: table.guestCount,
-                    })}
+                <IconUser aria-hidden="true" className="shrink-0" size={14} />
+                <span className="truncate">
+                  {table.guestCount === undefined
+                    ? "--"
+                    : t("pages.table.sessionGuests", {
+                        count: table.guestCount,
+                      })}
+                </span>
               </span>
               <span className="inline-flex items-center gap-1.5">
-                <IconReceipt aria-hidden="true" size={14} />
-                {table.itemCount === undefined
-                  ? "0"
-                  : t("pages.table.sessionItems", {
-                      count: table.itemCount,
-                    })}
+                <IconReceipt aria-hidden="true" className="shrink-0" size={14} />
+                <span className="truncate">
+                  {table.itemCount === undefined
+                    ? "0"
+                    : t("pages.table.sessionItems", {
+                        count: table.itemCount,
+                      })}
+                </span>
               </span>
             </div>
 
             <div className="mt-3 flex items-end justify-between gap-3 border-t border-border/60 pt-3">
-              <span className="inline-flex items-center gap-1.5 text-xs text-muted">
-                <IconClock aria-hidden="true" size={14} />
-                {table.orderTime === undefined
-                  ? "--"
-                  : t("pages.table.sessionStarted", {
-                      time: table.orderTime,
-                    })}
+              <span className="inline-flex min-w-0 items-center gap-1.5 text-xs text-muted">
+                <IconClock aria-hidden="true" className="shrink-0" size={14} />
+                <span className="truncate">
+                  {table.orderTime === undefined
+                    ? "--"
+                    : t("pages.table.sessionStarted", {
+                        time: table.orderTime,
+                      })}
+                </span>
               </span>
-              <div className="text-end">
+              <div className="shrink-0 text-end">
                 <p className="text-[10px] font-medium text-muted">
                   {t("pages.table.sessionTotal")}
                 </p>
@@ -287,11 +310,13 @@ function TableCard({
             </div>
           </>
         ) : table.status === "reserved" ? (
-          <span className="inline-flex items-center gap-1.5 text-sm text-muted">
-            <IconClock aria-hidden="true" size={15} />
-            {t("pages.table.reservationAt", {
-              time: table.reservationTime ?? "—",
-            })}
+          <span className="inline-flex min-w-0 items-center gap-1.5 text-sm text-muted">
+            <IconClock aria-hidden="true" className="shrink-0" size={15} />
+            <span className="truncate">
+              {t("pages.table.reservationAt", {
+                time: table.reservationTime ?? "—",
+              })}
+            </span>
           </span>
         ) : null}
       </Card.Content>

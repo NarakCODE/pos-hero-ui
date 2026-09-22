@@ -236,7 +236,7 @@ Table is a floor-activity workspace for restaurant service teams.
 
 ### Table grid
 
-- Three-column responsive grid of HeroUI <code>Card</code> table cards.
+- Responsive grid (1 column on mobile, 2 columns on tablet/small screens, 3 columns on desktop, 4 columns on large screens) of HeroUI <code>Card</code> table cards.
 - Static tables TA01 through TA12.
 - Statuses: Available, In Progress, Reserved, and Dirty.
 - Status badge, table identifier, section, and active-session context.

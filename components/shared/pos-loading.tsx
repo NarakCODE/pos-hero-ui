@@ -70,10 +70,16 @@ export function TableCardSkeleton() {
   );
 }
 
-export function TableGridSkeleton({ count = 12 }: { count?: number }) {
+export function TableGridSkeleton({
+  className = "grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4",
+  count = 12,
+}: {
+  className?: string;
+  count?: number;
+} = {}) {
   return (
     <LoadingRegion
-      className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3"
+      className={className}
       label="Loading tables"
     >
       {Array.from({ length: count }, (_, index) => (

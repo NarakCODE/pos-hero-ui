@@ -20,9 +20,9 @@ import { useMemo, useState } from "react";
 import {
   IconAdjustmentsHorizontal,
   IconPackage,
-  IconPlus,
   IconRefresh,
 } from "@tabler/icons-react";
+import { CreateProductModal } from "@/components/product/create-product-modal";
 import { POSAside } from "@/components/shared/pos-aside";
 import { POSLayout } from "@/components/shared/pos-layout";
 import { defaultLocale, isLocale, type Locale } from "@/config/i18n";
@@ -345,6 +345,7 @@ function ProductsDataGrid({
                     key={product.id}
                     locale={locale}
                     product={product}
+                    onProductSelect={onProductSelect}
                   />
                 )}
               </Table.Body>
@@ -439,14 +440,7 @@ function ProductsToolbar({
           </SearchField.Group>
         </SearchField>
 
-        <Button
-          aria-label={t("addProduct")}
-          isIconOnly
-          type="button"
-          variant="secondary"
-        >
-          <IconPlus aria-hidden="true" />
-        </Button>
+        <CreateProductModal />
 
         <Popover>
           <Button
@@ -598,11 +592,13 @@ function ProductTableRow({
   categoryLabels,
   formatter,
   locale,
+  onProductSelect,
   product,
 }: {
   categoryLabels: Record<ProductCategory, string>;
   formatter: Intl.NumberFormat;
   locale: Locale;
+  onProductSelect: (productId: string) => void;
   product: Product;
 }) {
   const t = useTranslations("Product");
@@ -616,6 +612,7 @@ function ProductTableRow({
       id={product.id}
       textValue={`${productName} ${product.sku ?? ""}`}
       className="cursor-pointer hover:bg-surface-secondary/50 data-[selected=true]:bg-accent/10 [&>td]:py-3"
+      onPress={() => onProductSelect(product.id)}
     >
       <Table.Cell textValue={productName}>
         <div className="flex min-w-0 items-center gap-3">

@@ -5,9 +5,9 @@ import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useTransition } from "react";
 import {
+  IconBox,
   IconBuildingStore,
   IconClipboardList,
-  IconDots,
   IconSettings,
   IconUser,
   type TablerIcon,
@@ -19,7 +19,7 @@ export type POSContextPanelKind =
   | "table"
   | "customer"
   | "settings"
-  | "more";
+  | "products";
 
 type ContextPanelIcon = TablerIcon;
 
@@ -33,17 +33,27 @@ const panelConfig: Record<POSContextPanelKind, POSContextPanelConfig> = {
   table: { href: "/sales", icon: IconBuildingStore },
   customer: { href: "/customer", icon: IconUser },
   settings: { href: "/settings", icon: IconSettings },
-  more: { href: "/more", icon: IconDots },
+  products: { href: "/sales", icon: IconBox },
 };
 
-export function POSContextPanel({ kind }: { kind: POSContextPanelKind }) {
+export function POSContextPanel({
+  kind,
+  onAction,
+}: {
+  kind: POSContextPanelKind;
+  onAction?: () => void;
+}) {
   const t = useTranslations("SalesMenu");
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const { href, icon: Icon } = panelConfig[kind];
   const translationKey = `rightPanel.${kind}` as const;
 
-  const handleNavigate = () => {
+  const handleAction = () => {
+    if (onAction) {
+      onAction();
+      return;
+    }
     startTransition(() => router.push(href));
   };
 
@@ -78,7 +88,7 @@ export function POSContextPanel({ kind }: { kind: POSContextPanelKind }) {
           size="lg"
           type="button"
           variant="secondary"
-          onPress={handleNavigate}
+          onPress={handleAction}
         >
           {({ isPending: buttonPending }) =>
             buttonPending ? (

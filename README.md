@@ -94,7 +94,7 @@ The protected routes use the shared POS shell with a header, footer navigation, 
 - Summary metrics for customers, active members, and rewards.
 - Desktop list/detail layout that becomes a touch-friendly stacked layout on smaller screens.
 
-### Settings
+### settings
 
 - Large touch targets and spacious controls for cashier and tablet use.
 - Horizontal section navigation on smaller screens.
@@ -121,8 +121,10 @@ components/
 └── shared/                    POS layout, header, footer, and shell
 
 messages/
-├── en.json                    English translations
-└── km.json                    Khmer translations
+├── en.json                    Shared English translations
+├── en/                        English feature catalogs
+├── km.json                    Shared Khmer translations
+└── km/                        Khmer feature catalogs
 ```
 
 ## Localization and fonts
@@ -132,7 +134,11 @@ The active locale is read from the `locale` cookie. The supported locales are:
 - `en` — Inter
 - `km` — Kantumruy Pro with Noto Sans Khmer fallback
 
-Translation catalogs live in `messages/en.json` and `messages/km.json`. New UI copy should be added to both catalogs and consumed through `next-intl`.
+Shared translation catalogs live in `messages/en.json` and `messages/km.json`.
+Feature catalogs use one namespace per file, such as
+`messages/en/customer.json` and `messages/en/product.json`, with matching Khmer
+catalogs. They are merged by the request configuration before being consumed
+through `next-intl`.
 
 ## Design and component conventions
 

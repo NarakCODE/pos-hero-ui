@@ -31,6 +31,10 @@ import {
 import { POSLayout } from "@/components/shared/pos-layout";
 import { POSAside } from "@/components/shared/pos-aside";
 import {
+  CreateCustomerModal,
+  type CreateCustomerFormData,
+} from "./create-customer-modal";
+import {
   customerRecords,
   type CustomerRecord,
   type CustomerTier,
@@ -72,10 +76,7 @@ const tierLabels: Record<CustomerTier, string> = {
   black: "tierBlack",
 };
 
-const tierColors: Record<
-  CustomerTier,
-  "accent" | "warning" | "default"
-> = {
+const tierColors: Record<CustomerTier, "accent" | "warning" | "default"> = {
   vip: "accent",
   gold: "warning",
   member: "default",
@@ -89,18 +90,35 @@ export function CustomerPageClient({
   headerTitle: string;
   rightPanelLabel: string;
 }) {
+  const [customers, setCustomers] = useState<CustomerRecord[]>(() => [
+    ...customerRecords,
+  ]);
   const [selectedCustomerId, setSelectedCustomerId] = useState<string | null>(
     customerRecords[0]?.id ?? null,
   );
+
+  const handleCustomerCreate = (data: CreateCustomerFormData) => {
+    const nextCustomer = createCustomerRecord(data, customers.length);
+
+    setCustomers((currentCustomers) => [nextCustomer, ...currentCustomers]);
+    setSelectedCustomerId(nextCustomer.id);
+  };
 
   return (
     <POSLayout
       showSearch={false}
       headerTitle={headerTitle}
       rightPanelLabel={rightPanelLabel}
-      rightPanel={<CustomerAside selectedCustomerId={selectedCustomerId} />}
+      rightPanel={
+        <CustomerAside
+          customers={customers}
+          selectedCustomerId={selectedCustomerId}
+        />
+      }
     >
       <CustomerWorkspace
+        customers={customers}
+        onCustomerCreate={handleCustomerCreate}
         onCustomerSelect={setSelectedCustomerId}
         selectedCustomerId={selectedCustomerId}
       />
@@ -109,16 +127,19 @@ export function CustomerPageClient({
 }
 
 export function CustomerWorkspace({
+  customers,
+  onCustomerCreate,
   onCustomerSelect,
   selectedCustomerId,
 }: {
+  customers: CustomerRecord[];
+  onCustomerCreate: (data: CreateCustomerFormData) => void;
   onCustomerSelect: (customerId: string) => void;
   selectedCustomerId: string | null;
 }) {
-  const t = useTranslations("SalesMenu");
+  const t = useTranslations("Customer");
   const [activeSegment, setActiveSegment] = useState<CustomerSegment>("all");
-  const [activityFilter, setActivityFilter] =
-    useState<ActivityFilter>("all");
+  const [activityFilter, setActivityFilter] = useState<ActivityFilter>("all");
   const [query, setQuery] = useState("");
   const [sortDescriptor, setSortDescriptor] = useState<SortDescriptor>({
     column: "customer",
@@ -132,16 +153,13 @@ export function CustomerWorkspace({
   const filteredCustomers = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();
 
-    return customerRecords.filter((customer) => {
+    return customers.filter((customer) => {
       const matchesSegment =
         activeSegment === "all" ||
         (activeSegment === "regular"
           ? customer.tier === "member"
           : customer.tier === activeSegment);
-      const matchesActivity = matchesCustomerActivity(
-        customer,
-        activityFilter,
-      );
+      const matchesActivity = matchesCustomerActivity(customer, activityFilter);
       const searchableContent = [
         customer.name,
         customer.phone,
@@ -158,7 +176,7 @@ export function CustomerWorkspace({
         searchableContent.includes(normalizedQuery)
       );
     });
-  }, [activeSegment, activityFilter, query]);
+  }, [activeSegment, activityFilter, customers, query]);
 
   const totalPages = Math.max(
     1,
@@ -225,6 +243,7 @@ export function CustomerWorkspace({
       <CustomerToolbar
         activityFilter={activityFilter}
         activeFilterCount={activeFilterCount}
+        onCustomerCreate={onCustomerCreate}
         query={query}
         selectedSegment={activeSegment}
         t={t}
@@ -238,7 +257,7 @@ export function CustomerWorkspace({
         <Table className="min-h-0 flex-1" variant="secondary">
           <Table.ScrollContainer className="min-h-0 flex-1 overflow-auto overscroll-contain">
             <Table.Content
-              aria-label={t("pages.customer.tableLabel")}
+              aria-label={t("tableLabel")}
               selectedKeys={selectedKeys}
               selectionMode="single"
               sortDescriptor={sortDescriptor}
@@ -248,28 +267,22 @@ export function CustomerWorkspace({
               <Table.Header className="sticky top-0 z-20 bg-surface text-foreground">
                 <Table.Column allowsSorting id="customer" isRowHeader>
                   {({ sortDirection }) => (
-                    <Table.SortableColumnHeader
-                      sortDirection={sortDirection}
-                    >
-                      {t("pages.customer.tableCustomer")}
+                    <Table.SortableColumnHeader sortDirection={sortDirection}>
+                      {t("tableCustomer")}
                     </Table.SortableColumnHeader>
                   )}
                 </Table.Column>
                 <Table.Column allowsSorting id="contact">
                   {({ sortDirection }) => (
-                    <Table.SortableColumnHeader
-                      sortDirection={sortDirection}
-                    >
-                      {t("pages.customer.tableContact")}
+                    <Table.SortableColumnHeader sortDirection={sortDirection}>
+                      {t("tableContact")}
                     </Table.SortableColumnHeader>
                   )}
                 </Table.Column>
                 <Table.Column allowsSorting id="tier">
                   {({ sortDirection }) => (
-                    <Table.SortableColumnHeader
-                      sortDirection={sortDirection}
-                    >
-                      {t("pages.customer.tableTier")}
+                    <Table.SortableColumnHeader sortDirection={sortDirection}>
+                      {t("tableTier")}
                     </Table.SortableColumnHeader>
                   )}
                 </Table.Column>
@@ -279,7 +292,7 @@ export function CustomerWorkspace({
                       className="justify-end"
                       sortDirection={sortDirection}
                     >
-                      {t("pages.customer.tableVisits")}
+                      {t("tableVisits")}
                     </Table.SortableColumnHeader>
                   )}
                 </Table.Column>
@@ -289,7 +302,7 @@ export function CustomerWorkspace({
                       className="justify-end"
                       sortDirection={sortDirection}
                     >
-                      {t("pages.customer.tableSpend")}
+                      {t("tableSpend")}
                     </Table.SortableColumnHeader>
                   )}
                 </Table.Column>
@@ -302,10 +315,10 @@ export function CustomerWorkspace({
                       <IconUser aria-hidden="true" size={24} />
                     </div>
                     <p className="mt-4 text-sm font-semibold text-foreground">
-                      {t("pages.customer.noResultsTitle")}
+                      {t("noResultsTitle")}
                     </p>
                     <p className="mt-1 text-sm text-muted">
-                      {t("pages.customer.noResultsDescription")}
+                      {t("noResultsDescription")}
                     </p>
                   </div>
                 )}
@@ -341,6 +354,7 @@ function CustomerToolbar({
   activityFilter,
   activeFilterCount,
   onActivityFilterChange,
+  onCustomerCreate,
   onResetFilters,
   onSearchChange,
   onSegmentChange,
@@ -351,12 +365,13 @@ function CustomerToolbar({
   activityFilter: ActivityFilter;
   activeFilterCount: number;
   onActivityFilterChange: (value: ActivityFilter) => void;
+  onCustomerCreate: (data: CreateCustomerFormData) => void;
   onResetFilters: () => void;
   onSearchChange: (value: string) => void;
   onSegmentChange: (key: Key) => void;
   query: string;
   selectedSegment: CustomerSegment;
-  t: ReturnType<typeof useTranslations<"SalesMenu">>;
+  t: ReturnType<typeof useTranslations<"Customer">>;
 }) {
   return (
     <div className="flex shrink-0 flex-col">
@@ -367,14 +382,14 @@ function CustomerToolbar({
         onSelectionChange={onSegmentChange}
       >
         <Tabs.ListContainer>
-          <Tabs.List aria-label={t("pages.customer.segmentLabel")}>
+          <Tabs.List aria-label={t("segmentLabel")}>
             {customerSegments.map((segment) => (
               <Tabs.Tab
                 key={segment.id}
                 id={segment.id}
                 className="w-auto shrink-0 whitespace-nowrap"
               >
-                {t(`pages.customer.${segment.labelKey}`)}
+                {t(segment.labelKey)}
                 <Tabs.Indicator />
               </Tabs.Tab>
             ))}
@@ -384,7 +399,7 @@ function CustomerToolbar({
 
       <div className="flex w-full shrink-0 items-center gap-2 px-[var(--pos-content-padding)] py-3">
         <SearchField
-          aria-label={t("pages.customer.searchLabel")}
+          aria-label={t("searchLabel")}
           className="flex-1"
           fullWidth
           value={query}
@@ -394,15 +409,17 @@ function CustomerToolbar({
           <SearchField.Group>
             <SearchField.SearchIcon />
             <SearchField.Input
-              placeholder={t("pages.customer.searchPlaceholder")}
+              placeholder={t("searchPlaceholder")}
             />
             <SearchField.ClearButton />
           </SearchField.Group>
         </SearchField>
 
+        <CreateCustomerModal onCreate={onCustomerCreate} />
+
         <Popover>
           <Button
-            aria-label={t("pages.customer.filters")}
+            aria-label={t("filters")}
             className="relative h-10 w-10 min-w-10 shrink-0"
             isIconOnly
             variant="secondary"
@@ -428,7 +445,7 @@ function CustomerToolbar({
               <div className="flex w-full items-center justify-between px-4 py-3">
                 <div className="flex items-center gap-2">
                   <Popover.Heading className="text-start text-sm font-semibold text-foreground">
-                    {t("pages.customer.filters")}
+                    {t("filters")}
                   </Popover.Heading>
                   {activeFilterCount > 0 ? (
                     <Chip
@@ -448,18 +465,18 @@ function CustomerToolbar({
                     variant="ghost"
                     onPress={onResetFilters}
                   >
-                    {t("pages.customer.filterReset")}
+                    {t("filterReset")}
                   </Button>
                 ) : null}
               </div>
 
               <div className="max-h-[70vh] space-y-4 overflow-y-auto p-4 text-start text-sm">
                 <CustomerFilterSelect
-                  ariaLabel={t("pages.customer.filterActivityLabel")}
-                  label={t("pages.customer.filterActivityLabel")}
+                  ariaLabel={t("filterActivityLabel")}
+                  label={t("filterActivityLabel")}
                   options={activityFilterOptions.map((option) => ({
                     id: option.id,
-                    label: t(`pages.customer.${option.labelKey}`),
+                    label: t(option.labelKey),
                   }))}
                   selectedValue={activityFilter}
                   onChange={onActivityFilterChange}
@@ -517,7 +534,8 @@ function CustomerFilterSelect<T extends string>({
               defaultChildren
             ) : (
               <span>{currentOption.label}</span>
-            )}
+            )
+          }
         </Select.Value>
         <Select.Indicator />
       </Select.Trigger>
@@ -545,7 +563,7 @@ function CustomerTableRow({
   t,
 }: {
   customer: CustomerRecord;
-  t: ReturnType<typeof useTranslations<"SalesMenu">>;
+  t: ReturnType<typeof useTranslations<"Customer">>;
 }) {
   return (
     <Table.Row
@@ -556,10 +574,7 @@ function CustomerTableRow({
       <Table.Cell textValue={customer.name}>
         <div className="flex min-w-0 items-center gap-3">
           <Avatar color="accent" size="sm" variant="soft">
-            <Avatar.Image
-              alt=""
-              src={getCustomerAvatarUrl(customer.id)}
-            />
+            <Avatar.Image alt="" src={getCustomerAvatarUrl(customer.id)} />
             <Avatar.Fallback>{customer.initials}</Avatar.Fallback>
           </Avatar>
           <div className="min-w-0">
@@ -567,7 +582,8 @@ function CustomerTableRow({
               {customer.name}
             </p>
             <p className="truncate text-xs text-muted">
-              {t(`pages.customer.${tierLabels[customer.tier]}`)} · {customer.lastVisit}
+              {t(tierLabels[customer.tier])} ·{" "}
+              {customer.lastVisit}
             </p>
           </div>
         </div>
@@ -582,7 +598,7 @@ function CustomerTableRow({
       </Table.Cell>
       <Table.Cell>
         <Chip color={tierColors[customer.tier]} size="sm" variant="soft">
-          {t(`pages.customer.${tierLabels[customer.tier]}`)}
+          {t(tierLabels[customer.tier])}
         </Chip>
       </Table.Cell>
       <Table.Cell className="text-end text-sm tabular-nums text-foreground">
@@ -598,16 +614,18 @@ function CustomerTableRow({
 }
 
 export function CustomerAside({
+  customers,
   selectedCustomerId,
 }: {
+  customers: CustomerRecord[];
   selectedCustomerId: string | null;
 }) {
-  const t = useTranslations("SalesMenu");
+  const t = useTranslations("Customer");
   const [isBasicInformationExpanded, setIsBasicInformationExpanded] =
     useState(true);
   const customer =
-    customerRecords.find((record) => record.id === selectedCustomerId) ??
-    customerRecords[0];
+    customers.find((record) => record.id === selectedCustomerId) ??
+    customers[0];
 
   if (!customer) {
     return null;
@@ -626,7 +644,7 @@ export function CustomerAside({
             id="customer-aside-title"
             className="text-base font-bold tracking-tight text-foreground"
           >
-            {t("pages.customer.profileTitle")}
+            {t("profileTitle")}
           </h2>
         </div>
       }
@@ -646,15 +664,16 @@ export function CustomerAside({
                 {customer.name}
               </h3>
               <p className="text-xs text-muted">
-                {t("pages.customer.customerId")}: {getCustomerCode(customer)}
+                {t("customerId")}:{" "}
+                {getCustomerCode(customer, customers)}
               </p>
               <p className="text-xs text-muted">
-                {t("pages.customer.telephone")}: {customer.phone}
+                {t("telephone")}: {customer.phone}
               </p>
             </div>
           </div>
           <Chip color="success" size="sm" variant="soft">
-            {t("pages.customer.statusActive")}
+            {t("statusActive")}
           </Chip>
         </div>
 
@@ -666,7 +685,7 @@ export function CustomerAside({
           <Disclosure.Heading>
             <Disclosure.Trigger className="flex w-full items-center justify-between gap-3 py-3 text-start">
               <span className="text-sm font-semibold text-foreground">
-                {t("pages.customer.basicInformation")}
+                {t("basicInformation")}
               </span>
               <Disclosure.Indicator />
             </Disclosure.Trigger>
@@ -674,42 +693,41 @@ export function CustomerAside({
           <Disclosure.Content className="border-t border-border/60 pt-4">
             <div className="grid grid-cols-2 gap-x-4 gap-y-4">
               <CustomerDetail
-                label={t("pages.customer.email")}
+                label={t("email")}
                 value={customer.email}
               />
               <CustomerDetail
-                label={t("pages.customer.gender")}
+                label={t("gender")}
                 value={customer.gender ?? "--"}
               />
               <CustomerDetail
-                label={t("pages.customer.dateOfBirth")}
+                label={t("dateOfBirth")}
                 value={customer.dateOfBirth ?? "--"}
               />
               <CustomerDetail
-                label={t("pages.customer.tier")}
-                value={t(`pages.customer.${tierLabels[customer.tier]}`)}
+                label={t("tier")}
+                value={t(tierLabels[customer.tier])}
               />
               <CustomerDetail
-                label={t("pages.customer.payLater")}
+                label={t("payLater")}
                 value={customer.payLater ?? "--"}
               />
               <CustomerDetail
-                label={t("pages.customer.payLaterLimit")}
+                label={t("payLaterLimit")}
                 value={customer.payLaterLimit ?? "--"}
               />
               <CustomerDetail
-                label={t("pages.customer.joinedDate")}
+                label={t("joinedDate")}
                 value={customer.joinedDate ?? customer.memberSince}
               />
               <CustomerDetail
-                label={t("pages.customer.tags")}
+                label={t("tags")}
                 value={customer.tags?.join(", ") || "--"}
               />
             </div>
           </Disclosure.Content>
         </Disclosure>
       </div>
-
     </POSAside>
   );
 }
@@ -717,7 +735,7 @@ export function CustomerAside({
 function CustomerAsideFooter({
   t,
 }: {
-  t: ReturnType<typeof useTranslations<"SalesMenu">>;
+  t: ReturnType<typeof useTranslations<"Customer">>;
 }) {
   return (
     <div>
@@ -730,7 +748,7 @@ function CustomerAsideFooter({
           variant="secondary"
         >
           <IconShoppingCart aria-hidden="true" size={17} />
-          {t("pages.customer.startOrder")}
+          {t("startOrder")}
         </Button>
         <Button
           className="min-w-0 rounded-full px-2 text-xs"
@@ -740,7 +758,7 @@ function CustomerAsideFooter({
           variant="secondary"
         >
           <IconEdit aria-hidden="true" size={17} />
-          {t("pages.customer.editCustomer")}
+          {t("editCustomer")}
         </Button>
         <Button
           className="min-w-0 rounded-full px-2 text-xs"
@@ -750,7 +768,7 @@ function CustomerAsideFooter({
           variant="secondary"
         >
           <IconCash aria-hidden="true" size={17} />
-          {t("pages.customer.payBack")}
+          {t("payBack")}
         </Button>
       </div>
 
@@ -762,10 +780,10 @@ function CustomerAsideFooter({
           variant="secondary"
         >
           <IconCalendar aria-hidden="true" size={18} />
-          {t("pages.customer.reservation")}
+          {t("reservation")}
         </Button>
         <Button
-          aria-label={t("pages.customer.callCustomer")}
+          aria-label={t("callCustomer")}
           className="shrink-0 rounded-full"
           isIconOnly
           size="lg"
@@ -775,7 +793,7 @@ function CustomerAsideFooter({
           <IconPhone aria-hidden="true" size={18} />
         </Button>
         <Button
-          aria-label={t("pages.customer.messageCustomer")}
+          aria-label={t("messageCustomer")}
           className="shrink-0 rounded-full"
           isIconOnly
           size="lg"
@@ -785,7 +803,7 @@ function CustomerAsideFooter({
           <IconMessage aria-hidden="true" size={18} />
         </Button>
         <Button
-          aria-label={t("pages.customer.moreActions")}
+          aria-label={t("moreActions")}
           className="shrink-0 rounded-full"
           isIconOnly
           size="lg"
@@ -810,12 +828,63 @@ function CustomerDetail({ label, value }: { label: string; value: string }) {
   );
 }
 
-function getCustomerCode(customer: CustomerRecord) {
+function createCustomerRecord(
+  data: CreateCustomerFormData,
+  existingCustomerCount: number,
+): CustomerRecord {
+  const id = `customer-${Date.now()}`;
+  const genderLabels: Record<string, string> = {
+    female: "Female",
+    male: "Male",
+    other: "Other",
+  };
+
+  return {
+    id,
+    customerCode: `C${String(existingCustomerCount + 1).padStart(3, "0")}`,
+    name: data.name,
+    initials: getCustomerInitials(data.name),
+    phone: data.phone,
+    email: data.email || "--",
+    gender: genderLabels[data.gender],
+    dateOfBirth: data.dateOfBirth || undefined,
+    tier: data.tier,
+    payLater: "$0.00",
+    payLaterLimit: "$0.00",
+    joinedDate: "Today",
+    tags: [],
+    status: "active",
+    visits: 0,
+    points: 0,
+    lifetimeSpend: "$0.00",
+    lastVisit: "New customer",
+    memberSince: "Today",
+    favorite: "--",
+  };
+}
+
+function getCustomerInitials(name: string) {
+  const initials = name
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0])
+    .join("")
+    .toUpperCase();
+
+  return initials || "CU";
+}
+
+function getCustomerCode(
+  customer: CustomerRecord,
+  customers: CustomerRecord[],
+) {
   if (customer.customerCode) {
     return customer.customerCode;
   }
 
-  const index = customerRecords.findIndex((record) => record.id === customer.id);
+  const index = customers.findIndex((record) => record.id === customer.id);
 
   return `C${String(index + 1).padStart(3, "0")}`;
 }
@@ -832,13 +901,13 @@ function CustomerPagination({
   onPageSizeChange: (value: Key | Key[] | null) => void;
   page: number;
   pageSize: PageSize;
-  t: ReturnType<typeof useTranslations<"SalesMenu">>;
+  t: ReturnType<typeof useTranslations<"Customer">>;
   totalPages: number;
 }) {
   return (
     <div className="flex w-full shrink-0 items-center justify-between gap-3">
       <Select
-        aria-label={t("pages.customer.paginationRows")}
+        aria-label={t("paginationRows")}
         className="w-28 shrink-0"
         value={String(pageSize)}
         variant="secondary"
@@ -868,7 +937,7 @@ function CustomerPagination({
         <Pagination.Content>
           <Pagination.Item>
             <Pagination.Previous
-              aria-label={t("pages.customer.paginationPrevious")}
+              aria-label={t("paginationPrevious")}
               className={linkClass}
               isDisabled={page === 1}
               onPress={() => onPageChange(Math.max(1, page - 1))}
@@ -891,7 +960,7 @@ function CustomerPagination({
           )}
           <Pagination.Item>
             <Pagination.Next
-              aria-label={t("pages.customer.paginationNext")}
+              aria-label={t("paginationNext")}
               className={linkClass}
               isDisabled={page === totalPages}
               onPress={() => onPageChange(Math.min(totalPages, page + 1))}

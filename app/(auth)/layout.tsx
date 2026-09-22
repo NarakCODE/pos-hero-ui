@@ -3,7 +3,6 @@ import type { ReactNode } from "react";
 import { getTranslations } from "next-intl/server";
 import { LanguageSwitcher } from "@/components/shared/language-switcher";
 import { Logo } from "@/components/shared/logo";
-import { ThemeSwitcher } from "@/components/shared/theme-switcher";
 
 export default async function AuthLayout({
   children,
@@ -39,7 +38,7 @@ export default async function AuthLayout({
             className="pointer-events-none absolute -bottom-28 -start-16 size-72 rounded-full border border-white/20"
           />
 
-          <div className="relative z-10 flex min-h-screen w-full flex-col items-start justify-center p-10 text-start text-white xl:p-14">
+          <div className="relative z-10 flex min-h-screen w-full flex-col items-start justify-center p-10 gap-3 text-start text-white xl:p-14">
             <Link
               href="/"
               aria-label={brandName}
@@ -48,11 +47,11 @@ export default async function AuthLayout({
               <Logo name={brandName} size="xl" />
             </Link>
 
-            <div className="mt-4 w-full max-w-lg">
+            <div className="w-full max-w-lg">
               <h1 className="max-w-xl text-4xl font-semibold leading-tight tracking-tight text-white xl:text-5xl">
                 {t("headline")}
               </h1>
-              <p className="mt-3 max-w-md text-lg leading-8 text-white/80">
+              <p className="max-w-md text-lg leading-8 text-white/80">
                 {t("description")}
               </p>
             </div>
@@ -70,7 +69,6 @@ export default async function AuthLayout({
             </Link>
             <div className="ms-auto flex items-center gap-2">
               <LanguageSwitcher />
-              <ThemeSwitcher />
             </div>
           </header>
 

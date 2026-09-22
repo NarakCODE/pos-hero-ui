@@ -21,7 +21,7 @@ future product specification.
 | Customer       | <code>/customer</code>  | Customer directory, segmentation, profile details, and actions | Implemented UI with fixture data        |
 | Settings       | <code>/settings</code>  | Company, staff, currency, station, and device configuration    | Implemented UI with session-local edits |
 | Dashboard      | <code>/dashboard</code> | Entry screen with a link to the POS register                   | Minimal entry screen                    |
-| More           | <code>/more</code>      | Reserved navigation area for future tools                      | Placeholder screen                      |
+| More           | <code>—</code>          | Bottom drawer for register operations from the shared POS footer | Implemented drawer experience           |
 
 ## Shared POS experience
 
@@ -44,8 +44,11 @@ The protected routes use the shared layout components in
 
 ### Localization and visual system
 
-- Translations are stored in <code>messages/en.json</code> and
-  <code>messages/km.json</code> and are consumed with <code>next-intl</code>.
+- Shared translations are stored in <code>messages/en.json</code> and
+  <code>messages/km.json</code>. Feature catalogs use one flat namespace per
+  file, such as <code>messages/en/customer.json</code> and
+  <code>messages/en/product.json</code>, and are merged before they are
+  consumed with <code>next-intl</code>.
 - English uses Inter. Khmer uses Kantumruy Pro with Noto Sans Khmer as the
   fallback: “Kantumruy Pro”, “Noto Sans Khmer”, sans-serif.
 - HeroUI v3 supplies the application controls, surfaces, cards, tables, tabs,
@@ -387,9 +390,10 @@ reports.
 
 ### More
 
-<code>/more</code> is a reserved POS navigation module. It currently renders a
-shared placeholder empty state and a context panel, ready for future tools such
-as reports, utilities, integrations, or administration shortcuts.
+More is a drawer-only POS action menu opened from the shared footer. It contains
+quick register operations such as cash drawer access, receipt reprints, cash
+in/out, shift closing, register locking, printer testing, kitchen queue status,
+and delivery status. There is no standalone <code>/more</code> route.
 
 ## Component ownership
 
@@ -442,8 +446,7 @@ production layers would be:
    taxes, service charges, and receipt numbering rules.
 6. Complete the Menu & Products, Inventory, Customer, Reports, and Integrations
    settings forms.
-7. Replace fixture-only Dashboard and More pages with operational reports and
-   administrative utilities.
+7. Expand the More drawer with operational reports and administrative utilities.
 8. Add automated component, route, accessibility, and end-to-end tests.
 
 ## Deployment

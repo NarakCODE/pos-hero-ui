@@ -43,6 +43,9 @@ const gapClasses: Record<AppLayoutSpacing, string> = {
   comfortable: "gap-4 sm:gap-6",
 };
 
+const asideGridColumnsClass =
+  "lg:grid-cols-[minmax(0,1fr)_minmax(20rem,var(--app-layout-aside-width))]";
+
 function joinClasses(...classes: Array<string | false | null | undefined>) {
   return classes.filter(Boolean).join(" ");
 }
@@ -97,8 +100,7 @@ export function AppLayout({
         data-slot="app-layout-workspace"
         className={joinClasses(
           "mx-auto grid min-h-0 w-full max-w-[var(--app-layout-max-width)] flex-1 grid-cols-1 overflow-hidden",
-          hasAside &&
-            "lg:grid-cols-[minmax(0,1fr)_minmax(20rem,var(--app-layout-aside-width))]",
+          hasAside && asideGridColumnsClass,
           paddingClasses[padding],
           gapClasses[gap],
           workspaceClassName,
@@ -108,11 +110,25 @@ export function AppLayout({
           aria-label={mainLabel}
           data-slot="app-layout-main"
           className={joinClasses(
-            "min-h-0 min-w-0 overflow-hidden",
+            "flex min-h-0 min-w-0 flex-col overflow-hidden",
             mainClassName,
           )}
         >
-          {children}
+          <div
+            data-slot="app-layout-main-content"
+            className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden"
+          >
+            {children}
+          </div>
+
+          {footer ? (
+            <div
+              data-slot="app-layout-footer"
+              className={joinClasses("w-full shrink-0", footerClassName)}
+            >
+              {footer}
+            </div>
+          ) : null}
         </main>
 
         {hasAside ? (
@@ -120,7 +136,7 @@ export function AppLayout({
             aria-label={asideLabel}
             data-slot="app-layout-aside"
             className={joinClasses(
-              "hidden min-h-0 min-w-0 overflow-hidden lg:flex",
+              "hidden h-full min-h-0 min-w-0 overflow-hidden lg:flex",
               asideClassName,
             )}
           >
@@ -128,18 +144,6 @@ export function AppLayout({
           </aside>
         ) : null}
       </div>
-
-      {footer ? (
-        <div
-          data-slot="app-layout-footer"
-          className={joinClasses(
-            "mx-auto w-full max-w-[var(--app-layout-max-width)] shrink-0",
-            footerClassName,
-          )}
-        >
-          {footer}
-        </div>
-      ) : null}
     </div>
   );
 }

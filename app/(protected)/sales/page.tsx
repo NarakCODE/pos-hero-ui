@@ -103,15 +103,16 @@ export default function SalesPage() {
     [t],
   );
 
-  const sizeOptions: Array<{ id: SizeId; label: string; icon: TablerIcon }> = useMemo(
-    () =>
-      sizeIds.map((id) => ({
-        id,
-        label: t(`modifiers.${id}`),
-        icon: sizeIconById[id],
-      })),
-    [t],
-  );
+  const sizeOptions: Array<{ id: SizeId; label: string; icon: TablerIcon }> =
+    useMemo(
+      () =>
+        sizeIds.map((id) => ({
+          id,
+          label: t(`modifiers.${id}`),
+          icon: sizeIconById[id],
+        })),
+      [t],
+    );
 
   const sweetnessOptions: Array<{ id: SweetnessId; label: string }> = useMemo(
     () => sweetnessIds.map((id) => ({ id, label: t(`modifiers.${id}`) })),
@@ -312,7 +313,11 @@ export default function SalesPage() {
 
   const quickActions = [
     { id: "brandWallet", icon: IconWallet, label: t("payment.brandWallet") },
-    { id: "digitalWallet", icon: IconWallet, label: t("payment.digitalWallet") },
+    {
+      id: "digitalWallet",
+      icon: IconWallet,
+      label: t("payment.digitalWallet"),
+    },
     { id: "promotion", icon: IconTag, label: t("payment.promotion") },
     { id: "member", icon: IconUser, label: t("payment.member") },
     { id: "sendKitchen", icon: IconSend, label: t("payment.sendKitchen") },
@@ -406,7 +411,7 @@ export default function SalesPage() {
           onHoldOrder={() => {}}
           resetLabel={t("resetTicket")}
           onResetOrder={handleClearTicket}
-      />
+        />
       }
     >
       <div className="flex h-full min-h-0 flex-1 flex-col overflow-hidden">
@@ -436,7 +441,7 @@ export default function SalesPage() {
           </Tabs.ListContainer>
 
           {/* 2. Search Menu Items Bar (below tab categories section) */}
-          <div className="flex shrink-0 items-center gap-2 px-[var(--pos-content-padding)] py-3">
+          <div className="flex shrink-0 items-center gap-2 px-(--pos-content-padding) py-3">
             <SearchField
               aria-label={t("searchLabel")}
               className="flex-1"
@@ -470,7 +475,7 @@ export default function SalesPage() {
             <Tabs.Panel
               key={item.id}
               id={item.id}
-              className="mt-0 min-h-0 min-w-0 flex-1 overflow-y-auto overscroll-contain p-[var(--pos-content-padding)]"
+              className="mt-0 flex min-h-0 min-w-0 flex-1 flex-col overflow-y-auto overscroll-contain scrollbar p-(--pos-content-padding)"
             >
               {filteredProducts.length > 0 ? (
                 <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 sm:gap-3 md:grid-cols-4">

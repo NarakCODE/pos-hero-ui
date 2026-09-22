@@ -22,7 +22,6 @@ import { POSLayout } from "@/components/shared/pos-layout";
 import {
   IconArchive,
   IconBarcode,
-  IconBox,
   IconBuilding,
   IconBuildingStore,
   IconCircleCheck,
@@ -57,7 +56,6 @@ type SettingsTileId =
   | "currency"
   | "staff"
   | "menu"
-  | "products"
   | "inventory"
   | "customer"
   | "reports"
@@ -147,13 +145,6 @@ const settingsTiles: ReadonlyArray<{
     icon: IconReceipt,
     labelKey: "tileMenu",
     descriptionKey: "tileMenuDescription",
-  },
-  {
-    id: "products",
-    category: "menuProducts",
-    icon: IconBox,
-    labelKey: "tileProducts",
-    descriptionKey: "tileProductsDescription",
   },
   {
     id: "inventory",
@@ -424,6 +415,7 @@ export function SettingsWorkspace() {
                     <Card
                       key={tile.id}
                       aria-pressed={isSelected}
+                      className="transition-colors hover:bg-surface-hover"
                       role="button"
                       tabIndex={0}
                       variant={isSelected ? "default" : "secondary"}

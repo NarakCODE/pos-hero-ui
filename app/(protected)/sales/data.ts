@@ -56,6 +56,7 @@ export type Product = {
   name: Record<Locale, string>;
   category: ProductCategory;
   price: number;
+  status?: "active" | "inactive";
   favorite?: boolean;
   bestSeller?: boolean;
   image: string;

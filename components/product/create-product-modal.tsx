@@ -9,6 +9,7 @@ import { ProductCreationFields } from "./product-creation-fields";
 import {
   isProductCreationCategory,
   isProductCreationStatus,
+  isProductVariationType,
   type ProductCreationFormData,
   type ProductMediaData,
   type ProductVariationDraft,
@@ -25,12 +26,18 @@ const emptyMedia: ProductMediaData = {
   mediaGallery: [],
 };
 
+const createDefaultVariations = (): ProductVariationDraft[] => [
+  { id: 0, type: "", value: "" },
+];
+
 export function CreateProductModal({ onCreate }: CreateProductModalProps) {
   const t = useTranslations("Product");
   const [isOpen, setIsOpen] = useState(false);
   const [description, setDescription] = useState("");
   const [media, setMedia] = useState<ProductMediaData>(emptyMedia);
-  const [variations, setVariations] = useState<ProductVariationDraft[]>([]);
+  const [variations, setVariations] = useState<ProductVariationDraft[]>(
+    createDefaultVariations,
+  );
 
   const handleOpenChange = (nextIsOpen: boolean) => {
     setIsOpen(nextIsOpen);
@@ -38,7 +45,7 @@ export function CreateProductModal({ onCreate }: CreateProductModalProps) {
     if (!nextIsOpen) {
       setDescription("");
       setMedia(emptyMedia);
-      setVariations([]);
+      setVariations(createDefaultVariations());
     }
   };
 
@@ -76,9 +83,11 @@ export function CreateProductModal({ onCreate }: CreateProductModalProps) {
       mediaGallery: media.mediaGallery,
       category,
       status,
-      variations: variations
-        .filter((variation) => variation.value.trim())
-        .map(({ type, value }) => ({ type, value: value.trim() })),
+      variations: variations.flatMap(({ type, value }) =>
+        isProductVariationType(type) && value.trim()
+          ? [{ type, value: value.trim() }]
+          : [],
+      ),
     };
 
     onCreate?.(data);
@@ -145,10 +154,15 @@ export function CreateProductModal({ onCreate }: CreateProductModalProps) {
 
                 <Modal.Footer>
                   <div className="flex w-full flex-col gap-3 sm:flex-row sm:justify-end">
-                    <Button slot="close" type="button" variant="secondary">
+                    <Button
+                      slot="close"
+                      type="button"
+                      variant="secondary"
+                      fullWidth
+                    >
                       {t("cancel")}
                     </Button>
-                    <Button form="create-product-form" type="submit">
+                    <Button form="create-product-form" type="submit" fullWidth>
                       {t("createProductAction")}
                     </Button>
                   </div>

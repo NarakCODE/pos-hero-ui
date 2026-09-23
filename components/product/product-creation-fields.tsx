@@ -11,7 +11,7 @@ import {
   Select,
   TextField,
 } from "@heroui/react";
-import { IconPlus, IconX } from "@tabler/icons-react";
+import { IconPlus, IconTrash } from "@tabler/icons-react";
 import { useTranslations } from "next-intl";
 import { lazy, Suspense, useRef, useState } from "react";
 
@@ -47,64 +47,45 @@ export function ProductCreationFields({
   variations,
 }: ProductCreationFieldsProps) {
   const t = useTranslations("Product");
-  const [selectedVariation, setSelectedVariation] = useState("");
-  const [variationValue, setVariationValue] = useState("");
   const [variationStatus, setVariationStatus] = useState("");
-  const nextVariationId = useRef(0);
-  const normalizedVariationValue = variationValue.trim().toLowerCase();
-  const selectedVariationOption = productVariationOptions.find(
-    (option) => option.id === selectedVariation,
+  const nextVariationId = useRef(
+    variations.reduce(
+      (nextId, variation) => Math.max(nextId, variation.id + 1),
+      0,
+    ),
   );
-  const selectedVariationLabel = selectedVariationOption
-    ? t(selectedVariationOption.labelKey)
-    : "";
-  const isDuplicateVariation =
-    isProductVariationType(selectedVariation) &&
-    normalizedVariationValue.length > 0 &&
-    variations.some(
-      (variation) =>
-        variation.type === selectedVariation &&
-        variation.value.trim().toLowerCase() === normalizedVariationValue,
-    );
-  const canAddVariation =
-    isProductVariationType(selectedVariation) &&
-    normalizedVariationValue.length > 0 &&
-    !isDuplicateVariation;
-  const groupedVariations = productVariationOptions.flatMap((option) => {
-    const options = variations.filter(
-      (variation) => variation.type === option.id,
-    );
-
-    return options.length
-      ? [{ id: option.id, label: t(option.labelKey), options }]
-      : [];
-  });
 
   const addVariation = () => {
-    if (!canAddVariation || !isProductVariationType(selectedVariation)) {
-      return;
-    }
-
     onVariationsChange([
       ...variations,
       {
         id: nextVariationId.current++,
-        type: selectedVariation,
-        value: variationValue.trim(),
+        type: "",
+        value: "",
       },
     ]);
-    setVariationStatus(
-      t("variationAddedAnnouncement", {
-        type: selectedVariationLabel,
-        value: variationValue.trim(),
-      }),
-    );
-    setVariationValue("");
+    setVariationStatus(t("variationAddedAnnouncement"));
   };
 
-  const selectVariationType = (value: string | null) => {
-    setSelectedVariation(value && isProductVariationType(value) ? value : "");
-    setVariationValue("");
+  const updateVariationType = (id: number, value: string | null) => {
+    if (!value || !isProductVariationType(value)) {
+      return;
+    }
+
+    onVariationsChange(
+      variations.map((variation) =>
+        variation.id === id ? { ...variation, type: value } : variation,
+      ),
+    );
+    setVariationStatus("");
+  };
+
+  const updateVariationValue = (id: number, value: string) => {
+    onVariationsChange(
+      variations.map((variation) =>
+        variation.id === id ? { ...variation, value } : variation,
+      ),
+    );
     setVariationStatus("");
   };
 
@@ -114,11 +95,13 @@ export function ProductCreationFields({
       (option) => option.id === variation?.type,
     );
 
-    if (variation && variationOption) {
+    if (variation) {
       setVariationStatus(
         t("variationRemovedAnnouncement", {
-          type: t(variationOption.labelKey),
-          value: variation.value,
+          type: variationOption
+            ? t(variationOption.labelKey)
+            : t("variationType"),
+          value: variation.value || t("variationValueDefaultLabel"),
         }),
       );
     }
@@ -127,7 +110,7 @@ export function ProductCreationFields({
   };
 
   return (
-    <div className="grid w-full min-w-0 gap-10 lg:grid-cols-[minmax(0,1fr)_22rem] xl:grid-cols-[minmax(0,1fr)_24rem]">
+    <div className="grid w-full min-w-0 gap-10 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
       <div className="min-w-0 space-y-10">
         {/* General information */}
         <section
@@ -181,47 +164,6 @@ export function ProductCreationFields({
 
               <FieldError />
             </TextField>
-          </div>
-
-          <div className="space-y-2">
-            <div className="space-y-1">
-              <Label>{t("productDescription")}</Label>
-              <Description>{t("productDescriptionHelp")}</Description>
-            </div>
-
-            <Suspense
-              fallback={
-                <div
-                  aria-live="polite"
-                  className="flex min-h-44 items-center justify-center rounded-xl border border-border text-sm text-muted"
-                  role="status"
-                >
-                  {t("editorLoading")}
-                </div>
-              }
-            >
-              <ProductDescriptionEditor
-                editorLabel={t("productDescription")}
-                onChange={onDescriptionChange}
-                placeholder={t("productDescriptionPlaceholder")}
-                toolbarLabel={t("descriptionToolbar")}
-                toolbarLabels={{
-                  bold: t("formatBold"),
-                  blockquote: t("formatBlockquote"),
-                  bulletList: t("formatBulletList"),
-                  code: t("formatInlineCode"),
-                  heading1: t("formatHeading1"),
-                  heading2: t("formatHeading2"),
-                  heading3: t("formatHeading3"),
-                  italic: t("formatItalic"),
-                  numberedList: t("formatNumberedList"),
-                  strikethrough: t("formatStrikethrough"),
-                  underline: t("formatUnderline"),
-                }}
-              />
-            </Suspense>
-
-            <input name="description" type="hidden" value={description} />
           </div>
         </section>
 
@@ -291,83 +233,139 @@ export function ProductCreationFields({
         {/* Variations */}
         <section
           aria-labelledby="product-variations-heading"
-          className="space-y-5"
+          className="min-w-0 space-y-4"
         >
           <div className="space-y-1">
-            <SectionHeading
+            <h2
+              className="text-base font-semibold text-foreground"
               id="product-variations-heading"
-              title={t("variations")}
-            />
-
-            <p className="text-sm text-muted">{t("variationsDescription")}</p>
+            >
+              {t("variations")}
+            </h2>
+            <p className="text-sm leading-5 text-muted">
+              {t("variationsDescription")}
+            </p>
           </div>
 
-          <div className="grid gap-3 sm:grid-cols-[minmax(0,0.8fr)_minmax(0,1fr)_auto] sm:items-end">
-            <Select
-              fullWidth
-              placeholder={t("variationTypePlaceholder")}
-              value={selectedVariation || null}
-              variant="secondary"
-              onChange={(value) =>
-                selectVariationType(value === null ? null : String(value))
-              }
-            >
-              <Label>{t("variationType")}</Label>
+          <div className="space-y-3">
+            {variations.map((variation) => {
+              const variationOption = productVariationOptions.find(
+                (option) => option.id === variation.type,
+              );
+              const variationTypeLabel = variationOption
+                ? t(variationOption.labelKey)
+                : t("variationType");
+              const normalizedValue = variation.value.trim().toLowerCase();
+              const isVariationStarted =
+                isProductVariationType(variation.type) ||
+                normalizedValue.length > 0;
+              const isDuplicateVariation =
+                isProductVariationType(variation.type) &&
+                normalizedValue.length > 0 &&
+                variations.some(
+                  (candidate) =>
+                    candidate.id !== variation.id &&
+                    candidate.type === variation.type &&
+                    candidate.value.trim().toLowerCase() === normalizedValue,
+                );
 
-              <Select.Trigger>
-                <Select.Value />
-                <Select.Indicator />
-              </Select.Trigger>
+              return (
+                <div
+                  className="grid grid-cols-[minmax(0,1fr)_auto] gap-2 rounded-xl border border-border bg-surface p-3 sm:grid-cols-[minmax(0,0.8fr)_minmax(0,1fr)_auto] sm:items-start"
+                  key={variation.id}
+                >
+                  <Select
+                    className="col-span-2 min-w-0 sm:col-span-1"
+                    fullWidth
+                    isRequired={isVariationStarted}
+                    name={`variations.${variation.id}.type`}
+                    placeholder={t("variationTypePlaceholder")}
+                    value={variation.type || null}
+                    variant="secondary"
+                    onChange={(value) =>
+                      updateVariationType(
+                        variation.id,
+                        value === null ? null : String(value),
+                      )
+                    }
+                  >
+                    <Label className="sr-only">{t("variationType")}</Label>
+                    <Select.Trigger>
+                      <Select.Value />
+                      <Select.Indicator />
+                    </Select.Trigger>
+                    <Select.Popover placement="bottom start">
+                      <ListBox>
+                        {productVariationOptions.map((option) => (
+                          <ListBox.Item
+                            id={option.id}
+                            key={option.id}
+                            textValue={t(option.labelKey)}
+                          >
+                            {t(option.labelKey)}
+                            <ListBox.ItemIndicator />
+                          </ListBox.Item>
+                        ))}
+                      </ListBox>
+                    </Select.Popover>
+                    <FieldError />
+                  </Select>
 
-              <Select.Popover placement="bottom start">
-                <ListBox>
-                  {productVariationOptions.map((option) => (
-                    <ListBox.Item
-                      id={option.id}
-                      key={option.id}
-                      textValue={t(option.labelKey)}
-                    >
-                      {t(option.labelKey)}
-                      <ListBox.ItemIndicator />
-                    </ListBox.Item>
-                  ))}
-                </ListBox>
-              </Select.Popover>
-            </Select>
+                  <TextField
+                    className="min-w-0"
+                    fullWidth
+                    isInvalid={isDuplicateVariation}
+                    isRequired={isVariationStarted}
+                    name={`variations.${variation.id}.value`}
+                    validate={(value) => {
+                      if (!value.trim() && isVariationStarted) {
+                        return t("variationValueRequired");
+                      }
 
-            <TextField
-              fullWidth
-              isInvalid={isDuplicateVariation}
-              value={variationValue}
-              onChange={(value) => {
-                setVariationValue(value);
-                setVariationStatus("");
-              }}
-            >
-              <Label>
-                {selectedVariationOption
-                  ? t("variationValueLabel", {
-                      type: selectedVariationLabel,
-                    })
-                  : t("variationValueDefaultLabel")}
-              </Label>
+                      if (isDuplicateVariation) {
+                        return t("variationDuplicateError");
+                      }
 
-              <Input
-                placeholder={t("variationValuePlaceholder")}
-                variant="secondary"
-                onKeyDown={(event) => {
-                  if (event.key === "Enter") {
-                    event.preventDefault();
-                    addVariation();
-                  }
-                }}
-              />
+                      return true;
+                    }}
+                    value={variation.value}
+                    onChange={(value) =>
+                      updateVariationValue(variation.id, value)
+                    }
+                  >
+                    <Label className="sr-only">
+                      {t("variationValueLabel", {
+                        type: variationTypeLabel,
+                      })}
+                    </Label>
+                    <Input
+                      placeholder={t("variationValuePlaceholder")}
+                      variant="secondary"
+                    />
+                    <FieldError />
+                  </TextField>
 
-              <FieldError>{t("variationDuplicateError")}</FieldError>
-            </TextField>
+                  <Button
+                    aria-label={t("removeVariation", {
+                      type: variationTypeLabel,
+                      value: variation.value || t("variationValueDefaultLabel"),
+                    })}
+                    className="col-start-2 justify-self-end sm:col-start-auto"
+                    isIconOnly
+                    size="md"
+                    type="button"
+                    variant="danger-soft"
+                    onPress={() => removeVariation(variation.id)}
+                  >
+                    <IconTrash aria-hidden="true" size={18} />
+                  </Button>
+                </div>
+              );
+            })}
 
             <Button
-              isDisabled={!canAddVariation}
+              className="w-full justify-center border border-dashed border-border"
+              fullWidth
               type="button"
               variant="secondary"
               onPress={addVariation}
@@ -375,73 +373,63 @@ export function ProductCreationFields({
               <IconPlus aria-hidden="true" size={18} />
               {t("addVariationType")}
             </Button>
+
+            <p
+              aria-atomic="true"
+              aria-live="polite"
+              className="sr-only"
+              role="status"
+            >
+              {variationStatus}
+            </p>
           </div>
+        </section>
 
-          {groupedVariations.length ? (
-            <div className="space-y-5">
-              {groupedVariations.map((group) => {
-                const headingId = `product-variation-group-${group.id}`;
+        {/* Description */}
+        <section
+          aria-labelledby="product-description-heading"
+          className="min-w-0 space-y-2"
+        >
+          <SectionHeading
+            id="product-description-heading"
+            title={t("productDescription")}
+          />
+          <Description>{t("productDescriptionHelp")}</Description>
 
-                return (
-                  <div className="space-y-2" key={group.id}>
-                    <div className="flex items-center gap-2">
-                      <h3
-                        className="text-sm font-medium text-foreground"
-                        id={headingId}
-                      >
-                        {group.label}
-                      </h3>
-
-                      <span className="text-xs text-muted">
-                        {group.options.length}
-                      </span>
-                    </div>
-
-                    <ul
-                      aria-labelledby={headingId}
-                      className="flex flex-wrap gap-2"
-                    >
-                      {group.options.map((variation) => (
-                        <li
-                          className="inline-flex items-center gap-1 rounded-full border border-border bg-surface-secondary py-1 ps-3 pe-1 text-sm"
-                          key={variation.id}
-                        >
-                          <span>{variation.value}</span>
-
-                          <Button
-                            aria-label={t("removeVariation", {
-                              type: group.label,
-                              value: variation.value,
-                            })}
-                            isIconOnly
-                            size="sm"
-                            type="button"
-                            variant="ghost"
-                            onPress={() => removeVariation(variation.id)}
-                          >
-                            <IconX aria-hidden="true" size={16} />
-                          </Button>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                );
-              })}
-            </div>
-          ) : (
-            <div className="rounded-xl border border-dashed border-border px-4 py-6 text-center">
-              <p className="text-sm text-muted">{t("variationsEmpty")}</p>
-            </div>
-          )}
-
-          <p
-            aria-atomic="true"
-            aria-live="polite"
-            className="sr-only"
-            role="status"
+          <Suspense
+            fallback={
+              <div
+                aria-live="polite"
+                className="flex min-h-44 items-center justify-center rounded-xl border border-border text-sm text-muted"
+                role="status"
+              >
+                {t("editorLoading")}
+              </div>
+            }
           >
-            {variationStatus}
-          </p>
+            <ProductDescriptionEditor
+              editorLabel={t("productDescription")}
+              onChange={onDescriptionChange}
+              placeholder={t("productDescriptionPlaceholder")}
+              toolbarLabel={t("descriptionToolbar")}
+              value={description}
+              toolbarLabels={{
+                bold: t("formatBold"),
+                blockquote: t("formatBlockquote"),
+                bulletList: t("formatBulletList"),
+                code: t("formatInlineCode"),
+                heading1: t("formatHeading1"),
+                heading2: t("formatHeading2"),
+                heading3: t("formatHeading3"),
+                italic: t("formatItalic"),
+                numberedList: t("formatNumberedList"),
+                strikethrough: t("formatStrikethrough"),
+                underline: t("formatUnderline"),
+              }}
+            />
+          </Suspense>
+
+          <input name="description" type="hidden" value={description} />
         </section>
       </div>
 

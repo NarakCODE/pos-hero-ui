@@ -23,6 +23,7 @@ import {
   IconRefresh,
 } from "@tabler/icons-react";
 import { CreateProductModal } from "@/components/product/create-product-modal";
+import { getProductImage } from "@/components/product/product-images";
 import { POSAside } from "@/components/shared/pos-aside";
 import { POSLayout } from "@/components/shared/pos-layout";
 import { defaultLocale, isLocale, type Locale } from "@/config/i18n";
@@ -617,7 +618,7 @@ function ProductTableRow({
       <Table.Cell textValue={productName}>
         <div className="flex min-w-0 items-center gap-3">
           <Avatar color="accent" size="sm" variant="soft">
-            <Avatar.Image alt="" src={product.image} />
+            <Avatar.Image alt="" src={getProductImage(product.id)} />
             <Avatar.Fallback>{productName.charAt(0)}</Avatar.Fallback>
           </Avatar>
           <div className="min-w-0">
@@ -692,135 +693,155 @@ function ProductAside({
   return (
     <POSAside
       ariaLabelledBy="products-aside-title"
-      headerClassName="p-[var(--pos-content-padding)]"
-      mainClassName="flex min-h-0 flex-col px-[var(--pos-content-padding)]"
-      footerClassName="px-[var(--pos-content-padding)] pb-[var(--pos-content-padding)] pt-3"
-      footer={
-        <div className="space-y-3 border-t border-border/70 pt-3">
-          <div className="flex items-start justify-between gap-3">
-            <div className="min-w-0">
-              <p className="text-xs font-semibold text-foreground">
-                {t("details")}
-              </p>
-              <p className="mt-1 text-xs text-muted">{t("lastUpdated")}</p>
-            </div>
-            <Chip
-              color={selectedProductStatus === "active" ? "accent" : "default"}
-              size="sm"
-              variant="soft"
-            >
-              {selectedProductStatus === "active" ? t("active") : t("inactive")}
-            </Chip>
-          </div>
-          <div className="grid grid-cols-2 gap-x-6 gap-y-3">
-            <ProductMetadata
-              label={t("sku")}
-              value={selectedProduct.sku ?? "--"}
-            />
-            <ProductMetadata
-              label={t("category")}
-              value={categoryLabels[selectedProduct.category]}
-            />
-            <ProductMetadata
-              label={t("price")}
-              value={formatter.format(selectedProduct.price)}
-            />
-            <ProductMetadata
-              label={t("stock")}
-              value={
-                getStockStatus(selectedProduct) === "inStock"
-                  ? t("inStock")
-                  : t("outOfStock")
-              }
-            />
-          </div>
-        </div>
-      }
+      headerClassName="border-b border-border/70 p-[var(--pos-content-padding)]"
+      mainClassName="flex min-h-0 flex-col gap-5 overflow-y-auto px-[var(--pos-content-padding)] py-[var(--pos-content-padding)]"
       header={
         <>
-          <div className="mb-4">
-            <p className="text-[10px] font-semibold tracking-[0.16em] text-muted">
-              {t("asideEyebrow")}
-            </p>
-            <h2
-              id="products-aside-title"
-              className="text-base font-bold tracking-tight text-foreground"
-            >
-              {t("asideTitle")}
-            </h2>
-          </div>
-
-          <div className="flex items-start justify-between gap-4">
+          <div className="flex items-start justify-between gap-3">
             <div className="flex min-w-0 items-center gap-3">
               <Avatar color="accent" size="sm" variant="soft">
                 <Avatar.Fallback>
                   <IconPackage aria-hidden="true" size={18} />
                 </Avatar.Fallback>
               </Avatar>
-              <p className="truncate text-sm text-muted">
-                {t("asideDescription")}
-              </p>
+              <div className="min-w-0">
+                <p className="text-[10px] font-semibold tracking-[0.16em] text-muted">
+                  {t("asideEyebrow")}
+                </p>
+                <h2
+                  id="products-aside-title"
+                  className="truncate text-base font-bold tracking-tight text-foreground"
+                >
+                  {t("asideTitle")}
+                </h2>
+              </div>
             </div>
-            <Chip color="accent" size="sm" variant="soft">
+            <Chip className="shrink-0" color="accent" size="sm" variant="soft">
               {t("asideCount", { count: productsToShow.length })}
             </Chip>
           </div>
+          <p className="mt-3 text-xs leading-5 text-muted">
+            {t("asideDescription")}
+          </p>
         </>
       }
     >
       <section
-        aria-labelledby="products-list-title"
-        className="flex min-h-0 flex-1 flex-col border-y border-border/70"
+        aria-labelledby="selected-product-title"
+        className="space-y-4"
       >
-        <div className="flex shrink-0 items-center justify-between gap-2 bg-surface-secondary/50 px-2 py-2.5 text-xs font-semibold text-muted">
-          <h3 id="products-list-title">{t("asideProducts")}</h3>
-          <span>{productsToShow.length}</span>
-        </div>
-        <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
-          <ListBox
-            aria-label={t("asideLabel")}
-            selectedKeys={
-              isSelectedProductInList
-                ? new Set([selectedProduct.id])
-                : new Set()
-            }
-            selectionMode="single"
-            onSelectionChange={(selection) => {
-              if (selection !== "all") {
-                const selectedKey = Array.from(selection)[0];
-
-                if (selectedKey) {
-                  onSelectionChange(String(selectedKey));
-                }
-              }
+        <div
+          className="relative aspect-[16/10] overflow-hidden rounded-2xl bg-default"
+        >
+          <div
+            aria-label={selectedProduct.name[locale]}
+            className="absolute inset-0 bg-cover bg-center outline outline-1 -outline-offset-1 outline-black/10 dark:outline-white/10"
+            role="img"
+            style={{
+              backgroundImage: `url("${getProductImage(selectedProduct.id)}")`,
             }}
+          />
+          <Chip
+            className="absolute end-3 top-3 border border-border/50 bg-surface/90 backdrop-blur"
+            color={selectedProductStatus === "active" ? "accent" : "default"}
+            size="sm"
+            variant="soft"
           >
-            {productsToShow.map((product) => {
-              const productName = product.name[locale];
-
-              return (
-                <ListBox.Item
-                  key={product.id}
-                  id={product.id}
-                  textValue={productName}
-                >
-                  <Avatar color="accent" size="sm" variant="soft">
-                    <Avatar.Image alt="" src={product.image} />
-                    <Avatar.Fallback>{productName.charAt(0)}</Avatar.Fallback>
-                  </Avatar>
-                  <div className="flex min-w-0 flex-1 flex-col">
-                    <Label>{productName}</Label>
-                    <Description>
-                      {formatter.format(product.price)} ·{" "}
-                      {categoryLabels[product.category]}
-                    </Description>
-                  </div>
-                  <ListBox.ItemIndicator />
-                </ListBox.Item>
-              );
-            })}
-          </ListBox>
+            {selectedProductStatus === "active" ? t("active") : t("inactive")}
+          </Chip>
         </div>
+        <div className="flex items-start justify-between gap-3">
+          <div className="min-w-0">
+            <h3
+              className="truncate text-lg font-semibold tracking-tight text-foreground"
+              id="selected-product-title"
+            >
+              {selectedProduct.name[locale]}
+            </h3>
+            <p className="mt-1 text-xs text-muted">
+              {categoryLabels[selectedProduct.category]}
+            </p>
+          </div>
+          <p className="shrink-0 text-base font-semibold tabular-nums text-foreground">
+            {formatter.format(selectedProduct.price)}
+          </p>
+        </div>
+
+        {selectedProduct.description?.[locale] ? (
+          <p className="line-clamp-3 text-sm leading-5 text-muted">
+            {selectedProduct.description[locale]}
+          </p>
+        ) : null}
+
+        <div className="grid grid-cols-2 gap-2">
+          <ProductMetadata
+            label={t("sku")}
+            value={selectedProduct.sku ?? "--"}
+          />
+          <ProductMetadata
+            label={t("stock")}
+            value={
+              getStockStatus(selectedProduct) === "inStock"
+                ? t("inStock")
+                : t("outOfStock")
+            }
+          />
+        </div>
+      </section>
+
+      <section
+        aria-labelledby="products-list-title"
+        className="space-y-2 border-t border-border/70 pt-4"
+      >
+        <h3
+          className="text-sm font-semibold text-foreground"
+          id="products-list-title"
+        >
+          {t("asideProducts")}
+        </h3>
+        <ListBox
+          aria-label={t("asideLabel")}
+          selectedKeys={
+            isSelectedProductInList
+              ? new Set([selectedProduct.id])
+              : new Set()
+          }
+          selectionMode="single"
+          onSelectionChange={(selection) => {
+            if (selection !== "all") {
+              const selectedKey = Array.from(selection)[0];
+
+              if (selectedKey) {
+                onSelectionChange(String(selectedKey));
+              }
+            }
+          }}
+        >
+          {productsToShow.map((product) => {
+            const productName = product.name[locale];
+
+            return (
+              <ListBox.Item
+                key={product.id}
+                id={product.id}
+                textValue={productName}
+              >
+                <Avatar color="accent" size="sm" variant="soft">
+                  <Avatar.Image alt="" src={getProductImage(product.id)} />
+                  <Avatar.Fallback>{productName.charAt(0)}</Avatar.Fallback>
+                </Avatar>
+                <div className="flex min-w-0 flex-1 flex-col">
+                  <Label>{productName}</Label>
+                  <Description>
+                    {formatter.format(product.price)} ·{" "}
+                    {categoryLabels[product.category]}
+                  </Description>
+                </div>
+                <ListBox.ItemIndicator />
+              </ListBox.Item>
+            );
+          })}
+        </ListBox>
       </section>
     </POSAside>
   );
@@ -828,11 +849,11 @@ function ProductAside({
 
 function ProductMetadata({ label, value }: { label: string; value: string }) {
   return (
-    <div className="min-w-0">
+    <div className="min-w-0 rounded-xl border border-border/70 bg-surface-secondary/50 p-3">
       <p className="truncate text-[10px] font-medium tracking-wider text-muted">
         {label}
       </p>
-      <p className="mt-0.5 truncate text-sm font-semibold text-foreground">
+      <p className="mt-1 truncate text-sm font-semibold text-foreground">
         {value}
       </p>
     </div>

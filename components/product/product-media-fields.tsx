@@ -133,9 +133,12 @@ export function ProductMediaFields({ onChange }: ProductMediaFieldsProps) {
   };
 
   return (
-    <section aria-labelledby="product-media-heading" className="space-y-5">
+    <section
+      aria-labelledby="product-media-heading"
+      className="w-full min-w-0 space-y-5"
+    >
       <h2
-        className="text-base font-semibold text-foreground"
+        className="text-start text-base font-semibold text-foreground"
         id="product-media-heading"
       >
         {t("mediaAndAssets")}
@@ -168,7 +171,7 @@ export function ProductMediaFields({ onChange }: ProductMediaFieldsProps) {
         onRemove={removeGalleryImage}
         uploadLabel={t("dropOrBrowse")}
       />
-      <Description>
+      <Description className="text-center">
         {t("mediaGalleryCount", { count: gallery.length })}
       </Description>
     </section>
@@ -214,9 +217,11 @@ function ImageUploadField({
   };
 
   return (
-    <div className="space-y-2">
-      <Label htmlFor={inputId}>{label}</Label>
-      <Description id={descriptionId}>{description}</Description>
+    <div className="w-full space-y-2">
+      <div className="flex w-full flex-col">
+        <Label htmlFor={inputId}>{label}</Label>
+        <Description id={descriptionId}>{description}</Description>
+      </div>
       <p className="text-xs text-muted" id={constraintsId}>
         {t("uploadConstraints")}
       </p>
@@ -286,7 +291,7 @@ function ImageUploadField({
             <p className="text-sm text-muted">{uploadLabel}</p>
           </div>
         )}
-        <div className="flex">
+        <div className="flex justify-center">
           <Button
             type="button"
             variant="secondary"
@@ -299,7 +304,7 @@ function ImageUploadField({
       </div>
       <p
         aria-live="polite"
-        className="min-h-5 text-xs text-danger"
+        className="min-h-5 text-center text-xs text-danger"
         id={errorId}
       >
         {error}

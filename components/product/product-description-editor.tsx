@@ -1,33 +1,14 @@
 "use client";
 
-import {Button} from "@heroui/react";
+import { Button } from "@heroui/react";
+import { Markdown } from "@tiptap/markdown";
+import StarterKit from "@tiptap/starter-kit";
 import {
-  INSERT_ORDERED_LIST_COMMAND,
-  INSERT_UNORDERED_LIST_COMMAND,
-  ListItemNode,
-  ListNode,
-} from "@lexical/list";
-import {useLexicalComposerContext} from "@lexical/react/LexicalComposerContext";
-import {LexicalComposer} from "@lexical/react/LexicalComposer";
-import {ContentEditable} from "@lexical/react/LexicalContentEditable";
-import {LexicalErrorBoundary} from "@lexical/react/LexicalErrorBoundary";
-import {HistoryPlugin} from "@lexical/react/LexicalHistoryPlugin";
-import {ListPlugin} from "@lexical/react/LexicalListPlugin";
-import {OnChangePlugin} from "@lexical/react/LexicalOnChangePlugin";
-import {RichTextPlugin} from "@lexical/react/LexicalRichTextPlugin";
-import {
-  $getSelection,
-  $isRangeSelection,
-  FORMAT_TEXT_COMMAND,
-  type LexicalEditor,
-} from "lexical";
-import {
-  $createHeadingNode,
-  $createQuoteNode,
-  HeadingNode,
-  QuoteNode,
-} from "@lexical/rich-text";
-import {$setBlocksType} from "@lexical/selection";
+  EditorContent,
+  useEditor,
+  useEditorState,
+  type Editor,
+} from "@tiptap/react";
 import {
   IconBlockquote,
   IconBold,
@@ -41,7 +22,7 @@ import {
   IconStrikethrough,
   IconUnderline,
 } from "@tabler/icons-react";
-import type {ReactNode} from "react";
+import { useEffect, useState, type ReactNode } from "react";
 
 type FormatAction =
   | "bold"
@@ -62,36 +43,44 @@ export interface ProductDescriptionEditorProps {
   placeholder: string;
   toolbarLabel: string;
   toolbarLabels: Record<FormatAction, string>;
+  value: string;
 }
 
-const editorConfig = {
-  namespace: "ProductDescription",
-  onError(error: Error) {
-    throw error;
-  },
-  nodes: [HeadingNode, QuoteNode, ListNode, ListItemNode],
-  theme: {
+const extensions = [
+  StarterKit.configure({
     heading: {
-      h1: "mb-2 text-2xl font-semibold",
-      h2: "mb-2 text-xl font-semibold",
-      h3: "mb-2 text-lg font-semibold",
+      levels: [1, 2, 3],
     },
-    list: {
-      listitem: "my-1",
-      ol: "list-decimal ps-6",
-      ul: "list-disc ps-6",
-    },
-    paragraph: "mb-2 last:mb-0",
-    quote: "border-s-2 border-border ps-4 italic text-muted",
-    text: {
-      bold: "font-semibold",
-      code: "rounded bg-surface-secondary px-1 font-mono text-sm",
-      italic: "italic",
-      strikethrough: "line-through",
-      underline: "underline",
-    },
-  },
+  }),
+  Markdown,
+];
+
+const emptyFormatState = {
+  isEmpty: true,
+  bold: false,
+  italic: false,
+  underline: false,
+  strikethrough: false,
+  code: false,
+  heading1: false,
+  heading2: false,
+  heading3: false,
+  bulletList: false,
+  numberedList: false,
+  blockquote: false,
 };
+
+const editorClassName = [
+  "min-h-44 px-3 py-2.5 text-sm leading-6 outline-none",
+  "[&_p]:mb-2 [&_p:last-child]:mb-0",
+  "[&_h1]:mb-2 [&_h1]:text-2xl [&_h1]:font-semibold",
+  "[&_h2]:mb-2 [&_h2]:text-xl [&_h2]:font-semibold",
+  "[&_h3]:mb-2 [&_h3]:text-lg [&_h3]:font-semibold",
+  "[&_ul]:list-disc [&_ul]:ps-6 [&_ol]:list-decimal [&_ol]:ps-6",
+  "[&_li]:my-1",
+  "[&_blockquote]:border-s-2 [&_blockquote]:border-border [&_blockquote]:ps-4 [&_blockquote]:italic [&_blockquote]:text-muted",
+  "[&_code]:rounded [&_code]:bg-surface-secondary [&_code]:px-1 [&_code]:font-mono [&_code]:text-sm",
+].join(" ");
 
 export function ProductDescriptionEditor({
   editorLabel,
@@ -99,163 +88,246 @@ export function ProductDescriptionEditor({
   placeholder,
   toolbarLabel,
   toolbarLabels,
+  value,
 }: ProductDescriptionEditorProps) {
+  const [initialValue] = useState(value);
+  const editor = useEditor({
+    extensions,
+    content: initialValue,
+    contentType: "markdown",
+    immediatelyRender: false,
+    editorProps: {
+      attributes: {
+        "aria-label": editorLabel,
+        class: editorClassName,
+      },
+      handlePaste: (_view, event) => {
+        const clipboard = event.clipboardData;
+        const markdown = clipboard?.getData("text/plain");
+        const markdownManager = editor?.markdown;
+
+        if (
+          !markdown ||
+          clipboard?.getData("text/html") ||
+          !looksLikeMarkdown(markdown) ||
+          !editor ||
+          !markdownManager
+        ) {
+          return false;
+        }
+
+        editor.commands.insertContent(markdownManager.parse(markdown));
+        return true;
+      },
+    },
+    onUpdate: ({ editor: updatedEditor }) => {
+      queueMicrotask(() =>
+        onChange(updatedEditor.isEmpty ? "" : updatedEditor.getMarkdown()),
+      );
+    },
+  });
+
+  useEffect(() => {
+    if (editor && editor.getMarkdown() !== value) {
+      editor.commands.setContent(value, {
+        contentType: "markdown",
+        emitUpdate: false,
+      });
+    }
+  }, [editor, value]);
+
+  const formatState =
+    useEditorState({
+      editor,
+      selector: ({ editor: currentEditor }) => ({
+        isEmpty: currentEditor?.isEmpty ?? true,
+        bold: currentEditor?.isActive("bold") ?? false,
+        italic: currentEditor?.isActive("italic") ?? false,
+        underline: currentEditor?.isActive("underline") ?? false,
+        strikethrough: currentEditor?.isActive("strike") ?? false,
+        code: currentEditor?.isActive("code") ?? false,
+        heading1: currentEditor?.isActive("heading", { level: 1 }) ?? false,
+        heading2: currentEditor?.isActive("heading", { level: 2 }) ?? false,
+        heading3: currentEditor?.isActive("heading", { level: 3 }) ?? false,
+        bulletList: currentEditor?.isActive("bulletList") ?? false,
+        numberedList: currentEditor?.isActive("orderedList") ?? false,
+        blockquote: currentEditor?.isActive("blockquote") ?? false,
+      }),
+    }) ?? emptyFormatState;
+
   return (
-    <LexicalComposer initialConfig={editorConfig}>
-      <div className="overflow-hidden rounded-xl border border-border bg-surface">
-        <div
-          aria-label={toolbarLabel}
-          className="flex flex-wrap items-center gap-1 border-b border-border p-2"
-          role="group"
+    <div className="overflow-hidden rounded-xl border border-border bg-surface">
+      <div
+        aria-label={toolbarLabel}
+        className="flex flex-wrap items-center gap-1 border-b border-border p-2"
+        role="group"
+      >
+        <FormatButton
+          editor={editor}
+          isActive={formatState.bold}
+          label={toolbarLabels.bold}
+          onPress={(activeEditor) =>
+            activeEditor.chain().focus().toggleBold().run()
+          }
         >
-          <FormatButton
-            label={toolbarLabels.bold}
-            onPress={(editor) =>
-              editor.dispatchCommand(FORMAT_TEXT_COMMAND, "bold")
-            }
-          >
-            <IconBold aria-hidden="true" size={18} />
-          </FormatButton>
-          <FormatButton
-            label={toolbarLabels.italic}
-            onPress={(editor) =>
-              editor.dispatchCommand(FORMAT_TEXT_COMMAND, "italic")
-            }
-          >
-            <IconItalic aria-hidden="true" size={18} />
-          </FormatButton>
-          <FormatButton
-            label={toolbarLabels.underline}
-            onPress={(editor) =>
-              editor.dispatchCommand(FORMAT_TEXT_COMMAND, "underline")
-            }
-          >
-            <IconUnderline aria-hidden="true" size={18} />
-          </FormatButton>
-          <FormatButton
-            label={toolbarLabels.strikethrough}
-            onPress={(editor) =>
-              editor.dispatchCommand(FORMAT_TEXT_COMMAND, "strikethrough")
-            }
-          >
-            <IconStrikethrough aria-hidden="true" size={18} />
-          </FormatButton>
-          <FormatButton
-            label={toolbarLabels.code}
-            onPress={(editor) =>
-              editor.dispatchCommand(FORMAT_TEXT_COMMAND, "code")
-            }
-          >
-            <IconCode aria-hidden="true" size={18} />
-          </FormatButton>
-          <span aria-hidden="true" className="mx-1 h-5 border-s border-border" />
-          <FormatButton
-            label={toolbarLabels.heading1}
-            onPress={(editor) => setBlockType(editor, "h1")}
-          >
-            <IconH1 aria-hidden="true" size={18} />
-          </FormatButton>
-          <FormatButton
-            label={toolbarLabels.heading2}
-            onPress={(editor) => setBlockType(editor, "h2")}
-          >
-            <IconH2 aria-hidden="true" size={18} />
-          </FormatButton>
-          <FormatButton
-            label={toolbarLabels.heading3}
-            onPress={(editor) => setBlockType(editor, "h3")}
-          >
-            <IconH3 aria-hidden="true" size={18} />
-          </FormatButton>
-          <FormatButton
-            label={toolbarLabels.bulletList}
-            onPress={(editor) =>
-              editor.dispatchCommand(INSERT_UNORDERED_LIST_COMMAND, undefined)
-            }
-          >
-            <IconList aria-hidden="true" size={18} />
-          </FormatButton>
-          <FormatButton
-            label={toolbarLabels.numberedList}
-            onPress={(editor) =>
-              editor.dispatchCommand(INSERT_ORDERED_LIST_COMMAND, undefined)
-            }
-          >
-            <IconListNumbers aria-hidden="true" size={18} />
-          </FormatButton>
-          <FormatButton
-            label={toolbarLabels.blockquote}
-            onPress={(editor) => setBlockType(editor, "quote")}
-          >
-            <IconBlockquote aria-hidden="true" size={18} />
-          </FormatButton>
-        </div>
-        <div className="relative min-h-44">
-          <RichTextPlugin
-            contentEditable={
-              <ContentEditable
-                aria-label={editorLabel}
-                className="min-h-44 px-3 py-2.5 text-sm leading-6"
-              />
-            }
-            placeholder={
-              <div className="pointer-events-none absolute inset-x-3 top-2.5 text-sm text-muted">
-                {placeholder}
-              </div>
-            }
-            ErrorBoundary={LexicalErrorBoundary}
-          />
-        </div>
+          <IconBold aria-hidden="true" size={18} />
+        </FormatButton>
+        <FormatButton
+          editor={editor}
+          isActive={formatState.italic}
+          label={toolbarLabels.italic}
+          onPress={(activeEditor) =>
+            activeEditor.chain().focus().toggleItalic().run()
+          }
+        >
+          <IconItalic aria-hidden="true" size={18} />
+        </FormatButton>
+        <FormatButton
+          editor={editor}
+          isActive={formatState.underline}
+          label={toolbarLabels.underline}
+          onPress={(activeEditor) =>
+            activeEditor.chain().focus().toggleUnderline().run()
+          }
+        >
+          <IconUnderline aria-hidden="true" size={18} />
+        </FormatButton>
+        <FormatButton
+          editor={editor}
+          isActive={formatState.strikethrough}
+          label={toolbarLabels.strikethrough}
+          onPress={(activeEditor) =>
+            activeEditor.chain().focus().toggleStrike().run()
+          }
+        >
+          <IconStrikethrough aria-hidden="true" size={18} />
+        </FormatButton>
+        <FormatButton
+          editor={editor}
+          isActive={formatState.code}
+          label={toolbarLabels.code}
+          onPress={(activeEditor) =>
+            activeEditor.chain().focus().toggleCode().run()
+          }
+        >
+          <IconCode aria-hidden="true" size={18} />
+        </FormatButton>
+        <span aria-hidden="true" className="mx-1 h-5 border-s border-border" />
+        <FormatButton
+          editor={editor}
+          isActive={formatState.heading1}
+          label={toolbarLabels.heading1}
+          onPress={(activeEditor) =>
+            activeEditor.chain().focus().toggleHeading({ level: 1 }).run()
+          }
+        >
+          <IconH1 aria-hidden="true" size={18} />
+        </FormatButton>
+        <FormatButton
+          editor={editor}
+          isActive={formatState.heading2}
+          label={toolbarLabels.heading2}
+          onPress={(activeEditor) =>
+            activeEditor.chain().focus().toggleHeading({ level: 2 }).run()
+          }
+        >
+          <IconH2 aria-hidden="true" size={18} />
+        </FormatButton>
+        <FormatButton
+          editor={editor}
+          isActive={formatState.heading3}
+          label={toolbarLabels.heading3}
+          onPress={(activeEditor) =>
+            activeEditor.chain().focus().toggleHeading({ level: 3 }).run()
+          }
+        >
+          <IconH3 aria-hidden="true" size={18} />
+        </FormatButton>
+        <FormatButton
+          editor={editor}
+          isActive={formatState.bulletList}
+          label={toolbarLabels.bulletList}
+          onPress={(activeEditor) =>
+            activeEditor.chain().focus().toggleBulletList().run()
+          }
+        >
+          <IconList aria-hidden="true" size={18} />
+        </FormatButton>
+        <FormatButton
+          editor={editor}
+          isActive={formatState.numberedList}
+          label={toolbarLabels.numberedList}
+          onPress={(activeEditor) =>
+            activeEditor.chain().focus().toggleOrderedList().run()
+          }
+        >
+          <IconListNumbers aria-hidden="true" size={18} />
+        </FormatButton>
+        <FormatButton
+          editor={editor}
+          isActive={formatState.blockquote}
+          label={toolbarLabels.blockquote}
+          onPress={(activeEditor) =>
+            activeEditor.chain().focus().toggleBlockquote().run()
+          }
+        >
+          <IconBlockquote aria-hidden="true" size={18} />
+        </FormatButton>
       </div>
-      <HistoryPlugin />
-      <ListPlugin />
-      <OnChangePlugin
-        onChange={(editorState) => onChange(JSON.stringify(editorState.toJSON()))}
-      />
-    </LexicalComposer>
+
+      <div className="relative min-h-44">
+        <EditorContent editor={editor} />
+        {formatState.isEmpty ? (
+          <div className="pointer-events-none absolute inset-x-3 top-2.5 text-sm text-muted">
+            {placeholder}
+          </div>
+        ) : null}
+      </div>
+    </div>
+  );
+}
+
+function looksLikeMarkdown(value: string) {
+  return (
+    /^#{1,3}\s/m.test(value) ||
+    /^\s*(?:[-*+]\s|\d+\.\s)/m.test(value) ||
+    /^>\s/m.test(value) ||
+    /\*\*[^*]+\*\*|__[^_]+__|~~[^~]+~~|`[^`]+`/.test(value) ||
+    /(^|[^*])\*[^*\s][^*]*\*(?!\*)|(^|[^_])_[^_\s][^_]*_(?!_)/.test(value) ||
+    /\[[^\]]+\]\([^)]+\)/.test(value) ||
+    /^```/m.test(value)
   );
 }
 
 function FormatButton({
   children,
+  editor,
+  isActive,
   label,
   onPress,
 }: {
   children: ReactNode;
+  editor: Editor | null;
+  isActive: boolean;
   label: string;
-  onPress: (editor: LexicalEditor) => void;
+  onPress: (editor: Editor) => void;
 }) {
-  const [editor] = useLexicalComposerContext();
-
   return (
     <Button
       aria-label={label}
+      aria-pressed={isActive}
+      isDisabled={!editor}
       isIconOnly
       size="sm"
       type="button"
-      variant="secondary"
-      onPress={() => onPress(editor)}
+      variant={isActive ? "primary" : "secondary"}
+      onPress={() => {
+        if (editor) {
+          onPress(editor);
+        }
+      }}
     >
       {children}
     </Button>
   );
-}
-
-function setBlockType(
-  editor: LexicalEditor,
-  blockType: "h1" | "h2" | "h3" | "quote",
-) {
-  editor.update(() => {
-    const selection = $getSelection();
-
-    if (!$isRangeSelection(selection)) {
-      return;
-    }
-
-    $setBlocksType(selection, () =>
-      blockType === "quote"
-        ? $createQuoteNode()
-        : $createHeadingNode(blockType),
-    );
-  });
 }

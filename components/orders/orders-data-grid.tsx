@@ -421,127 +421,127 @@ function OrdersToolbar({
           </SearchField.Group>
         </SearchField>
 
-          <Popover>
-            <Button
-              aria-label={t("toolbar.filters")}
-              className="relative h-10 w-10 min-w-10 shrink-0"
-              isIconOnly
-              variant="secondary"
-            >
-              <IconAdjustmentsHorizontal aria-hidden="true" size={18} />
-              {activeFilterCount > 0 ? (
-                <Chip
-                  className="absolute -inset-e-1 -top-1"
-                  color="accent"
-                  size="sm"
-                  variant="soft"
-                >
-                  {activeFilterCount}
-                </Chip>
-              ) : null}
-            </Button>
+        <Popover>
+          <Button
+            aria-label={t("toolbar.filters")}
+            className="relative h-10 w-10 min-w-10 shrink-0"
+            isIconOnly
+            variant="secondary"
+          >
+            <IconAdjustmentsHorizontal aria-hidden="true" size={18} />
+            {activeFilterCount > 0 ? (
+              <Chip
+                className="absolute -inset-e-1 -top-1"
+                color="accent"
+                size="sm"
+                variant="soft"
+              >
+                {activeFilterCount}
+              </Chip>
+            ) : null}
+          </Button>
 
-            <Popover.Content
-              className="w-85 max-w-[95vw] rounded-2xl border-0 bg-surface p-0 shadow-2xl sm:w-105"
-              placement="bottom end"
-            >
-              <Popover.Dialog className="flex w-full flex-col p-0 text-start outline-none">
-                <div className="flex w-full items-center justify-between px-4 py-3">
-                  <div className="flex items-center gap-2">
-                    <Popover.Heading className="text-start text-sm font-semibold text-foreground">
-                      {t("toolbar.filters")}
-                    </Popover.Heading>
-                    {activeFilterCount > 0 ? (
-                      <Chip
-                        className="h-5 min-w-5 justify-center px-1 text-xs font-semibold"
-                        color="accent"
-                        size="sm"
-                        variant="soft"
-                      >
-                        {activeFilterCount}
-                      </Chip>
-                    ) : null}
-                  </div>
+          <Popover.Content
+            className="w-85 max-w-[95vw] rounded-2xl border-0 bg-surface p-0 shadow-2xl sm:w-105"
+            placement="bottom end"
+          >
+            <Popover.Dialog className="flex w-full flex-col p-0 text-start outline-none">
+              <div className="flex w-full items-center justify-between px-4 py-3">
+                <div className="flex items-center gap-2">
+                  <Popover.Heading className="text-start text-sm font-semibold text-foreground">
+                    {t("toolbar.filters")}
+                  </Popover.Heading>
                   {activeFilterCount > 0 ? (
-                    <Button
-                      className="h-7 px-2 text-xs font-medium text-muted hover:text-foreground"
+                    <Chip
+                      className="h-5 min-w-5 justify-center px-1 text-xs font-semibold"
+                      color="accent"
                       size="sm"
-                      variant="ghost"
-                      onPress={onResetFilters}
+                      variant="soft"
                     >
-                      <IconRefresh
-                        aria-hidden="true"
-                        className="mr-1 inline-block"
-                        size={14}
-                      />
-                      {t("toolbar.reset")}
-                    </Button>
+                      {activeFilterCount}
+                    </Chip>
                   ) : null}
                 </div>
+                {activeFilterCount > 0 ? (
+                  <Button
+                    className="h-7 px-2 text-xs font-medium text-muted hover:text-foreground"
+                    size="sm"
+                    variant="ghost"
+                    onPress={onResetFilters}
+                  >
+                    <IconRefresh
+                      aria-hidden="true"
+                      className="mr-1 inline-block"
+                      size={14}
+                    />
+                    {t("toolbar.reset")}
+                  </Button>
+                ) : null}
+              </div>
 
-                <div className="max-h-[70vh] space-y-4 overflow-y-auto p-4 text-start text-sm">
-                  <FilterSelect
-                    ariaLabel={t("toolbar.channelLabel")}
-                    label={t("toolbar.channelLabel")}
-                    options={channelFilterOptions.map((opt) => {
-                      const avatarSrc =
-                        opt.id !== "all"
-                          ? getOrderChannelAvatarSrc(opt.id)
-                          : undefined;
+              <div className="max-h-[70vh] space-y-4 overflow-y-auto p-4 text-start text-sm">
+                <FilterSelect
+                  ariaLabel={t("toolbar.channelLabel")}
+                  label={t("toolbar.channelLabel")}
+                  options={channelFilterOptions.map((opt) => {
+                    const avatarSrc =
+                      opt.id !== "all"
+                        ? getOrderChannelAvatarSrc(opt.id)
+                        : undefined;
 
-                      return {
-                        id: opt.id,
-                        label: t(opt.labelKey),
-                        leading:
-                          opt.id !== "all" ? (
-                            <Avatar
-                              aria-hidden="true"
-                              className="h-4 w-4 shrink-0"
-                            >
-                              {avatarSrc ? (
-                                <Avatar.Image
-                                  alt=""
-                                  className="object-contain"
-                                  src={avatarSrc}
-                                />
-                              ) : (
-                                <Avatar.Fallback>
-                                  <IconReceipt aria-hidden="true" size={12} />
-                                </Avatar.Fallback>
-                              )}
-                            </Avatar>
-                          ) : undefined,
-                      };
-                    })}
-                    selectedValue={channelFilter}
-                    onChange={onChannelFilterChange}
-                  />
-
-                  <FilterSelect
-                    ariaLabel={t("toolbar.dateLabel")}
-                    label={t("toolbar.dateLabel")}
-                    options={dateFilterOptions.map((opt) => ({
+                    return {
                       id: opt.id,
                       label: t(opt.labelKey),
-                    }))}
-                    selectedValue={dateFilter}
-                    onChange={onDateFilterChange}
-                  />
+                      leading:
+                        opt.id !== "all" ? (
+                          <Avatar
+                            aria-hidden="true"
+                            className="h-4 w-4 shrink-0"
+                          >
+                            {avatarSrc ? (
+                              <Avatar.Image
+                                alt=""
+                                className="object-contain"
+                                src={avatarSrc}
+                              />
+                            ) : (
+                              <Avatar.Fallback>
+                                <IconReceipt aria-hidden="true" size={12} />
+                              </Avatar.Fallback>
+                            )}
+                          </Avatar>
+                        ) : undefined,
+                    };
+                  })}
+                  selectedValue={channelFilter}
+                  onChange={onChannelFilterChange}
+                />
 
-                  <FilterSelect
-                    ariaLabel={t("toolbar.paymentStatusLabel")}
-                    label={t("toolbar.paymentStatusLabel")}
-                    options={paymentStatusFilterOptions.map((opt) => ({
-                      id: opt.id,
-                      label: t(opt.labelKey),
-                    }))}
-                    selectedValue={paymentStatusFilter}
-                    onChange={onPaymentStatusFilterChange}
-                  />
-                </div>
-              </Popover.Dialog>
-            </Popover.Content>
-          </Popover>
+                <FilterSelect
+                  ariaLabel={t("toolbar.dateLabel")}
+                  label={t("toolbar.dateLabel")}
+                  options={dateFilterOptions.map((opt) => ({
+                    id: opt.id,
+                    label: t(opt.labelKey),
+                  }))}
+                  selectedValue={dateFilter}
+                  onChange={onDateFilterChange}
+                />
+
+                <FilterSelect
+                  ariaLabel={t("toolbar.paymentStatusLabel")}
+                  label={t("toolbar.paymentStatusLabel")}
+                  options={paymentStatusFilterOptions.map((opt) => ({
+                    id: opt.id,
+                    label: t(opt.labelKey),
+                  }))}
+                  selectedValue={paymentStatusFilter}
+                  onChange={onPaymentStatusFilterChange}
+                />
+              </div>
+            </Popover.Dialog>
+          </Popover.Content>
+        </Popover>
       </div>
     </div>
   );

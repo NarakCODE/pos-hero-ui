@@ -1,13 +1,10 @@
 "use client";
 
-import { usePathname, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useEffect, useState, type ReactNode } from "react";
 import { authSessionStorageKey } from "@/config/auth";
-import { POSLoadingGate } from "./pos-loading-gate";
-import { POSPageLoading } from "./pos-loading";
 
 export function ProtectedAppShell({ children }: { children: ReactNode }) {
-  const pathname = usePathname();
   const router = useRouter();
   const [isAuthorized, setIsAuthorized] = useState(false);
 
@@ -25,8 +22,8 @@ export function ProtectedAppShell({ children }: { children: ReactNode }) {
   }, [router]);
 
   if (!isAuthorized) {
-    return <POSPageLoading />;
+    return null;
   }
 
-  return <POSLoadingGate key={pathname}>{children}</POSLoadingGate>;
+  return <>{children}</>;
 }

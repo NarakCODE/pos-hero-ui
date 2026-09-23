@@ -17,6 +17,7 @@ import {
   type TablerIcon,
 } from "@tabler/icons-react";
 import { ProductCard } from "@/components/product-card";
+import { getProductImage } from "@/components/product/product-images";
 import {
   OrderChannelSelect,
   type OrderChannel,
@@ -46,28 +47,6 @@ import {
   type SweetnessId,
   sweetnessIds,
 } from "./data";
-
-const productImages = [
-  "/products/product-1.png",
-  "/products/product-2.png",
-  "/products/product-3.png",
-  "/products/product-4.png",
-  "/products/product-5.png",
-  "/products/product-6.png",
-  "/products/product-7.png",
-  "/products/product-8.png",
-  "/products/product-9.png",
-  "/products/product-10.png",
-  "/products/product-11.png",
-] as const;
-
-function getProductImage(productId: string): string {
-  let hash = 14;
-  for (let i = 0; i < productId.length; i++) {
-    hash = Math.imul(hash ^ productId.charCodeAt(i), 16777619);
-  }
-  return productImages[Math.abs(hash) % productImages.length];
-}
 
 const sizeIconById: Record<SizeId, TablerIcon> = {
   extraSmall: IconLetterXSmall,

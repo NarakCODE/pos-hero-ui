@@ -12,7 +12,7 @@ export type ProductVariationType = "Color" | "Size" | "Material";
 export interface ProductCreationFormData {
   name: string;
   sku: string;
-  /** Serialized Lexical editor state. */
+  /** Markdown serialized from the Tiptap editor. */
   description: string;
   price: number;
   compareAtPrice?: number;
@@ -31,7 +31,7 @@ export interface ProductMediaData {
 
 export interface ProductVariationDraft {
   id: number;
-  type: ProductVariationType;
+  type: ProductVariationType | "";
   value: string;
 }
 

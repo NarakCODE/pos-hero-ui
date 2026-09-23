@@ -1,5 +1,8 @@
+"use client";
+
 import { Skeleton } from "@heroui/react";
-import type { ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
+import { POSFooter } from "./pos-footer";
 
 export const POS_LOADING_DURATION_MS = 600;
 
@@ -11,6 +14,10 @@ const contentPaddingClasses = {
 } as const;
 
 export type POSPageLoadingPadding = keyof typeof contentPaddingClasses;
+
+type POSPageLoadingStyle = CSSProperties & {
+  "--pos-page-loading-aside-width": string;
+};
 
 interface LoadingRegionProps {
   children: ReactNode;
@@ -40,38 +47,35 @@ export function TableCardSkeleton() {
   return (
     <div
       aria-hidden="true"
-      className="flex min-h-44 w-full flex-col justify-between rounded-xl border border-border bg-surface p-4 shadow-xs"
+      className="flex min-h-[29rem] w-full flex-col rounded-xl border border-border bg-surface p-3 shadow-xs"
     >
-      {/* Table Label, Section & Status */}
-      <div className="flex items-start justify-between gap-3">
+      <div className="flex items-start justify-between gap-3 pb-2">
         <div className="flex min-w-0 flex-col gap-1.5">
-          <Skeleton className="h-5 w-20 rounded-md" />
-          <Skeleton className="h-3.5 w-16 rounded-md" />
+          <Skeleton className="h-3 w-10 rounded-md" />
+          <Skeleton className="h-7 w-10 rounded-md" />
+          <Skeleton className="h-3 w-20 rounded-md" />
         </div>
-        <Skeleton className="h-6 w-20 rounded-full" />
+        <Skeleton className="size-5 rounded-full" />
       </div>
 
-      {/* Table Meta Chips (Server, Guests, Items) */}
-      <div className="my-4 flex flex-wrap items-center gap-2">
-        <Skeleton className="h-4 w-20 rounded-md" />
-        <Skeleton className="h-4 w-16 rounded-md" />
-        <Skeleton className="h-4 w-14 rounded-md" />
-      </div>
-
-      {/* Footer (Start Time & Running Total) */}
-      <div className="flex items-end justify-between gap-3 border-t border-border/60 pt-3">
-        <Skeleton className="h-3.5 w-24 rounded-md" />
-        <div className="flex flex-col items-end gap-1">
-          <Skeleton className="h-2.5 w-10 rounded-md" />
-          <Skeleton className="h-5 w-16 rounded-md" />
-        </div>
+      <div className="flex flex-1 flex-col">
+        {Array.from({ length: 15 }, (_, index) => (
+          <div
+            key={`table-slot-skeleton-${index}`}
+            className="flex min-h-6 items-center gap-1.5 border-b border-border/40 last:border-b-0"
+          >
+            <Skeleton className="h-3 w-[3.6rem] shrink-0 rounded-sm" />
+            <Skeleton className="h-3 min-w-0 flex-1 rounded-sm" />
+            <Skeleton className="size-2 shrink-0 rounded-full" />
+          </div>
+        ))}
       </div>
     </div>
   );
 }
 
 export function TableGridSkeleton({
-  className = "grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4",
+  className = "grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3",
   count = 12,
 }: {
   className?: string;
@@ -483,8 +487,9 @@ export function POSHeaderSkeleton({ className = "" }: { className?: string }) {
           <Skeleton className="h-9 w-full rounded-xl" />
         </div>
 
-        {/* Right: Switchers */}
-        <div className="flex shrink-0 items-center gap-2">
+        {/* Right: Actions & Switchers */}
+        <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
+          <Skeleton className="size-8 rounded-xl" />
           <Skeleton className="hidden h-8 w-24 rounded-xl sm:block" />
           <Skeleton className="size-8 rounded-xl" />
         </div>
@@ -494,35 +499,7 @@ export function POSHeaderSkeleton({ className = "" }: { className?: string }) {
 }
 
 export function POSFooterSkeleton({ className = "" }: { className?: string }) {
-  return (
-    <footer
-      aria-hidden="true"
-      className={`sticky bottom-0 z-30 shrink-0 border-t border-border bg-card px-[var(--pos-content-padding)] py-2 shadow-xs transition-colors sm:py-2.5 ${className}`}
-    >
-      <div className="flex min-w-0 items-center gap-3">
-        {/* Sign out button */}
-        <Skeleton className="h-9 w-20 shrink-0 rounded-lg sm:w-24" />
-
-        {/* Navigation items */}
-        <div className="flex min-w-0 flex-1 items-center justify-around gap-1 sm:justify-center sm:gap-2">
-          {Array.from({ length: 6 }, (_, index) => (
-            <Skeleton
-              key={`pos-nav-skeleton-${index}`}
-              className="h-9 w-16 rounded-lg sm:w-20 md:w-24"
-            />
-          ))}
-        </div>
-
-        {/* Cashier status info */}
-        <div className="hidden shrink-0 items-center border-s border-border/70 ps-3 lg:flex">
-          <div className="flex flex-col items-end gap-1">
-            <Skeleton className="h-3 w-24 rounded-md" />
-            <Skeleton className="h-2.5 w-14 rounded-md" />
-          </div>
-        </div>
-      </div>
-    </footer>
-  );
+  return <POSFooter className={`w-full ${className}`} />;
 }
 
 export function POSTabsSkeleton({
@@ -583,6 +560,7 @@ function DefaultPageContentSkeleton() {
 
 export function POSPageLoading({
   aside,
+  asideWidth = "40%",
   children,
   className = "",
   contentPadding = "default",
@@ -590,18 +568,27 @@ export function POSPageLoading({
   showHeader = true,
 }: {
   aside?: ReactNode;
+  asideWidth?: CSSProperties["width"];
   children?: ReactNode;
   className?: string;
   contentPadding?: POSPageLoadingPadding;
   showFooter?: boolean;
   showHeader?: boolean;
 }) {
+  const asideWidthValue =
+    typeof asideWidth === "number" ? `${asideWidth}px` : asideWidth;
+
   return (
     <div
       data-slot="pos-page-loading"
       className={`flex h-screen h-dvh w-full flex-col overflow-hidden bg-background text-foreground ${contentPaddingClasses[contentPadding]} ${className}`}
+      style={
+        {
+          "--pos-page-loading-aside-width": asideWidthValue,
+        } as POSPageLoadingStyle
+      }
     >
-      <div className="mx-auto grid min-h-0 w-full flex-1 grid-cols-1 overflow-hidden lg:grid-cols-[minmax(0,1fr)_minmax(20rem,40%)]">
+      <div className="mx-auto grid min-h-0 w-full flex-1 grid-cols-1 overflow-hidden lg:grid-cols-[minmax(0,1fr)_minmax(20rem,var(--pos-page-loading-aside-width))]">
         <main
           className={`flex min-h-0 min-w-0 flex-col overflow-hidden bg-background ${
             aside ? "border-e border-border" : ""
@@ -620,7 +607,7 @@ export function POSPageLoading({
         ) : null}
       </div>
 
-      {showFooter && <POSFooterSkeleton />}
+      {showFooter && <POSFooter className="w-full" />}
     </div>
   );
 }

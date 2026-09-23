@@ -1,15 +1,18 @@
 "use client";
 
 import { Button, ScrollShadow, toast } from "@heroui/react";
-import { useLocale, useTranslations } from "next-intl";
+import { useTranslations } from "next-intl";
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   IconBox,
   IconCashRegister,
   IconChefHat,
+  IconChevronLeft,
+  IconChevronRight,
   IconClipboardList,
   IconClock,
+  IconLayoutDashboard,
   IconLock,
   IconLogout,
   IconMotorbike,
@@ -49,36 +52,158 @@ const navigationItems: NavigationItem[] = [
 ];
 
 export function POSFooter({ className = "" }: { className?: string }) {
-  const locale = useLocale();
   const t = useTranslations("SalesMenu");
   const pathname = usePathname();
   const router = useRouter();
-  const [currentTime, setCurrentTime] = useState<Date | null>(null);
 
   // Quick action state
   const [isCashModalOpen, setIsCashModalOpen] = useState(false);
   const [isCloseShiftOpen, setIsCloseShiftOpen] = useState(false);
   const [isLockModalOpen, setIsLockModalOpen] = useState(false);
 
-  useEffect(() => {
-    const updateTime = () => setCurrentTime(new Date());
+  // Desktop horizontal scroll & drag-to-slide state
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
 
-    updateTime();
-    const intervalId = window.setInterval(updateTime, 60_000);
+  const isPointerDownRef = useRef(false);
+  const isDraggingRef = useRef(false);
+  const startXRef = useRef(0);
+  const startScrollLeftRef = useRef(0);
 
-    return () => window.clearInterval(intervalId);
+  const updateScrollButtons = useCallback(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const { scrollLeft, scrollWidth, clientWidth } = el;
+    setCanScrollLeft(scrollLeft > 4);
+    setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 4);
   }, []);
+
+  const scrollByAmount = (amount: number) => {
+    const el = scrollRef.current;
+    if (!el) return;
+    el.scrollBy({ left: amount, behavior: "smooth" });
+  };
+
+  // Convert vertical mousewheel scroll to horizontal scroll on desktop
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+
+    const handleWheel = (event: WheelEvent) => {
+      if (event.deltaY !== 0 && Math.abs(event.deltaY) >= Math.abs(event.deltaX)) {
+        const maxScroll = el.scrollWidth - el.clientWidth;
+        if (maxScroll > 0) {
+          const target = el.scrollLeft + event.deltaY;
+          if (
+            (event.deltaY > 0 && el.scrollLeft < maxScroll) ||
+            (event.deltaY < 0 && el.scrollLeft > 0)
+          ) {
+            event.preventDefault();
+            el.scrollLeft = Math.max(0, Math.min(maxScroll, target));
+          }
+        }
+      }
+    };
+
+    el.addEventListener("wheel", handleWheel, { passive: false });
+    return () => {
+      el.removeEventListener("wheel", handleWheel);
+    };
+  }, []);
+
+  // Monitor resize and scroll to toggle left/right scroll buttons
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+
+    updateScrollButtons();
+    el.addEventListener("scroll", updateScrollButtons, { passive: true });
+    window.addEventListener("resize", updateScrollButtons, { passive: true });
+
+    const observer = new ResizeObserver(updateScrollButtons);
+    observer.observe(el);
+    if (el.firstElementChild) {
+      observer.observe(el.firstElementChild);
+    }
+
+    return () => {
+      el.removeEventListener("scroll", updateScrollButtons);
+      window.removeEventListener("resize", updateScrollButtons);
+      observer.disconnect();
+    };
+  }, [updateScrollButtons]);
+
+  // Smoothly scroll active destination into view when route changes
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const activeEl = el.querySelector<HTMLElement>('[aria-current="page"]');
+    if (activeEl) {
+      activeEl.scrollIntoView({
+        behavior: "smooth",
+        block: "nearest",
+        inline: "nearest",
+      });
+    }
+  }, [pathname]);
+
+  // Mouse drag-to-slide handlers
+  const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (e.pointerType === "touch") return;
+    if (e.button !== 0) return;
+    isPointerDownRef.current = true;
+    isDraggingRef.current = false;
+    startXRef.current = e.clientX;
+    startScrollLeftRef.current = scrollRef.current?.scrollLeft ?? 0;
+  };
+
+  const handlePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (!isPointerDownRef.current) return;
+    const deltaX = e.clientX - startXRef.current;
+    if (Math.abs(deltaX) > 4) {
+      if (!isDraggingRef.current) {
+        isDraggingRef.current = true;
+        setIsDragging(true);
+        try {
+          e.currentTarget.setPointerCapture(e.pointerId);
+        } catch {
+          // ignore if capture fails
+        }
+      }
+      if (scrollRef.current) {
+        scrollRef.current.scrollLeft = startScrollLeftRef.current - deltaX;
+      }
+    }
+  };
+
+  const handlePointerUp = (e: React.PointerEvent<HTMLDivElement>) => {
+    isPointerDownRef.current = false;
+    if (isDraggingRef.current) {
+      try {
+        e.currentTarget.releasePointerCapture(e.pointerId);
+      } catch {
+        // ignore
+      }
+      setTimeout(() => {
+        isDraggingRef.current = false;
+        setIsDragging(false);
+      }, 50);
+    }
+  };
+
+  const handleClickCapture = (e: React.MouseEvent) => {
+    if (isDraggingRef.current) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+  };
 
   const currentNav = navigationItems.find((item) =>
     pathname.startsWith(item.href),
   );
   const activeId = currentNav?.id;
-  const timeLabel = currentTime
-    ? new Intl.DateTimeFormat(locale === "km" ? "km-KH" : "en-US", {
-        hour: "numeric",
-        minute: "2-digit",
-      }).format(currentTime)
-    : "—";
 
   const labels: Record<NavigationId, string> = {
     sales: t("navigation.sales"),
@@ -131,10 +256,25 @@ export function POSFooter({ className = "" }: { className?: string }) {
 
   const menuItems = [
     {
+      id: "dashboard",
+      icon: IconLayoutDashboard,
+      label: t("navigation.dashboard"),
+      href: "/dashboard",
+      onPress: () => handleNavigate("/dashboard"),
+    },
+    {
       id: "products",
       icon: IconBox,
       label: "Products",
+      href: "/products",
       onPress: () => handleNavigate("/products"),
+    },
+    {
+      id: "kitchen",
+      icon: IconChefHat,
+      label: t("navigation.kitchen"),
+      href: "/kitchen",
+      onPress: () => handleNavigate("/kitchen"),
     },
     {
       id: "drawer-kick",
@@ -219,15 +359,35 @@ export function POSFooter({ className = "" }: { className?: string }) {
             }
           />
 
+          {canScrollLeft && (
+            <Button
+              aria-label="Scroll navigation left"
+              className="hidden shrink-0 sm:inline-flex"
+              isIconOnly
+              onPress={() => scrollByAmount(-240)}
+              size="md"
+              variant="secondary"
+            >
+              <IconChevronLeft aria-hidden="true" size={18} />
+            </Button>
+          )}
+
           <ScrollShadow
-            className="min-w-0 flex-1"
+            ref={scrollRef}
+            className={`min-w-0 flex-1 select-none ${isDragging ? "cursor-grabbing" : "cursor-grab"}`}
             hideScrollBar
             orientation="horizontal"
             size={24}
+            onDragStart={(e) => e.preventDefault()}
+            onPointerCancel={handlePointerUp}
+            onPointerDown={handlePointerDown}
+            onPointerMove={handlePointerMove}
+            onPointerUp={handlePointerUp}
+            onClickCapture={handleClickCapture}
           >
             <nav
               aria-label={t("navigation.label")}
-              className="flex min-w-full w-max items-center justify-start gap-1 px-1 sm:gap-2"
+              className={`flex min-w-full w-max items-center justify-start gap-1 px-1 sm:gap-2 ${isDragging ? "pointer-events-none" : ""}`}
             >
               {navigationItems.map((item) => {
                 const isActive =
@@ -256,8 +416,9 @@ export function POSFooter({ className = "" }: { className?: string }) {
 
               {menuItems.map((menuItem) => {
                 const MenuIcon = menuItem.icon;
-                const isActive =
-                  menuItem.id === "products" && pathname.startsWith("/products");
+                const isActive = Boolean(
+                  menuItem.href && pathname.startsWith(menuItem.href),
+                );
 
                 return (
                   <Button
@@ -266,7 +427,7 @@ export function POSFooter({ className = "" }: { className?: string }) {
                     variant={isActive ? "primary" : "ghost"}
                     onPress={menuItem.onPress}
                     aria-current={isActive ? "page" : undefined}
-                    className="shrink-0 transition-colors hover:bg-surface-hover"
+                    className="shrink-0"
                   >
                     <MenuIcon aria-hidden="true" size={20} />
                     <span>{menuItem.label}</span>
@@ -276,17 +437,19 @@ export function POSFooter({ className = "" }: { className?: string }) {
             </nav>
           </ScrollShadow>
 
-          <div
-            aria-label={t("ticketSummary.dateTime")}
-            className="hidden shrink-0 items-center border-s border-border/70 ps-3 text-end text-xs lg:flex"
-          >
-            <div className="flex flex-col gap-0.5">
-              <span className="font-medium text-foreground">
-                {t("cashier")} · {t("shiftOpen")}
-              </span>
-              <time className="text-muted">{timeLabel}</time>
-            </div>
-          </div>
+          {canScrollRight && (
+            <Button
+              aria-label="Scroll navigation right"
+              className="hidden shrink-0 sm:inline-flex"
+              isIconOnly
+              onPress={() => scrollByAmount(240)}
+              size="md"
+              variant="secondary"
+            >
+              <IconChevronRight aria-hidden="true" size={18} />
+            </Button>
+          )}
+
         </div>
       </footer>
 

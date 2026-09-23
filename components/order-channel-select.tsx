@@ -88,7 +88,6 @@ export function OrderChannelSelect({
             if (isPlaceholder && state.selectedItems.length === 0 && !value) {
               return defaultChildren;
             }
-
             const selectedChannel =
               orderChannels.find(
                 (channel) => channel === state.selectedItems[0]?.key,
@@ -131,7 +130,7 @@ export function OrderChannelSelect({
         </Select.Value>
         <Select.Indicator />
       </Select.Trigger>
-      <Select.Popover className="min-w-[160px]" placement="bottom start">
+      <Select.Popover className="min-w-40" placement="bottom start">
         <ListBox>
           {orderChannels.map((channel) => (
             <ListBox.Item

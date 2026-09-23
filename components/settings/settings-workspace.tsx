@@ -24,7 +24,6 @@ import {
   IconBarcode,
   IconBuilding,
   IconBuildingStore,
-  IconCircleCheck,
   IconCoin,
   IconCreditCard,
   IconDeviceDesktop,
@@ -270,26 +269,14 @@ export function SettingsWorkspace() {
             ) : null
           }
           header={
-            <>
-              <h2
-                id="settings-detail-title"
-                className="text-base font-semibold text-foreground sm:text-lg"
-              >
-                {selectedTileData
-                  ? t(`pages.settings.${selectedTileData.labelKey}`)
-                  : t("pages.settings.panelTitle")}
-              </h2>
-              {selectedTile ? (
-                <div className="ms-auto flex shrink-0 items-center">
-                  <Chip color="success" size="sm" variant="soft">
-                    <IconCircleCheck aria-hidden="true" size={15} />
-                    {isSaved
-                      ? t("pages.settings.saved")
-                      : t("pages.settings.registerReady")}
-                  </Chip>
-                </div>
-              ) : null}
-            </>
+            <h2
+              id="settings-detail-title"
+              className="text-base font-semibold text-foreground sm:text-lg"
+            >
+              {selectedTileData
+                ? t(`pages.settings.${selectedTileData.labelKey}`)
+                : t("pages.settings.panelTitle")}
+            </h2>
           }
         >
           <div className="min-h-0 flex-1 overflow-y-auto">

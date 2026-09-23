@@ -8,21 +8,30 @@ import { useEffect, useRef, useState, type DragEvent } from "react";
 import type { ProductMediaData } from "./product-creation-types";
 
 interface ProductMediaFieldsProps {
+  initialThumbnailUrl?: string | null;
   onChange: (media: ProductMediaData) => void;
 }
 
 interface UploadedImage {
-  file: File;
+  file?: File;
   previewUrl: string;
+  name?: string;
 }
 
 const imageAccept = "image/png,image/jpeg,image/gif,.png,.jpg,.jpeg,.gif";
 const acceptedImageTypes = new Set(["image/png", "image/jpeg", "image/gif"]);
 const maximumImageSize = 5 * 1024 * 1024;
 
-export function ProductMediaFields({ onChange }: ProductMediaFieldsProps) {
+export function ProductMediaFields({
+  initialThumbnailUrl,
+  onChange,
+}: ProductMediaFieldsProps) {
   const t = useTranslations("Product");
-  const [thumbnail, setThumbnail] = useState<UploadedImage | null>(null);
+  const [thumbnail, setThumbnail] = useState<UploadedImage | null>(() =>
+    initialThumbnailUrl
+      ? { previewUrl: initialThumbnailUrl, name: "thumbnail.png" }
+      : null,
+  );
   const [gallery, setGallery] = useState<UploadedImage[]>([]);
   const [thumbnailError, setThumbnailError] = useState("");
   const [galleryError, setGalleryError] = useState("");
@@ -40,12 +49,14 @@ export function ProductMediaFields({ onChange }: ProductMediaFieldsProps) {
     const previewUrl = URL.createObjectURL(file);
     previewUrls.current.add(previewUrl);
 
-    return { file, previewUrl };
+    return { file, previewUrl, name: file.name };
   };
 
   const releaseUploadedImage = (image: UploadedImage) => {
-    URL.revokeObjectURL(image.previewUrl);
-    previewUrls.current.delete(image.previewUrl);
+    if (previewUrls.current.has(image.previewUrl)) {
+      URL.revokeObjectURL(image.previewUrl);
+      previewUrls.current.delete(image.previewUrl);
+    }
   };
 
   const publishMedia = (
@@ -54,7 +65,9 @@ export function ProductMediaFields({ onChange }: ProductMediaFieldsProps) {
   ) => {
     onChange({
       thumbnail: nextThumbnail?.file ?? null,
-      mediaGallery: nextGallery.map((image) => image.file),
+      mediaGallery: nextGallery.flatMap((image) =>
+        image.file ? [image.file] : [],
+      ),
     });
   };
 
@@ -261,29 +274,34 @@ function ImageUploadField({
                 : "grid grid-cols-[5rem_minmax(0,1fr)_auto] items-center gap-3"
             }
           >
-            {files.map((image, index) => (
-              <div
-                className={multiple ? "relative space-y-2" : "contents"}
-                key={`${image.file.name}-${image.file.size}-${image.file.lastModified}-${index}`}
-              >
-                <ImagePreview image={image} />
-                {!multiple ? (
-                  <p className="truncate text-sm text-foreground">
-                    {image.file.name}
-                  </p>
-                ) : null}
-                <Button
-                  aria-label={t("removeImage", { name: image.file.name })}
-                  isIconOnly
-                  size="sm"
-                  type="button"
-                  variant="secondary"
-                  onPress={() => onRemove(index)}
+            {files.map((image, index) => {
+              const fileName =
+                image.file?.name ?? image.name ?? t("thumbnail");
+
+              return (
+                <div
+                  className={multiple ? "relative space-y-2" : "contents"}
+                  key={`${image.previewUrl}-${index}`}
                 >
-                  <IconX aria-hidden="true" size={16} />
-                </Button>
-              </div>
-            ))}
+                  <ImagePreview image={image} />
+                  {!multiple ? (
+                    <p className="truncate text-sm text-foreground">
+                      {fileName}
+                    </p>
+                  ) : null}
+                  <Button
+                    aria-label={t("removeImage", { name: fileName })}
+                    isIconOnly
+                    size="sm"
+                    type="button"
+                    variant="secondary"
+                    onPress={() => onRemove(index)}
+                  >
+                    <IconX aria-hidden="true" size={16} />
+                  </Button>
+                </div>
+              );
+            })}
           </div>
         ) : (
           <div className="flex flex-col items-center gap-2 py-2 text-center">
@@ -316,7 +334,7 @@ function ImageUploadField({
 function ImagePreview({ image }: { image: UploadedImage }) {
   return (
     <div
-      aria-label={image.file.name}
+      aria-label={image.file?.name ?? image.name ?? "Product image"}
       className="aspect-[4/3] rounded-lg bg-cover bg-center bg-default outline outline-1 -outline-offset-1 outline-black/10 dark:outline-white/10"
       role="img"
       style={{ backgroundImage: `url("${image.previewUrl}")` }}

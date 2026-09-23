@@ -9,6 +9,7 @@ import {
   ListBox,
   NumberField,
   Select,
+  Switch,
   TextField,
 } from "@heroui/react";
 import { IconPlus, IconTrash } from "@tabler/icons-react";
@@ -21,6 +22,7 @@ import {
   productCategoryOptions,
   productStatusOptions,
   productVariationOptions,
+  type ProductFieldInitialValues,
   type ProductMediaData,
   type ProductVariationDraft,
 } from "./product-creation-types";
@@ -37,10 +39,12 @@ interface ProductCreationFieldsProps {
   onMediaChange: (media: ProductMediaData) => void;
   onVariationsChange: (variations: ProductVariationDraft[]) => void;
   variations: ProductVariationDraft[];
+  initialValues?: ProductFieldInitialValues;
 }
 
 export function ProductCreationFields({
   description,
+  initialValues,
   onDescriptionChange,
   onMediaChange,
   onVariationsChange,
@@ -124,6 +128,7 @@ export function ProductCreationFields({
 
           <div className="grid gap-5 sm:grid-cols-2">
             <TextField
+              defaultValue={initialValues?.name}
               fullWidth
               isRequired
               minLength={2}
@@ -144,6 +149,7 @@ export function ProductCreationFields({
             </TextField>
 
             <TextField
+              defaultValue={initialValues?.sku}
               fullWidth
               isRequired
               minLength={2}
@@ -179,6 +185,7 @@ export function ProductCreationFields({
 
           <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
             <NumberField
+              defaultValue={initialValues?.price}
               fullWidth
               isRequired
               minValue={0}
@@ -196,6 +203,7 @@ export function ProductCreationFields({
             </NumberField>
 
             <NumberField
+              defaultValue={initialValues?.compareAtPrice}
               fullWidth
               minValue={0}
               name="compareAtPrice"
@@ -212,6 +220,7 @@ export function ProductCreationFields({
             </NumberField>
 
             <NumberField
+              defaultValue={initialValues?.stock}
               fullWidth
               isRequired
               minValue={0}
@@ -435,7 +444,10 @@ export function ProductCreationFields({
 
       {/* Sidebar */}
       <aside className="min-w-0 space-y-8">
-        <ProductMediaFields onChange={onMediaChange} />
+        <ProductMediaFields
+          initialThumbnailUrl={initialValues?.initialThumbnailUrl}
+          onChange={onMediaChange}
+        />
 
         <section
           aria-labelledby="product-organization-heading"
@@ -448,6 +460,7 @@ export function ProductCreationFields({
 
           <div className="space-y-4">
             <Select
+              defaultValue={initialValues?.category}
               fullWidth
               isRequired
               name="category"
@@ -478,9 +491,9 @@ export function ProductCreationFields({
             </Select>
 
             <Select
+              defaultValue={initialValues?.status ?? "in-stock"}
               fullWidth
               name="status"
-              defaultValue="in-stock"
               variant="secondary"
             >
               <Label>{t("productInventoryStatus")}</Label>
@@ -505,6 +518,27 @@ export function ProductCreationFields({
                 </ListBox>
               </Select.Popover>
             </Select>
+
+            <Switch
+              className="w-full rounded-xl border border-border/70 bg-surface-secondary/50 p-3"
+              defaultSelected={initialValues?.available ?? true}
+              name="available"
+              value="true"
+            >
+              <Switch.Content className="flex w-full items-center justify-between gap-4">
+                <div className="min-w-0 space-y-1">
+                  <Label className="text-sm font-medium text-foreground">
+                    {t("productAvailability")}
+                  </Label>
+                  <Description className="text-xs leading-5 text-muted">
+                    {t("productAvailabilityDescription")}
+                  </Description>
+                </div>
+                <Switch.Control className="shrink-0">
+                  <Switch.Thumb />
+                </Switch.Control>
+              </Switch.Content>
+            </Switch>
           </div>
         </section>
       </aside>

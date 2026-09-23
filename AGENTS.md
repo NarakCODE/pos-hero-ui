@@ -37,6 +37,12 @@ Use `@tabler/icons-react` as the default icon library for application UI icons.
 
 No test framework or coverage threshold is configured. Until one is introduced, validate changes with `pnpm lint` and `pnpm build`. When adding tests, colocate them with the feature or use a dedicated `tests/` directory, and use descriptive names such as `button.test.tsx`.
 
+## Lint Audit Rules
+
+- Review all `pnpm lint` output; a successful exit with warnings is not a clean audit.
+- Fix unused imports, variables, and props. Apply optional `className` props to the intended rendered element or remove them when they are not needed.
+- Do not suppress lint findings with disable comments. Document any intentional exception with a scoped explanation.
+
 ## Commit & Pull Request Guidelines
 
 This repository has no commit history yet, so no established commit convention can be inferred. Use short, imperative messages with a clear scope, for example `feat: add settings page` or `fix: correct button spacing`. Pull requests should explain the behavior change, list validation commands, link the relevant issue when available, and include screenshots for visible UI changes.

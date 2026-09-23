@@ -1,14 +1,14 @@
 import {
-  OrderAsideSkeleton,
   POSPageLoading,
   POSSearchBarSkeleton,
   POSTabsSkeleton,
   TableGridSkeleton,
 } from "@/components/shared/pos-loading";
+import { TableAside } from "@/components/tables/table-aside";
 
 export default function Loading() {
   return (
-    <POSPageLoading aside={<OrderAsideSkeleton />}>
+    <POSPageLoading aside={<TableAside />}>
       <div className="flex h-full min-h-0 flex-col overflow-hidden">
         <POSTabsSkeleton count={6} />
         <POSSearchBarSkeleton />

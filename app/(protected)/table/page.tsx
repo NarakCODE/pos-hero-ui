@@ -1,20 +1,13 @@
 import { useTranslations } from "next-intl";
-import { POSLayout } from "@/components/shared/pos-layout";
-import { TableAside } from "@/components/tables/table-aside";
-import { TableFloor } from "@/components/tables/table-floor";
+import { TableWorkspace } from "@/components/tables/table-workspace";
 
 export default function TablePage() {
   const t = useTranslations("SalesMenu");
 
   return (
-    <POSLayout
-      showSearch={false}
+    <TableWorkspace
+      asideLabel={t("pages.table.asideAriaLabel")}
       headerTitle={t("pages.table.title")}
-      rightPanelLabel={t("pages.table.asideAriaLabel")}
-      rightPanelClassName="overflow-hidden"
-      rightPanel={<TableAside />}
-    >
-      <TableFloor />
-    </POSLayout>
+    />
   );
 }

@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { IconSearch } from "@tabler/icons-react";
 import { LanguageSwitcher } from "@/components/shared/language-switcher";
 import { Logo } from "@/components/shared/logo";
+import { NotificationPopover } from "@/components/shared/notification-popover";
 import { ThemeSwitcher } from "@/components/shared/theme-switcher";
 
 interface POSHeaderProps {
@@ -12,6 +13,7 @@ interface POSHeaderProps {
   onSearchChange?: (query: string) => void;
   searchPlaceholder?: string;
   showSearch?: boolean;
+  showNotifications?: boolean;
   title?: string;
   className?: string;
 }
@@ -21,6 +23,7 @@ export function POSHeader({
   onSearchChange,
   searchPlaceholder,
   searchQuery,
+  showNotifications = true,
   showSearch = true,
   title,
 }: POSHeaderProps) {
@@ -66,8 +69,9 @@ export function POSHeader({
           <div className="flex-1" />
         )}
 
-        {/* Right: Switchers */}
+        {/* Right: Actions & Switchers */}
         <div className="flex items-center gap-1.5 shrink-0 sm:gap-2">
+          {showNotifications ? <NotificationPopover /> : null}
           <div className="hidden sm:block">
             <LanguageSwitcher className="w-28" />
           </div>

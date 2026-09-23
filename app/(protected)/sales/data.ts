@@ -62,6 +62,7 @@ export type Product = {
   image: string;
   sku?: string;
   description?: Record<Locale, string>;
+  stock?: number;
   inStock?: boolean;
 };
 

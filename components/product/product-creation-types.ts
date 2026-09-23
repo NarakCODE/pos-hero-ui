@@ -10,14 +10,17 @@ export type ProductCreationStatus = "in-stock" | "low-stock" | "out-of-stock";
 export type ProductVariationType = "Color" | "Size" | "Material";
 
 export interface ProductCreationFormData {
+  id?: string;
   name: string;
   sku: string;
-  /** Markdown serialized from the Tiptap editor. */
+  /** Markdown serialized from the editor. */
   description: string;
   price: number;
   compareAtPrice?: number;
   stock: number;
+  available: boolean;
   thumbnail: File | null;
+  thumbnailUrl?: string | null;
   mediaGallery: File[];
   category: ProductCreationCategory;
   status: ProductCreationStatus;
@@ -33,6 +36,20 @@ export interface ProductVariationDraft {
   id: number;
   type: ProductVariationType | "";
   value: string;
+}
+
+export interface ProductFieldInitialValues {
+  name?: string;
+  sku?: string;
+  price?: number;
+  compareAtPrice?: number;
+  stock?: number;
+  available?: boolean;
+  category?: ProductCreationCategory;
+  status?: ProductCreationStatus;
+  initialThumbnailUrl?: string | null;
+  description?: string;
+  variations?: ProductVariationDraft[];
 }
 
 export const productCategoryOptions: ReadonlyArray<{

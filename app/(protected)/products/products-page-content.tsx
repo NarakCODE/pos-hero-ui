@@ -4,7 +4,6 @@ import {
   Avatar,
   Button,
   Chip,
-  Description,
   Label,
   ListBox,
   Pagination,
@@ -13,6 +12,7 @@ import {
   Select,
   Table,
   Tabs,
+  toast,
 } from "@heroui/react";
 import type { Key, Selection, SortDescriptor } from "@heroui/react";
 import { useLocale, useTranslations } from "next-intl";
@@ -22,12 +22,21 @@ import {
   IconPackage,
   IconRefresh,
 } from "@tabler/icons-react";
-import { CreateProductModal } from "@/components/product/create-product-modal";
+import { DeleteProductAlertDialog } from "@/components/product/delete-product-alert-dialog";
+import { ProductFormModal } from "@/components/product/product-form-modal";
 import { getProductImage } from "@/components/product/product-images";
+import { Carousel } from "@/components/shared/carousel";
+import { EmptyState } from "@/components/shared/empty-state";
 import { POSAside } from "@/components/shared/pos-aside";
 import { POSLayout } from "@/components/shared/pos-layout";
 import { defaultLocale, isLocale, type Locale } from "@/config/i18n";
-import { products, type Product, type ProductCategory } from "../sales/data";
+import {
+  products,
+  sizeIds,
+  type Product,
+  type ProductCategory,
+  type SizeId,
+} from "../sales/data";
 
 type ProductStatus = "active" | "inactive";
 type ProductStatusFilter = "all" | ProductStatus;
@@ -36,10 +45,34 @@ type CategoryFilter = "all" | ProductCategory;
 type PageSize = 25 | 50 | 100;
 
 const managedProducts = products;
-const asideProducts = managedProducts.slice(0, 10);
 const pageSizes: PageSize[] = [25, 50, 100];
 const linkClass = "text-muted hover:bg-surface hover:text-foreground";
 const activeClass = "bg-accent text-accent-foreground hover:bg-accent-hover";
+const productVariantDetails = {
+  extraSmall: {
+    labelKey: "variantSizeExtraSmall",
+    skuSuffix: "XS",
+    priceAdjustment: -0.75,
+  },
+  small: {
+    labelKey: "variantSizeSmall",
+    skuSuffix: "S",
+    priceAdjustment: -0.25,
+  },
+  medium: {
+    labelKey: "variantSizeMedium",
+    skuSuffix: "M",
+    priceAdjustment: 0,
+  },
+  large: {
+    labelKey: "variantSizeLarge",
+    skuSuffix: "L",
+    priceAdjustment: 0.75,
+  },
+} as const satisfies Record<
+  SizeId,
+  { labelKey: string; skuSuffix: string; priceAdjustment: number }
+>;
 
 export function ProductsPageContent() {
   const t = useTranslations("Product");
@@ -47,8 +80,9 @@ export function ProductsPageContent() {
   const locale: Locale = isLocale(currentLocale)
     ? currentLocale
     : defaultLocale;
+  const [productList, setProductList] = useState<Product[]>(managedProducts);
   const [selectedProductId, setSelectedProductId] = useState(
-    asideProducts[0]?.id ?? "",
+    managedProducts[0]?.id ?? "",
   );
   const formatter = useMemo(
     () =>
@@ -73,23 +107,38 @@ export function ProductsPageContent() {
     snack: t("categorySnack"),
   };
 
+  const handleDeleteProduct = (productId: string) => {
+    const targetProduct = productList.find((p) => p.id === productId);
+    const productName = targetProduct ? targetProduct.name[locale] : "";
+    setProductList((current) => {
+      const updated = current.filter((p) => p.id !== productId);
+      if (selectedProductId === productId) {
+        setSelectedProductId(updated[0]?.id ?? "");
+      }
+      return updated;
+    });
+    toast.success(t("productDeleted"), {
+      description: t("productDeletedDescription", { name: productName }),
+    });
+  };
+
   return (
     <POSLayout
       showSearch={false}
       headerTitle={t("title")}
       rightPanel={
         <ProductAside
+          allProducts={productList}
           categoryLabels={categoryLabels}
           formatter={formatter}
-          allProducts={managedProducts}
-          products={asideProducts}
+          onDeleteProduct={handleDeleteProduct}
           selectedProductId={selectedProductId}
-          onSelectionChange={setSelectedProductId}
         />
       }
       rightPanelLabel={t("asideLabel")}
     >
       <ProductsDataGrid
+        allProducts={productList}
         categoryLabels={categoryLabels}
         formatter={formatter}
         locale={locale}
@@ -101,12 +150,14 @@ export function ProductsPageContent() {
 }
 
 function ProductsDataGrid({
+  allProducts = managedProducts,
   categoryLabels,
   formatter,
   locale,
   onProductSelect,
   selectedProductId,
 }: {
+  allProducts?: Product[];
   categoryLabels: Record<ProductCategory, string>;
   formatter: Intl.NumberFormat;
   locale: Locale;
@@ -156,7 +207,7 @@ function ProductsDataGrid({
   const filteredProducts = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();
 
-    return managedProducts.filter((product) => {
+    return allProducts.filter((product) => {
       const matchesSearch =
         !normalizedQuery ||
         [product.name.en, product.name.km, product.sku ?? ""].some((value) =>
@@ -171,7 +222,7 @@ function ProductsDataGrid({
 
       return matchesSearch && matchesStatus && matchesCategory && matchesStock;
     });
-  }, [categoryFilter, query, statusFilter, stockFilter]);
+  }, [allProducts, categoryFilter, query, statusFilter, stockFilter]);
 
   const totalPages = Math.max(1, Math.ceil(filteredProducts.length / pageSize));
   const safePage = Math.min(page, totalPages);
@@ -326,17 +377,17 @@ function ProductsDataGrid({
               <Table.Body
                 items={paginatedProducts}
                 renderEmptyState={() => (
-                  <div className="flex flex-col items-center justify-center p-10 text-center">
-                    <div className="flex size-12 items-center justify-center rounded-2xl bg-default text-muted">
+                  <EmptyState className="p-10">
+                    <EmptyState.Media>
                       <IconPackage aria-hidden="true" size={24} />
-                    </div>
-                    <p className="mt-4 text-sm font-semibold text-foreground">
-                      {t("emptyTitle")}
-                    </p>
-                    <p className="mt-1 text-sm text-muted">
-                      {t("emptyDescription")}
-                    </p>
-                  </div>
+                    </EmptyState.Media>
+                    <EmptyState.Header>
+                      <EmptyState.Title>{t("emptyTitle")}</EmptyState.Title>
+                      <EmptyState.Description>
+                        {t("emptyDescription")}
+                      </EmptyState.Description>
+                    </EmptyState.Header>
+                  </EmptyState>
                 )}
               >
                 {(product) => (
@@ -441,7 +492,7 @@ function ProductsToolbar({
           </SearchField.Group>
         </SearchField>
 
-        <CreateProductModal />
+        <ProductFormModal mode="create" />
 
         <Popover>
           <Button
@@ -637,9 +688,9 @@ function ProductTableRow({
       </Table.Cell>
       <Table.Cell className="text-center">
         <Chip
-          color={stockStatus === "inStock" ? "accent" : "danger"}
+          color={stockStatus === "inStock" ? "success" : "danger"}
           size="sm"
-          variant="soft"
+          variant={stockStatus === "inStock" ? "secondary" : "soft"}
         >
           {stockStatus === "inStock" ? t("inStock") : t("outOfStock")}
         </Chip>
@@ -661,16 +712,14 @@ function ProductAside({
   allProducts,
   categoryLabels,
   formatter,
-  products: productsToShow,
+  onDeleteProduct,
   selectedProductId,
-  onSelectionChange,
 }: {
   allProducts: Product[];
   categoryLabels: Record<ProductCategory, string>;
   formatter: Intl.NumberFormat;
-  products: Product[];
+  onDeleteProduct?: (productId: string) => void;
   selectedProductId: string;
-  onSelectionChange: (id: string) => void;
 }) {
   const t = useTranslations("Product");
   const currentLocale = useLocale();
@@ -679,35 +728,53 @@ function ProductAside({
     : defaultLocale;
   const selectedProduct =
     allProducts.find((product) => product.id === selectedProductId) ??
-    productsToShow[0];
+    allProducts[0];
 
   if (!selectedProduct) {
-    return null;
+    return (
+      <POSAside
+        ariaLabelledBy="products-aside-title"
+        headerClassName="p-[var(--pos-content-padding)]"
+        mainClassName="flex min-h-0 flex-1 flex-col items-center justify-center p-[var(--pos-content-padding)] text-center text-muted"
+        header={
+          <div className="flex items-center gap-3">
+            <h2
+              id="products-aside-title"
+              className="text-base font-bold tracking-tight text-foreground"
+            >
+              {t("asideTitle")}
+            </h2>
+          </div>
+        }
+      >
+        <EmptyState className="p-10">
+          <EmptyState.Media>
+            <IconPackage aria-hidden="true" size={24} />
+          </EmptyState.Media>
+          <EmptyState.Header>
+            <EmptyState.Title>{t("emptyTitle")}</EmptyState.Title>
+            <EmptyState.Description>
+              {t("emptyDescription")}
+            </EmptyState.Description>
+          </EmptyState.Header>
+        </EmptyState>
+      </POSAside>
+    );
   }
 
-  const isSelectedProductInList = productsToShow.some(
-    (product) => product.id === selectedProduct.id,
-  );
-  const selectedProductStatus = getProductStatus(selectedProduct);
+  const variantSkuPrefix =
+    selectedProduct.sku ?? selectedProduct.id.slice(0, 8).toUpperCase();
 
   return (
     <POSAside
       ariaLabelledBy="products-aside-title"
-      headerClassName="border-b border-border/70 p-[var(--pos-content-padding)]"
+      headerClassName="p-[var(--pos-content-padding)]"
       mainClassName="flex min-h-0 flex-col gap-5 overflow-y-auto px-[var(--pos-content-padding)] py-[var(--pos-content-padding)]"
       header={
         <>
           <div className="flex items-start justify-between gap-3">
             <div className="flex min-w-0 items-center gap-3">
-              <Avatar color="accent" size="sm" variant="soft">
-                <Avatar.Fallback>
-                  <IconPackage aria-hidden="true" size={18} />
-                </Avatar.Fallback>
-              </Avatar>
               <div className="min-w-0">
-                <p className="text-[10px] font-semibold tracking-[0.16em] text-muted">
-                  {t("asideEyebrow")}
-                </p>
                 <h2
                   id="products-aside-title"
                   className="truncate text-base font-bold tracking-tight text-foreground"
@@ -716,9 +783,20 @@ function ProductAside({
                 </h2>
               </div>
             </div>
-            <Chip className="shrink-0" color="accent" size="sm" variant="soft">
-              {t("asideCount", { count: productsToShow.length })}
-            </Chip>
+
+            <div className="flex items-center gap-1.5">
+              <ProductFormModal
+                mode="edit"
+                product={selectedProduct}
+              />
+              {onDeleteProduct ? (
+                <DeleteProductAlertDialog
+                  isIconOnly
+                  productName={selectedProduct.name[locale]}
+                  onDelete={() => onDeleteProduct(selectedProduct.id)}
+                />
+              ) : null}
+            </div>
           </div>
           <p className="mt-3 text-xs leading-5 text-muted">
             {t("asideDescription")}
@@ -726,30 +804,58 @@ function ProductAside({
         </>
       }
     >
-      <section
-        aria-labelledby="selected-product-title"
-        className="space-y-4"
-      >
-        <div
-          className="relative aspect-[16/10] overflow-hidden rounded-2xl bg-default"
+      <section aria-labelledby="selected-product-title" className="space-y-4">
+        <Carousel
+          aria-label={t("galleryLabel")}
+          getSlideLabel={(index, count) =>
+            t("gallerySlideLabel", { current: index + 1, total: count })
+          }
+          nextLabel={t("galleryNext")}
+          previousLabel={t("galleryPrevious")}
         >
-          <div
-            aria-label={selectedProduct.name[locale]}
-            className="absolute inset-0 bg-cover bg-center outline outline-1 -outline-offset-1 outline-black/10 dark:outline-white/10"
-            role="img"
-            style={{
-              backgroundImage: `url("${getProductImage(selectedProduct.id)}")`,
-            }}
-          />
-          <Chip
-            className="absolute end-3 top-3 border border-border/50 bg-surface/90 backdrop-blur"
-            color={selectedProductStatus === "active" ? "accent" : "default"}
-            size="sm"
-            variant="soft"
+          <Carousel.Content aria-label={t("gallerySlides")}>
+            {sizeIds.map((sizeId) => {
+              const variantLabel = t(productVariantDetails[sizeId].labelKey);
+
+              return (
+                <Carousel.Item
+                  className="relative aspect-[16/10] overflow-hidden rounded-2xl bg-default"
+                  key={sizeId}
+                >
+                  <div
+                    aria-label={`${selectedProduct.name[locale]} · ${variantLabel}`}
+                    className="absolute inset-0 bg-cover bg-center outline outline-1 -outline-offset-1 outline-black/10 dark:outline-white/10"
+                    role="img"
+                    style={{
+                      backgroundImage: `url("${getProductImage(`${selectedProduct.id}-${sizeId}`)}")`,
+                    }}
+                  />
+                </Carousel.Item>
+              );
+            })}
+          </Carousel.Content>
+          <Carousel.Previous />
+          <Carousel.Next />
+          <Carousel.Dots aria-label={t("galleryPagination")} />
+          <Carousel.Thumbnails
+            aria-label={t("galleryThumbnails")}
+            className="mt-2"
           >
-            {selectedProductStatus === "active" ? t("active") : t("inactive")}
-          </Chip>
-        </div>
+            {sizeIds.map((sizeId) => {
+              const variantLabel = t(productVariantDetails[sizeId].labelKey);
+
+              return (
+                <Carousel.Thumbnail
+                  aria-label={t("galleryShowVariant", {
+                    variant: variantLabel,
+                  })}
+                  key={sizeId}
+                  src={getProductImage(`${selectedProduct.id}-${sizeId}`)}
+                />
+              );
+            })}
+          </Carousel.Thumbnails>
+        </Carousel>
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
             <h3
@@ -780,68 +886,80 @@ function ProductAside({
           />
           <ProductMetadata
             label={t("stock")}
-            value={
-              getStockStatus(selectedProduct) === "inStock"
-                ? t("inStock")
-                : t("outOfStock")
-            }
+            value={t("stockAmount", {
+              count: getStockAmount(selectedProduct),
+            })}
           />
         </div>
       </section>
 
       <section
-        aria-labelledby="products-list-title"
-        className="space-y-2 border-t border-border/70 pt-4"
+        aria-labelledby="product-variants-title"
+        className="space-y-3 border-t border-border/70 pt-4"
       >
-        <h3
-          className="text-sm font-semibold text-foreground"
-          id="products-list-title"
-        >
-          {t("asideProducts")}
-        </h3>
-        <ListBox
-          aria-label={t("asideLabel")}
-          selectedKeys={
-            isSelectedProductInList
-              ? new Set([selectedProduct.id])
-              : new Set()
-          }
-          selectionMode="single"
-          onSelectionChange={(selection) => {
-            if (selection !== "all") {
-              const selectedKey = Array.from(selection)[0];
-
-              if (selectedKey) {
-                onSelectionChange(String(selectedKey));
-              }
-            }
-          }}
-        >
-          {productsToShow.map((product) => {
-            const productName = product.name[locale];
+        <div className="flex items-center justify-between gap-3">
+          <h3
+            className="text-sm font-semibold text-foreground"
+            id="product-variants-title"
+          >
+            {t("variants")}
+          </h3>
+          <span className="text-xs tabular-nums text-muted">
+            {t("variantCount", { count: sizeIds.length })}
+          </span>
+        </div>
+        <div className="space-y-2">
+          {sizeIds.map((sizeId) => {
+            const variant = productVariantDetails[sizeId];
+            const variantLabel = t(variant.labelKey);
 
             return (
-              <ListBox.Item
-                key={product.id}
-                id={product.id}
-                textValue={productName}
+              <div
+                className="flex items-center justify-between gap-3 rounded-xl border border-border/70 bg-surface px-3 py-2.5"
+                key={sizeId}
               >
-                <Avatar color="accent" size="sm" variant="soft">
-                  <Avatar.Image alt="" src={getProductImage(product.id)} />
-                  <Avatar.Fallback>{productName.charAt(0)}</Avatar.Fallback>
-                </Avatar>
-                <div className="flex min-w-0 flex-1 flex-col">
-                  <Label>{productName}</Label>
-                  <Description>
-                    {formatter.format(product.price)} ·{" "}
-                    {categoryLabels[product.category]}
-                  </Description>
+                <div className="flex min-w-0 items-center gap-3">
+                  <Avatar
+                    aria-hidden="true"
+                    className="shrink-0"
+                    color="accent"
+                    size="sm"
+                    variant="soft"
+                  >
+                    <Avatar.Image
+                      alt=""
+                      src={getProductImage(`${selectedProduct.id}-${sizeId}`)}
+                    />
+                    <Avatar.Fallback>{variantLabel.charAt(0)}</Avatar.Fallback>
+                  </Avatar>
+                  <div className="min-w-0">
+                    <p className="text-sm font-medium text-foreground">
+                      {variantLabel}
+                    </p>
+                    <p className="mt-0.5 truncate font-mono text-[11px] text-muted">
+                      {variantSkuPrefix}-{variant.skuSuffix}
+                    </p>
+                  </div>
                 </div>
-                <ListBox.ItemIndicator />
-              </ListBox.Item>
+                <div className="flex shrink-0 items-center gap-2">
+                  {sizeId === "medium" ? (
+                    <Chip color="accent" size="sm" variant="soft">
+                      {t("variantDefault")}
+                    </Chip>
+                  ) : null}
+                  <span className="text-sm font-semibold tabular-nums text-foreground">
+                    {formatter.format(
+                      Math.max(
+                        0,
+                        selectedProduct.price + variant.priceAdjustment,
+                      ),
+                    )}
+                  </span>
+                </div>
+              </div>
             );
           })}
-        </ListBox>
+        </div>
       </section>
     </POSAside>
   );
@@ -950,7 +1068,11 @@ function getProductStatus(product: Product): ProductStatus {
 }
 
 function getStockStatus(product: Product): Exclude<StockFilter, "all"> {
-  return product.inStock === false ? "outOfStock" : "inStock";
+  return getStockAmount(product) > 0 ? "inStock" : "outOfStock";
+}
+
+function getStockAmount(product: Product): number {
+  return product.stock ?? (product.inStock === false ? 0 : 50);
 }
 
 function compareProducts(

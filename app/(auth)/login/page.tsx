@@ -15,7 +15,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { authSessionStorageKey } from "@/config/auth";
 
-function GoogleLogo({ className = "size-5" }: { className?: string }) {
+function GoogleLogo() {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -32,7 +32,7 @@ function GoogleLogo({ className = "size-5" }: { className?: string }) {
   );
 }
 
-function FacebookLogo({ className = "size-5" }: { className?: string }) {
+function FacebookLogo() {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -60,7 +60,7 @@ function FacebookLogo({ className = "size-5" }: { className?: string }) {
   );
 }
 
-function AppleLogo({ className = "size-5" }: { className?: string }) {
+function AppleLogo() {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"

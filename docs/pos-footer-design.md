@@ -79,7 +79,7 @@ The public prop is only `className?: string`. Route and shortcut definitions, se
 - **Keep the one-row hierarchy:** preserve the fixed sign-out action, one scrollable route/action rail, and right-aligned shift metadata. It fits both sales and management pages without changing their content area.
 - **Use segment-aware active matching:** current matching uses `pathname.startsWith(href)`. Matching the route itself or a slash-delimited child avoids activating `/orders` on a similarly prefixed path such as `/orders-archive`.
 - **Localize the whole footer:** primary labels, sign-out copy, and cashier/shift labels use `SalesMenu`, but the nine shortcut labels and their toast text are hard-coded in English.
-- **Align the loading skeleton:** `POSFooterSkeleton` currently draws six navigation placeholders, while the live rail contains five destinations and nine shortcuts. Mirror the live grouping and overflow so the loading bar better represents the component that replaces it.
+- **Persistent footer navigation:** The loading skeleton was removed from the POS footer navigation in favor of rendering the live `POSFooter` directly during loading, eliminating route transition flicker and keeping navigation accessible at all times.
 - **Keep implementation status clear:** the current utility feedback is local demo behavior. Treating a toast as a completed drawer, printer, kitchen, or delivery operation would overstate what the UI does today.
 
 ## Component design contract

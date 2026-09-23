@@ -1,35 +1,72 @@
 "use client";
 
-import { Button } from "@heroui/react";
+import { ScrollShadow } from "@heroui/react";
 import { useTranslations } from "next-intl";
-import { useRouter } from "next/navigation";
-import { authSessionStorageKey } from "@/config/auth";
+import { useState } from "react";
+import { ChannelTenderCard } from "@/components/dashboard/channel-tender-card";
+import { DashboardHeroBanner } from "@/components/dashboard/dashboard-hero-banner";
+import {
+  DashboardToolbar,
+  type TimeRange,
+} from "@/components/dashboard/dashboard-toolbar";
+import { GradientKpiCards } from "@/components/dashboard/gradient-kpi-cards";
+import { TopProductsSurface } from "@/components/dashboard/top-products-surface";
+import { MonthlyRevenueCard } from "@/components/shared/montly-revenue-card";
+import { POSLayout } from "@/components/shared/pos-layout";
 
 export default function DashboardPage() {
   const t = useTranslations("Dashboard");
-  const router = useRouter();
-
-  const handleSignOut = () => {
-    window.sessionStorage.removeItem(authSessionStorageKey);
-    router.replace("/login");
-  };
+  const [selectedRange, setSelectedRange] = useState<TimeRange>("Today");
 
   return (
-    <main className="min-h-screen bg-background p-6 text-foreground sm:p-10">
-      <div className="mx-auto flex w-full max-w-full flex-col gap-6">
-        <div>
-          <h1 className="text-3xl font-semibold tracking-tight">{t("title")}</h1>
-          <p className="mt-2 text-muted">{t("description")}</p>
+    <POSLayout
+      contentPadding="comfortable"
+      headerTitle={t("title")}
+      showSearch={false}
+    >
+      <ScrollShadow className="flex h-full w-full flex-col overflow-y-auto">
+        <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 p-4 sm:p-6">
+          {/* Color Admin v4 Section 1: Dashboard Toolbar (Time Range & Actions) */}
+          <section aria-label="Dashboard toolbar and filters">
+            <DashboardToolbar
+              selectedRange={selectedRange}
+              onRangeChange={setSelectedRange}
+            />
+          </section>
+
+          {/* Color Admin v4 Section 2: Executive Revenue Hero Overview Banner */}
+          <section aria-label="Executive revenue banner">
+            <DashboardHeroBanner timeRange={selectedRange} />
+          </section>
+
+          {/* Color Admin v4 Section 3: Vibrant Gradient KPI Metric Cards with Background Watermarks */}
+          <section aria-label="Occupancy and loyalty metric cards">
+            <GradientKpiCards />
+          </section>
+
+          {/* Color Admin v4 Section 4: Performance Trends & Channel Distribution */}
+          <section
+            aria-label="Performance trends and channel distribution"
+            className="grid grid-cols-1 gap-5 lg:grid-cols-2"
+          >
+            {/* Monthly Revenue Chart */}
+            <MonthlyRevenueCard
+              currency="USD"
+              title="Monthly Sales Trend"
+              total={86400}
+              trend={{ direction: "up", value: "14.2%" }}
+            />
+
+            {/* Channel & Tender Distribution */}
+            <ChannelTenderCard />
+          </section>
+
+          {/* Color Admin v4 Section 5: Top Selling Products */}
+          <section aria-label="Top selling products">
+            <TopProductsSurface />
+          </section>
         </div>
-        <div className="flex items-center gap-3">
-          <Button type="button" variant="primary" onPress={() => router.push("/sales")}>
-            Open POS Register
-          </Button>
-          <Button type="button" variant="outline" onPress={handleSignOut}>
-            {t("signOut")}
-          </Button>
-        </div>
-      </div>
-    </main>
+      </ScrollShadow>
+    </POSLayout>
   );
 }

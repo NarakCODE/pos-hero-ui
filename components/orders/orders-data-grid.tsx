@@ -40,8 +40,6 @@ type PaymentStatusFilter = "all" | PaymentStatus;
 type PageSize = 25 | 50 | 100;
 
 const pageSizes: PageSize[] = [25, 50, 100];
-const linkClass = "text-muted hover:bg-surface hover:text-foreground";
-const activeClass = "bg-accent text-accent-foreground hover:bg-accent-hover";
 
 const statusFilterOptions: { id: StatusFilter; labelKey: string }[] = [
   { id: "all", labelKey: "statuses.all" },
@@ -250,7 +248,7 @@ export function OrdersDataGrid({
               onSelectionChange={handleSelectionChange}
               onSortChange={setSortDescriptor}
             >
-              <Table.Header className="sticky top-0 z-20 bg-surface text-foreground">
+              <Table.Header className="sticky top-0 z-20">
                 <Table.Column
                   allowsSorting
                   id="sequence"
@@ -442,18 +440,17 @@ function OrdersToolbar({
           </Button>
 
           <Popover.Content
-            className="w-85 max-w-[95vw] rounded-2xl border-0 bg-surface p-0 shadow-2xl sm:w-105"
+            className="w-85 max-w-[95vw] sm:w-105"
             placement="bottom end"
           >
-            <Popover.Dialog className="flex w-full flex-col p-0 text-start outline-none">
-              <div className="flex w-full items-center justify-between px-4 py-3">
+            <Popover.Dialog className="flex w-full flex-col">
+              <div className="flex w-full items-center justify-between border-b border-border/60 px-4 py-3">
                 <div className="flex items-center gap-2">
-                  <Popover.Heading className="text-start text-sm font-semibold text-foreground">
+                  <Popover.Heading>
                     {t("toolbar.filters")}
                   </Popover.Heading>
                   {activeFilterCount > 0 ? (
                     <Chip
-                      className="h-5 min-w-5 justify-center px-1 text-xs font-semibold"
                       color="accent"
                       size="sm"
                       variant="soft"
@@ -464,14 +461,12 @@ function OrdersToolbar({
                 </div>
                 {activeFilterCount > 0 ? (
                   <Button
-                    className="h-7 px-2 text-xs font-medium text-muted hover:text-foreground"
                     size="sm"
                     variant="ghost"
                     onPress={onResetFilters}
                   >
                     <IconRefresh
                       aria-hidden="true"
-                      className="mr-1 inline-block"
                       size={14}
                     />
                     {t("toolbar.reset")}
@@ -582,9 +577,7 @@ function FilterSelect<T extends string>({
         }
       }}
     >
-      <Label className="text-start text-xs font-semibold text-muted">
-        {label}
-      </Label>
+      <Label>{label}</Label>
       <Select.Trigger className="w-full justify-start text-start">
         <Select.Value>
           {({ defaultChildren, isPlaceholder }) => {
@@ -637,10 +630,11 @@ function OrderTableRows({
     <Table.Row
       id={order.id}
       textValue={`${order.orderCode} ${order.customerName}`}
-      className="cursor-pointer hover:bg-surface-secondary/50 data-[selected=true]:bg-accent/10 [&>td]:py-3"
     >
-      <Table.Cell className="text-center text-sm tabular-nums text-muted">
-        #{order.sequence}/1
+      <Table.Cell className="text-center">
+        <span className="text-sm tabular-nums text-muted">
+          #{order.sequence}/1
+        </span>
       </Table.Cell>
       <Table.Cell textValue={order.customerName}>
         <div className="min-w-0">
@@ -790,7 +784,6 @@ function TablePagination({
           <Pagination.Item>
             <Pagination.Previous
               aria-label={t("pagination.previous")}
-              className={linkClass}
               isDisabled={page === 1}
               onPress={() => onPageChange(Math.max(1, page - 1))}
             >
@@ -801,7 +794,6 @@ function TablePagination({
             (pageNumber) => (
               <Pagination.Item key={pageNumber}>
                 <Pagination.Link
-                  className={pageNumber === page ? activeClass : linkClass}
                   isActive={pageNumber === page}
                   onPress={() => onPageChange(pageNumber)}
                 >
@@ -813,7 +805,6 @@ function TablePagination({
           <Pagination.Item>
             <Pagination.Next
               aria-label={t("pagination.next")}
-              className={linkClass}
               isDisabled={page === totalPages}
               onPress={() => onPageChange(Math.min(totalPages, page + 1))}
             >

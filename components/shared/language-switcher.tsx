@@ -47,7 +47,7 @@ export function LanguageSwitcher({
       onChange={handleLocaleChange}
     >
       <Label className="sr-only">{t("label")}</Label>
-      <Select.Trigger className="flex items-center gap-2">
+      <Select.Trigger>
         <IconWorld aria-hidden="true" className="size-4 shrink-0 text-muted" />
         <Select.Value />
         <Select.Indicator />

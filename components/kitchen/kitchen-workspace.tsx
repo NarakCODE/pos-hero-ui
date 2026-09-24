@@ -82,7 +82,7 @@ function KitchenTicketList({
           >
             <Button
               aria-pressed={isSelected}
-              className="h-auto px-3 py-2.5"
+              className="h-auto"
               fullWidth
               onPress={() => onSelect(ticket.id)}
               size="lg"
@@ -533,97 +533,88 @@ export function KitchenWorkspace({
 
                   return (
                     <Card
-                      className={`overflow-hidden rounded scroll-mt-4 transition-all duration-200 ${
-                        isAllCompleted
-                          ? "border-success/30 bg-success/5"
-                          : ticket.priority === "rush"
-                            ? "border-danger/30"
-                            : ""
-                      }`}
+                      className="scroll-mt-4 overflow-hidden"
                       data-ticket-id={ticket.id}
                       id={`ticket-${ticket.id}`}
                       key={ticket.id}
                     >
-                      <Card.Header className="flex flex-col gap-3 border-b border-border/60 bg-surface-secondary/20 px-4 py-3 sm:flex-row sm:items-start sm:justify-between sm:px-5">
-                        <div className="flex min-w-0 flex-1 flex-col items-start gap-1 text-start">
-                          <div className="flex flex-wrap items-center gap-2 sm:gap-2.5 text-start">
-                            <Card.Title className="text-base font-bold text-foreground text-start">
-                              {ticket.tableNumber}
-                            </Card.Title>
-                            <span className="font-mono text-xs text-muted">
-                              {ticket.orderCode}
-                            </span>
-                            {ticket.priority === "rush" && (
-                              <Chip color="danger" size="sm" variant="soft">
-                                Rush
-                              </Chip>
-                            )}
-                            {ticket.priority === "vip" && (
-                              <Chip color="warning" size="sm" variant="soft">
-                                VIP
-                              </Chip>
-                            )}
-                            {ticket.serviceType &&
-                              ticket.serviceType !== "dineIn" && (
-                                <Chip color="accent" size="sm" variant="soft">
-                                  {ticket.serviceType === "takeaway"
-                                    ? "Takeaway"
-                                    : (ticket.channel ?? "Delivery")}
+                      <Card.Header>
+                        <div className="flex w-full flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                          <div className="flex min-w-0 flex-1 flex-col items-start gap-1 text-start">
+                            <div className="flex flex-wrap items-center gap-2 sm:gap-2.5 text-start">
+                              <Card.Title>
+                                {ticket.tableNumber}
+                              </Card.Title>
+                              <span className="font-mono text-xs text-muted">
+                                {ticket.orderCode}
+                              </span>
+                              {ticket.priority === "rush" && (
+                                <Chip color="danger" size="sm" variant="soft">
+                                  Rush
                                 </Chip>
                               )}
-                            {ticket.guestCount ? (
-                              <span className="text-xs text-muted">
-                                · {ticket.guestCount} guests
-                              </span>
-                            ) : null}
-                            {ticket.serverName ? (
-                              <span className="text-xs text-muted">
-                                · {ticket.serverName}
-                              </span>
-                            ) : null}
-                          </div>
-                        </div>
-
-                        <div className="flex shrink-0 flex-wrap items-center gap-3 sm:self-start sm:pt-0.5">
-                          <span className="text-xs text-muted">
-                            {t("readyCount", {
-                              completed: completedCount,
-                              total: ticket.dishes.length,
-                            })}
-                          </span>
-
-                          <div
-                            className={`flex items-center gap-1.5 text-xs ${
-                              isOverdue
-                                ? "text-danger font-semibold"
-                                : "text-muted"
-                            }`}
-                          >
-                            <IconClock aria-hidden="true" size={14} />
-                            <time className="font-mono font-medium text-foreground">
-                              {formatElapsedTime(
-                                ticket.elapsedSeconds + elapsedTick,
+                              {ticket.priority === "vip" && (
+                                <Chip color="warning" size="sm" variant="soft">
+                                  VIP
+                                </Chip>
                               )}
-                            </time>
+                              {ticket.serviceType &&
+                                ticket.serviceType !== "dineIn" && (
+                                  <Chip color="accent" size="sm" variant="soft">
+                                    {ticket.serviceType === "takeaway"
+                                      ? "Takeaway"
+                                      : (ticket.channel ?? "Delivery")}
+                                  </Chip>
+                                )}
+                              {ticket.guestCount ? (
+                                <span className="text-xs text-muted">
+                                  · {ticket.guestCount} guests
+                                </span>
+                              ) : null}
+                              {ticket.serverName ? (
+                                <span className="text-xs text-muted">
+                                  · {ticket.serverName}
+                                </span>
+                              ) : null}
+                            </div>
                           </div>
 
-                          <Button
-                            className={
-                              isAllCompleted
-                                ? "border border-success/30 bg-success-soft text-success-soft-foreground hover:bg-success-soft-hover active:bg-success-soft/90 [--button-bg:var(--success-soft)] [--button-fg:var(--success-soft-foreground)] [--button-bg-hover:var(--success-soft-hover)] [--button-bg-pressed:var(--success-soft-hover)]"
-                                : "bg-success text-white hover:bg-success/90 active:bg-success/80 [--button-bg:var(--success)] [--button-fg:white] [--button-bg-hover:color-mix(in_oklab,var(--success)_90%,black)] [--button-bg-pressed:color-mix(in_oklab,var(--success)_80%,black)]"
-                            }
-                            size="sm"
-                            variant="ghost"
-                            onPress={() => toggleCompleteAll(ticket.id)}
-                          >
-                            <IconCheck aria-hidden="true" size={15} />
-                            <span>
-                              {isAllCompleted
-                                ? t("allReady")
-                                : t("completeAll")}
+                          <div className="flex shrink-0 flex-wrap items-center gap-3 sm:self-start sm:pt-0.5">
+                            <span className="text-xs text-muted">
+                              {t("readyCount", {
+                                completed: completedCount,
+                                total: ticket.dishes.length,
+                              })}
                             </span>
-                          </Button>
+
+                            <div
+                              className={`flex items-center gap-1.5 text-xs ${
+                                isOverdue
+                                  ? "text-danger font-semibold"
+                                  : "text-muted"
+                              }`}
+                            >
+                              <IconClock aria-hidden="true" size={14} />
+                              <time className="font-mono font-medium text-foreground">
+                                {formatElapsedTime(
+                                  ticket.elapsedSeconds + elapsedTick,
+                                )}
+                              </time>
+                            </div>
+
+                            <Button
+                              size="sm"
+                              variant={isAllCompleted ? "secondary" : "primary"}
+                              onPress={() => toggleCompleteAll(ticket.id)}
+                            >
+                              <IconCheck aria-hidden="true" size={15} />
+                              <span>
+                                {isAllCompleted
+                                  ? t("allReady")
+                                  : t("completeAll")}
+                              </span>
+                            </Button>
+                          </div>
                         </div>
                       </Card.Header>
 
@@ -636,7 +627,7 @@ export function KitchenWorkspace({
                         </div>
                       )}
 
-                      <Card.Content className="p-4 sm:p-5">
+                      <Card.Content>
                         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
                           {ticket.dishes.map((dish) => {
                             const isDishCompleted = dish.status === "completed";
@@ -700,13 +691,8 @@ export function KitchenWorkspace({
 
                                 <div className="mt-3 flex items-center justify-end border-t border-border/40 pt-2.5">
                                   <Button
-                                    className={
-                                      isDishCompleted
-                                        ? "border border-success/30 bg-success-soft text-success-soft-foreground hover:bg-success-soft-hover active:bg-success-soft/90 [--button-bg:var(--success-soft)] [--button-fg:var(--success-soft-foreground)] [--button-bg-hover:var(--success-soft-hover)] [--button-bg-pressed:var(--success-soft-hover)]"
-                                        : "bg-success text-white hover:bg-success/90 active:bg-success/80 [--button-bg:var(--success)] [--button-fg:white] [--button-bg-hover:color-mix(in_oklab,var(--success)_90%,black)] [--button-bg-pressed:color-mix(in_oklab,var(--success)_80%,black)]"
-                                    }
                                     size="sm"
-                                    variant="ghost"
+                                    variant={isDishCompleted ? "secondary" : "primary"}
                                     onPress={() =>
                                       updateDishStatus(
                                         ticket.id,

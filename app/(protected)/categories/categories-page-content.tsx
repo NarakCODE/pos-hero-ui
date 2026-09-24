@@ -384,7 +384,7 @@ function CategoriesDataGrid({
               onSelectionChange={handleSelectionChange}
               onSortChange={setSortDescriptor}
             >
-              <Table.Header className="sticky top-0 z-20 bg-surface text-foreground">
+              <Table.Header className="sticky top-0 z-20">
                 <Table.Column allowsSorting id="name" isRowHeader>
                   {({ sortDirection }) => (
                     <Table.SortableColumnHeader sortDirection={sortDirection}>
@@ -548,7 +548,6 @@ function CategoryTableRow({
     <Table.Row
       id={category.id}
       textValue={`${name} ${category.id}`}
-      className="cursor-pointer hover:bg-surface-secondary/50 data-[selected=true]:bg-accent/10 [&>td]:py-3"
       onPress={() => onCategorySelect(category.id)}
     >
       <Table.Cell textValue={name}>
@@ -568,8 +567,10 @@ function CategoryTableRow({
           </div>
         </div>
       </Table.Cell>
-      <Table.Cell className="text-center text-sm font-medium tabular-nums text-foreground">
-        {productCount}
+      <Table.Cell className="text-center">
+        <span className="text-sm font-medium tabular-nums text-foreground">
+          {productCount}
+        </span>
       </Table.Cell>
       <Table.Cell className="text-center">
         <CategoryStatusChip status={category.status} />
@@ -886,61 +887,67 @@ function CategoryEditorModal({
             <Modal.Body>
               <Form
                 id="category-editor-form"
-                className="flex flex-col gap-5"
+                className="flex flex-col"
                 onSubmit={handleSubmit}
               >
-                <TextField
-                  className="w-full"
-                  isInvalid={isNameInvalid}
-                  isRequired
-                  name="name"
-                  value={name}
-                  variant="secondary"
-                  onChange={(value) => {
-                    setName(value);
-                    if (value.trim()) setIsNameInvalid(false);
-                  }}
-                >
-                  <Label>{t("nameLabel")}</Label>
-                  <Input
-                  autoComplete="off"
-                    id="category-name"
-                    maxLength={48}
-                    placeholder={t("namePlaceholder")}
-                  />
-                  <FieldError>{t("nameRequired")}</FieldError>
-                </TextField>
-                <TextField
-                  className="w-full"
-                  name="description"
-                  value={description}
-                  variant="secondary"
-                  onChange={setDescription}
-                >
-                  <Label>{t("descriptionLabel")}</Label>
-                  <TextArea
-                    maxLength={160}
-                    placeholder={t("descriptionPlaceholder")}
-                    rows={3}
-                  />
-                </TextField>
-                <Switch
-                  className="flex w-full items-center justify-between gap-4 rounded-xl border border-border/70 bg-surface-secondary/40 p-3"
-                  isSelected={isActive}
-                  onChange={setIsActive}
-                >
-                  <Switch.Content>
-                    <Label className="text-sm font-medium text-foreground">
-                      {t("activeCategory")}
-                    </Label>
-                    <p className="mt-0.5 text-xs text-muted">
-                      {t("activeCategoryDescription")}
-                    </p>
-                  </Switch.Content>
-                  <Switch.Control>
-                    <Switch.Thumb />
-                  </Switch.Control>
-                </Switch>
+                <div className="flex flex-col gap-5">
+                  <TextField
+                    className="w-full"
+                    isInvalid={isNameInvalid}
+                    isRequired
+                    name="name"
+                    value={name}
+                    variant="secondary"
+                    onChange={(value) => {
+                      setName(value);
+                      if (value.trim()) setIsNameInvalid(false);
+                    }}
+                  >
+                    <Label>{t("nameLabel")}</Label>
+                    <Input
+                      autoComplete="off"
+                      id="category-name"
+                      maxLength={48}
+                      placeholder={t("namePlaceholder")}
+                    />
+                    <FieldError>{t("nameRequired")}</FieldError>
+                  </TextField>
+                  <TextField
+                    className="w-full"
+                    name="description"
+                    value={description}
+                    variant="secondary"
+                    onChange={setDescription}
+                  >
+                    <Label>{t("descriptionLabel")}</Label>
+                    <TextArea
+                      maxLength={160}
+                      placeholder={t("descriptionPlaceholder")}
+                      rows={3}
+                    />
+                  </TextField>
+                  <div className="w-full rounded-xl border border-border/70 bg-surface-secondary/40 p-3">
+                    <Switch
+                      className="w-full"
+                      isSelected={isActive}
+                      onChange={setIsActive}
+                    >
+                      <Switch.Content className="flex w-full items-center justify-between">
+                        <div>
+                          <Label>
+                            {t("activeCategory")}
+                          </Label>
+                          <p className="mt-0.5 text-xs text-muted">
+                            {t("activeCategoryDescription")}
+                          </p>
+                        </div>
+                        <Switch.Control className="shrink-0">
+                          <Switch.Thumb />
+                        </Switch.Control>
+                      </Switch.Content>
+                    </Switch>
+                  </div>
+                </div>
               </Form>
             </Modal.Body>
             <Modal.Footer>
@@ -1000,7 +1007,7 @@ function DeleteCategoryAlertDialog({
             <AlertDialog.Body className="text-center">
               <p>{t("deleteDescription")}</p>
             </AlertDialog.Body>
-            <AlertDialog.Footer className="flex-col-reverse gap-2">
+            <AlertDialog.Footer className="flex-col-reverse">
               <Button className="w-full" slot="close" variant="secondary">
                 {t("cancel")}
               </Button>

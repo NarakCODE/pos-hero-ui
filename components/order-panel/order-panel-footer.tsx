@@ -55,10 +55,7 @@ export function SignOutAlertDialog({
           {trigger ?? confirmLabel}
         </Button>
       )}
-      <AlertDialog.Backdrop
-        className="bg-linear-to-t from-red-950/90 via-red-950/50 to-transparent dark:from-red-950/95 dark:via-red-950/60"
-        variant="blur"
-      >
+      <AlertDialog.Backdrop variant="blur">
         <AlertDialog.Container>
           <AlertDialog.Dialog
             className={`sm:max-w-[420px] ${className}`.trim()}
@@ -77,7 +74,7 @@ export function SignOutAlertDialog({
             <AlertDialog.Body className="text-center">
               <p>{body}</p>
             </AlertDialog.Body>
-            <AlertDialog.Footer className="flex-col-reverse gap-2">
+            <AlertDialog.Footer className="flex-col-reverse">
               <Button className="w-full" slot="close" variant="tertiary">
                 {cancelLabel}
               </Button>
@@ -269,11 +266,11 @@ export function OrderPanelFooter({
                   <Button
                     size="sm"
                     variant="danger-soft"
-                    className={`h-7 px-2.5 text-[11px] font-medium ${signOutTriggerClassName ?? ""}`}
+                    className={signOutTriggerClassName}
                   >
                     <IconLogout aria-hidden="true" size={24} />
 
-                    <span>{signOutTriggerLabel}</span>
+                    <span className="text-[11px] font-medium">{signOutTriggerLabel}</span>
                   </Button>
                 )
               }

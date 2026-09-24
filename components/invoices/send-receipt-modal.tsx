@@ -1,21 +1,18 @@
 "use client";
 
 import { useState } from "react";
+import type { Key } from "@heroui/react";
 import {
   Button,
   Input,
   Label,
+  ListBox,
   Modal,
+  Select,
   TextField,
   toast,
 } from "@heroui/react";
-import {
-  IconBrandTelegram,
-  IconBrandWhatsapp,
-  IconMail,
-  IconMessage2,
-  IconSend,
-} from "@tabler/icons-react";
+import { IconSend } from "@tabler/icons-react";
 import { formatUsd, type InvoiceRecord } from "./invoices-data";
 
 interface SendReceiptModalProps {
@@ -26,6 +23,13 @@ interface SendReceiptModalProps {
 
 type ChannelOption = "telegram" | "whatsapp" | "sms" | "email";
 
+const channelOptions: { id: ChannelOption; label: string }[] = [
+  { id: "telegram", label: "Telegram" },
+  { id: "whatsapp", label: "WhatsApp" },
+  { id: "sms", label: "SMS" },
+  { id: "email", label: "Email" },
+];
+
 export function SendReceiptModal({
   isOpen,
   onOpenChange,
@@ -35,29 +39,37 @@ export function SendReceiptModal({
   const [recipient, setRecipient] = useState(
     invoice?.customer.phone || invoice?.customer.email || "",
   );
-  const [includeVat, setIncludeVat] = useState(true);
 
   if (!invoice) return null;
 
-  const handleSend = (e?: React.FormEvent) => {
-    if (e) e.preventDefault();
+  const handleChannelChange = (value: Key | Key[] | null) => {
+    const key = Array.isArray(value) ? value[0] : value;
+    const option = channelOptions.find((candidate) => candidate.id === key);
+    if (!option) return;
 
-    if (!recipient.trim()) {
-      toast.danger("Please provide phone number or email");
+    setChannel(option.id);
+    setRecipient(
+      option.id === "email"
+        ? invoice.customer.email ?? ""
+        : invoice.customer.phone ?? "",
+    );
+  };
+
+  const handleSend = () => {
+    const destination = recipient.trim();
+    if (!destination) {
+      toast.danger("Enter a recipient.");
+      return;
+    }
+    if (channel === "email" && !/^\S+@\S+\.\S+$/.test(destination)) {
+      toast.danger("Enter a valid email address.");
       return;
     }
 
-    const channelNames: Record<ChannelOption, string> = {
-      telegram: "Telegram",
-      whatsapp: "WhatsApp",
-      sms: "SMS",
-      email: "Email",
-    };
-
-    toast.success(`E-Receipt sent via ${channelNames[channel]}`, {
-      description: `Dispatched to ${recipient} • ${formatUsd(invoice.totalUsd)}`,
+    const channelName = channelOptions.find((option) => option.id === channel)?.label;
+    toast.success(`Receipt sent via ${channelName}`, {
+      description: `${destination} · ${formatUsd(invoice.totalUsd)}`,
     });
-
     onOpenChange(false);
   };
 
@@ -66,153 +78,71 @@ export function SendReceiptModal({
       <Modal.Container size="sm">
         <Modal.Dialog>
           <Modal.Header>
-            <div className="flex items-center gap-2.5">
-              <div className="flex size-9 items-center justify-center rounded-xl bg-accent/15 text-accent">
-                <IconSend size={20} />
-              </div>
-              <div>
-                <Modal.Heading>
-                  Send Digital E-Receipt
-                </Modal.Heading>
-                <p className="text-xs text-muted">
-                  Invoice {invoice.receiptNumber} ({formatUsd(invoice.totalUsd)})
-                </p>
-              </div>
+            <div>
+              <Modal.Heading>Send receipt</Modal.Heading>
+              <p className="text-sm text-muted">
+                {invoice.receiptNumber} · {formatUsd(invoice.totalUsd)}
+              </p>
             </div>
             <Modal.CloseTrigger />
           </Modal.Header>
 
-          <Modal.Body className="space-y-4">
-            {/* Channel Selection */}
-            <div className="space-y-1.5">
-              <Label>Delivery Channel</Label>
-              <div className="grid grid-cols-2 gap-2">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setChannel("telegram");
-                    if (!recipient && invoice.customer.phone)
-                      setRecipient(invoice.customer.phone);
-                  }}
-                  className={`flex items-center gap-2 rounded-xl border p-2.5 text-start text-xs transition-colors ${
-                    channel === "telegram"
-                      ? "border-accent bg-accent/10 font-semibold text-accent"
-                      : "border-border bg-surface-secondary/40 text-foreground hover:bg-surface-secondary"
-                  }`}
-                >
-                  <IconBrandTelegram size={18} className="text-blue-500" />
-                  <span>Telegram</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    setChannel("whatsapp");
-                    if (!recipient && invoice.customer.phone)
-                      setRecipient(invoice.customer.phone);
-                  }}
-                  className={`flex items-center gap-2 rounded-xl border p-2.5 text-start text-xs transition-colors ${
-                    channel === "whatsapp"
-                      ? "border-accent bg-accent/10 font-semibold text-accent"
-                      : "border-border bg-surface-secondary/40 text-foreground hover:bg-surface-secondary"
-                  }`}
-                >
-                  <IconBrandWhatsapp size={18} className="text-emerald-500" />
-                  <span>WhatsApp</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    setChannel("sms");
-                    if (!recipient && invoice.customer.phone)
-                      setRecipient(invoice.customer.phone);
-                  }}
-                  className={`flex items-center gap-2 rounded-xl border p-2.5 text-start text-xs transition-colors ${
-                    channel === "sms"
-                      ? "border-accent bg-accent/10 font-semibold text-accent"
-                      : "border-border bg-surface-secondary/40 text-foreground hover:bg-surface-secondary"
-                  }`}
-                >
-                  <IconMessage2 size={18} className="text-amber-500" />
-                  <span>SMS</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    setChannel("email");
-                    if (invoice.customer.email)
-                      setRecipient(invoice.customer.email);
-                  }}
-                  className={`flex items-center gap-2 rounded-xl border p-2.5 text-start text-xs transition-colors ${
-                    channel === "email"
-                      ? "border-accent bg-accent/10 font-semibold text-accent"
-                      : "border-border bg-surface-secondary/40 text-foreground hover:bg-surface-secondary"
-                  }`}
-                >
-                  <IconMail size={18} className="text-purple-500" />
-                  <span>Email</span>
-                </button>
-              </div>
-            </div>
-
-            {/* Recipient Input */}
-            <TextField
-              fullWidth
-              aria-label="Recipient Contact"
-              value={recipient}
-              onChange={setRecipient}
-            >
-              <Label>
-                {channel === "email"
-                  ? "Customer Email Address"
-                  : "Customer Mobile Number"}
-              </Label>
-              <Input
-                placeholder={
-                  channel === "email"
-                    ? "customer@domain.com"
-                    : "+855 12 345 678"
-                }
+          <Modal.Body>
+            <div className="flex flex-col gap-4">
+              <Select
+                aria-label="Delivery method"
+                fullWidth
+                value={channel}
                 variant="secondary"
-              />
-            </TextField>
+                onChange={handleChannelChange}
+              >
+                <Label>Delivery method</Label>
+                <Select.Trigger>
+                  <Select.Value />
+                  <Select.Indicator />
+                </Select.Trigger>
+                <Select.Popover>
+                  <ListBox>
+                    {channelOptions.map((option) => (
+                      <ListBox.Item
+                        key={option.id}
+                        id={option.id}
+                        textValue={option.label}
+                      >
+                        {option.label}
+                        <ListBox.ItemIndicator />
+                      </ListBox.Item>
+                    ))}
+                  </ListBox>
+                </Select.Popover>
+              </Select>
 
-            {/* VAT Invoice Attachment Option */}
-            <div className="flex items-center justify-between rounded-xl bg-surface-secondary/70 p-3 text-xs">
-              <div className="flex flex-col">
-                <span className="font-semibold text-foreground">
-                  Attach Official Tax Invoice
-                </span>
-                <span className="text-[11px] text-muted">
-                  Includes GDT Tax Invoice PDF with VAT TIN
-                </span>
-              </div>
-              <input
-                type="checkbox"
-                checked={includeVat}
-                onChange={(e) => setIncludeVat(e.target.checked)}
-                className="size-4 rounded border-border text-accent focus:ring-accent"
-              />
+              <TextField
+                fullWidth
+                aria-label="Recipient"
+                value={recipient}
+                onChange={setRecipient}
+              >
+                <Label>{channel === "email" ? "Email address" : "Phone number"}</Label>
+                <Input
+                  type={channel === "email" ? "email" : "tel"}
+                  autoComplete={channel === "email" ? "email" : "tel"}
+                  placeholder={
+                    channel === "email" ? "name@example.com" : "+855 12 345 678"
+                  }
+                  variant="secondary"
+                />
+              </TextField>
             </div>
           </Modal.Body>
 
           <Modal.Footer>
-            <Button
-              variant="outline"
-              size="md"
-              onPress={() => onOpenChange(false)}
-            >
+            <Button variant="outline" onPress={() => onOpenChange(false)}>
               Cancel
             </Button>
-            <Button
-              variant="primary"
-              size="md"
-              onPress={() => handleSend()}
-            >
-              <IconSend size={16} />
-              <span>Send E-Receipt</span>
+            <Button variant="primary" onPress={handleSend}>
+              <IconSend aria-hidden="true" size={16} />
+              Send receipt
             </Button>
           </Modal.Footer>
         </Modal.Dialog>

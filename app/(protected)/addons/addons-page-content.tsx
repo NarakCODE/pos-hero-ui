@@ -348,7 +348,7 @@ function AddOnsDataGrid({
               onSelectionChange={handleSelectionChange}
               onSortChange={setSortDescriptor}
             >
-              <Table.Header className="sticky top-0 z-20 bg-surface text-foreground">
+              <Table.Header className="sticky top-0 z-20">
                 <Table.Column allowsSorting id="name" isRowHeader>
                   {({ sortDirection }) => (
                     <Table.SortableColumnHeader sortDirection={sortDirection}>
@@ -519,7 +519,7 @@ function AddOnTableRow({
     <Table.Row
       id={addOn.id}
       textValue={`${name} ${groupLabels[addOn.group]}`}
-      className="cursor-pointer hover:bg-surface-secondary/50 data-[selected=true]:bg-accent/10 [&>td]:py-3"
+      className="cursor-pointer"
       onPress={() => onAddOnSelect(addOn.id)}
     >
       <Table.Cell textValue={name}>
@@ -530,11 +530,15 @@ function AddOnTableRow({
           <p className="truncate text-xs text-muted">{t("menuModifier")}</p>
         </div>
       </Table.Cell>
-      <Table.Cell className="text-sm text-muted">
-        {groupLabels[addOn.group]}
+      <Table.Cell>
+        <span className="text-sm text-muted">
+          {groupLabels[addOn.group]}
+        </span>
       </Table.Cell>
-      <Table.Cell className="text-end text-sm font-semibold tabular-nums text-foreground">
-        {formatter.format(addOn.price)}
+      <Table.Cell className="text-end">
+        <span className="text-sm font-semibold tabular-nums text-foreground">
+          {formatter.format(addOn.price)}
+        </span>
       </Table.Cell>
       <Table.Cell className="text-center">
         <AddOnStatusChip status={addOn.status} />
@@ -755,101 +759,115 @@ function AddOnEditorModal({
             <Modal.Body>
               <Form
                 id="addon-editor-form"
-                className="flex flex-col gap-5"
+                className="flex flex-col"
                 onSubmit={handleSubmit}
               >
-                <TextField
-                  className="w-full"
-                  isInvalid={isNameInvalid}
-                  isRequired
-                  name="name"
-                  value={name}
-                  variant="secondary"
-                  onChange={(value) => {
-                    setName(value);
-                    if (value.trim()) setIsNameInvalid(false);
-                  }}
-                >
-                  <Label>{t("nameLabel")}</Label>
-                  <Input
-                    autoComplete="off"
-                    id="addon-name"
-                    maxLength={48}
-                    placeholder={t("namePlaceholder")}
-                  />
-                  <FieldError>{t("nameRequired")}</FieldError>
-                </TextField>
+                <div className="flex flex-col gap-5">
+                  <TextField
+                    className="w-full"
+                    isInvalid={isNameInvalid}
+                    isRequired
+                    name="name"
+                    value={name}
+                    variant="secondary"
+                    onChange={(value) => {
+                      setName(value);
+                      if (value.trim()) setIsNameInvalid(false);
+                    }}
+                  >
+                    <Label>{t("nameLabel")}</Label>
+                    <Input
+                      autoComplete="off"
+                      id="addon-name"
+                      maxLength={48}
+                      placeholder={t("namePlaceholder")}
+                    />
+                    <FieldError>{t("nameRequired")}</FieldError>
+                  </TextField>
 
-                <RadioGroup
-                  className="w-full gap-3"
-                  name="addon-group"
-                  value={group}
-                  variant="secondary"
-                  onChange={(value) => {
-                    const nextGroup = value as AddOnGroup;
-                    if (groupIds.includes(nextGroup)) {
-                      setGroup(nextGroup);
-                    }
-                  }}
-                >
-                  <Label>{t("groupLabel")}</Label>
-                  <Description>{t("groupDescription")}</Description>
-                  <div className="grid gap-2 sm:grid-cols-2">
-                    {groupOptions.map((option) => (
-                      <Radio key={option.id} value={option.id}>
-                        <Radio.Content className="flex min-h-14 w-full items-center gap-3 rounded-xl border border-default bg-surface p-3 data-[selected=true]:bg-surface-secondary">
-                          <Radio.Control>
-                            <Radio.Indicator />
-                          </Radio.Control>
-                          {option.label}
-                        </Radio.Content>
-                      </Radio>
-                    ))}
+                  <RadioGroup
+                    className="w-full"
+                    name="addon-group"
+                    value={group}
+                    variant="secondary"
+                    onChange={(value) => {
+                      const nextGroup = value as AddOnGroup;
+                      if (groupIds.includes(nextGroup)) {
+                        setGroup(nextGroup);
+                      }
+                    }}
+                  >
+                    <Label>{t("groupLabel")}</Label>
+                    <Description>{t("groupDescription")}</Description>
+                    <div className="grid gap-2 sm:grid-cols-2">
+                      {groupOptions.map((option) => (
+                        <Radio key={option.id} value={option.id}>
+                          {({ isSelected }) => (
+                            <Radio.Content className="w-full">
+                              <div
+                                className={`flex min-h-14 w-full items-center gap-3 rounded-xl border border-default p-3 ${
+                                  isSelected
+                                    ? "bg-surface-secondary"
+                                    : "bg-surface"
+                                }`}
+                              >
+                                <Radio.Control>
+                                  <Radio.Indicator />
+                                </Radio.Control>
+                                {option.label}
+                              </div>
+                            </Radio.Content>
+                          )}
+                        </Radio>
+                      ))}
+                    </div>
+                  </RadioGroup>
+
+                  <TextField
+                    className="w-full"
+                    isInvalid={isPriceInvalid}
+                    isRequired
+                    name="price"
+                    type="number"
+                    value={price}
+                    variant="secondary"
+                    onChange={(value) => {
+                      setPrice(value);
+                      if (value.trim() && Number.isFinite(Number(value)) && Number(value) >= 0) {
+                        setIsPriceInvalid(false);
+                      }
+                    }}
+                  >
+                    <Label>{t("priceLabel")}</Label>
+                    <Input
+                      id="addon-price"
+                      min="0"
+                      placeholder={formatter.format(0.5)}
+                      step="0.25"
+                    />
+                    <FieldError>{t("priceInvalid")}</FieldError>
+                  </TextField>
+
+                  <div className="flex w-full items-center justify-between gap-4 rounded-xl border border-border/70 bg-surface-secondary/40 p-3">
+                    <Switch
+                      className="flex w-full items-center justify-between"
+                      isSelected={isActive}
+                      onChange={setIsActive}
+                    >
+                      <Switch.Content>
+                        <Label>
+                          {t("activeAddOn")}
+                        </Label>
+                        <p className="mt-0.5 text-xs text-muted">
+                          {t("activeDescription")}
+                        </p>
+                      </Switch.Content>
+                      <Switch.Control>
+                        <Switch.Thumb />
+                      </Switch.Control>
+                    </Switch>
                   </div>
-                </RadioGroup>
-
-                <TextField
-                  className="w-full"
-                  isInvalid={isPriceInvalid}
-                  isRequired
-                  name="price"
-                  type="number"
-                  value={price}
-                  variant="secondary"
-                  onChange={(value) => {
-                    setPrice(value);
-                    if (value.trim() && Number.isFinite(Number(value)) && Number(value) >= 0) {
-                      setIsPriceInvalid(false);
-                    }
-                  }}
-                >
-                  <Label>{t("priceLabel")}</Label>
-                  <Input
-                    id="addon-price"
-                    min="0"
-                    placeholder={formatter.format(0.5)}
-                    step="0.25"
-                  />
-                  <FieldError>{t("priceInvalid")}</FieldError>
-                </TextField>
-
-                <Switch
-                  className="flex w-full items-center justify-between gap-4 rounded-xl border border-border/70 bg-surface-secondary/40 p-3"
-                  isSelected={isActive}
-                  onChange={setIsActive}
-                >
-                  <Switch.Content>
-                    <Label className="text-sm font-medium text-foreground">
-                      {t("activeAddOn")}
-                    </Label>
-                    <p className="mt-0.5 text-xs text-muted">
-                      {t("activeDescription")}
-                    </p>
-                  </Switch.Content>
-                  <Switch.Control>
-                    <Switch.Thumb />
-                  </Switch.Control>
-                </Switch>
+                </div>
               </Form>
             </Modal.Body>
             <Modal.Footer>
@@ -906,7 +924,7 @@ function DeleteAddOnAlertDialog({
             <AlertDialog.Body className="text-center">
               <p>{t("deleteDescription")}</p>
             </AlertDialog.Body>
-            <AlertDialog.Footer className="flex-col-reverse gap-2">
+            <AlertDialog.Footer className="flex-col-reverse">
               <Button className="w-full" slot="close" variant="secondary">
                 {t("cancel")}
               </Button>

@@ -380,9 +380,8 @@ function PromotionModalDialog({
                     isIconOnly
                     aria-label="Remove applied promotion"
                     onPress={handleRemove}
-                    className="size-7 text-muted hover:text-danger"
                   >
-                    <IconTrash aria-hidden="true" size={15} />
+                    <IconTrash aria-hidden="true" size={15} className="text-muted hover:text-danger" />
                   </Button>
                 ) : null}
               </div>
@@ -404,7 +403,7 @@ function PromotionModalDialog({
 
             {/* Optional search promotions */}
             {promotions.length > 3 ? (
-              <InputGroup fullWidth variant="secondary" className="h-8 text-xs">
+              <InputGroup fullWidth variant="secondary">
                 <InputGroup.Prefix>
                   <IconSearch aria-hidden="true" size={14} className="text-muted" />
                 </InputGroup.Prefix>
@@ -412,7 +411,6 @@ function PromotionModalDialog({
                   placeholder="Search promotions..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="text-xs"
                 />
                 {searchQuery ? (
                   <InputGroup.Suffix>
@@ -521,9 +519,8 @@ function PromotionModalDialog({
               <InputGroup
                 fullWidth
                 variant="secondary"
-                className={`flex-1 ${
-                  errorMessage ? "border-danger focus-within:border-danger" : ""
-                }`}
+                isInvalid={Boolean(errorMessage)}
+                className="flex-1"
               >
                 <InputGroup.Prefix>
                   <IconDiscount aria-hidden="true" size={18} className="text-muted" />
@@ -546,7 +543,6 @@ function PromotionModalDialog({
                       handleApplyCode();
                     }
                   }}
-                  className="text-xs sm:text-sm"
                 />
 
                 {promoCodeInput ? (
@@ -573,7 +569,7 @@ function PromotionModalDialog({
                 variant="secondary"
                 onPress={() => handleApplyCode()}
                 isDisabled={!promoCodeInput.trim()}
-                className="shrink-0 font-medium"
+                className="shrink-0"
               >
                 Verify
               </Button>
@@ -643,7 +639,7 @@ function PromotionModalDialog({
       </Modal.Body>
 
       {/* 5. Footer Buttons */}
-      <Modal.Footer className="w-full flex-col gap-2 sm:flex-row">
+      <Modal.Footer className="w-full flex-col sm:flex-row">
         {appliedPromotion && onRemovePromotion ? (
           <Button
             type="button"
@@ -651,10 +647,12 @@ function PromotionModalDialog({
             size="lg"
             fullWidth
             onPress={handleRemove}
-            className="text-danger hover:bg-danger/10 sm:flex-1"
+            className="sm:flex-1"
           >
-            <IconTrash aria-hidden="true" size={18} />
-            <span>Remove promotion</span>
+            <span className="flex items-center gap-1.5 text-danger">
+              <IconTrash aria-hidden="true" size={18} />
+              <span>Remove promotion</span>
+            </span>
           </Button>
         ) : null}
 
@@ -676,7 +674,7 @@ function PromotionModalDialog({
           fullWidth
           isDisabled={!selectedPromo || isCurrentPromotionAlreadyApplied}
           onPress={handleConfirmApply}
-          className="sm:flex-1 font-semibold"
+          className="sm:flex-1"
         >
           {isCurrentPromotionAlreadyApplied
             ? "Applied"

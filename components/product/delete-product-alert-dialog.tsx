@@ -47,10 +47,7 @@ export function DeleteProductAlertDialog({
   return (
     <AlertDialog>
       {trigger ?? defaultTrigger}
-      <AlertDialog.Backdrop
-        className="bg-linear-to-t from-red-950/90 via-red-950/50 to-transparent dark:from-red-950/95 dark:via-red-950/60"
-        variant="blur"
-      >
+      <AlertDialog.Backdrop variant="blur">
         <AlertDialog.Container>
           <AlertDialog.Dialog className="sm:max-w-105">
             <AlertDialog.CloseTrigger />
@@ -67,7 +64,7 @@ export function DeleteProductAlertDialog({
             <AlertDialog.Body className="text-center">
               <p>{t("deleteProductBody")}</p>
             </AlertDialog.Body>
-            <AlertDialog.Footer className="flex-col-reverse gap-2">
+            <AlertDialog.Footer className="flex-col-reverse">
               <Button className="w-full" slot="close" variant="tertiary">
                 {t("deleteProductCancel")}
               </Button>

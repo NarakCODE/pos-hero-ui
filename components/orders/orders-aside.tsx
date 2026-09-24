@@ -61,12 +61,11 @@ export function OrdersAside({ selectedOrderId }: OrdersAsideProps) {
         <div className="grid grid-cols-2 gap-2">
           <Button
             fullWidth
-            className="border border-success/20 bg-success-soft text-success hover:border-success/30 hover:bg-success/15"
             isDisabled={isPending}
             isPending={isPending && pendingAction === "accept"}
             size="lg"
             type="button"
-            variant="ghost"
+            variant="primary"
             onPress={() => handleAction("accept")}
           >
             {({ isPending: buttonPending }) =>

@@ -67,14 +67,14 @@ export function CashInOutModal({
   return (
     <Modal.Backdrop isOpen={isOpen} onOpenChange={onOpenChange}>
       <Modal.Container size="sm">
-        <Modal.Dialog className="rounded-2xl bg-surface">
-          <Modal.Header className="border-b border-border p-4">
+        <Modal.Dialog>
+          <Modal.Header>
             <div className="flex items-center gap-2.5">
               <div className="flex size-9 items-center justify-center rounded-xl bg-accent/15 text-accent">
                 <IconCash size={20} />
               </div>
               <div className="flex flex-col">
-                <Modal.Heading className="text-base font-bold text-foreground">
+                <Modal.Heading>
                   Cash In / Cash Out
                 </Modal.Heading>
                 <p className="text-xs text-muted">
@@ -85,14 +85,14 @@ export function CashInOutModal({
             <Modal.CloseTrigger />
           </Modal.Header>
 
-          <Modal.Body className="flex flex-col gap-4 p-4">
+          <Modal.Body>
+            <div className="flex flex-col gap-4">
             {/* Type Switcher */}
             <div className="grid grid-cols-2 gap-2 rounded-xl bg-surface-secondary p-1">
               <Button
                 size="sm"
                 variant={transactionType === "in" ? "primary" : "ghost"}
                 onPress={() => setTransactionType("in")}
-                className="gap-1.5"
               >
                 <IconArrowDownLeft size={16} />
                 <span>Cash In (Deposit)</span>
@@ -101,7 +101,6 @@ export function CashInOutModal({
                 size="sm"
                 variant={transactionType === "out" ? "primary" : "ghost"}
                 onPress={() => setTransactionType("out")}
-                className="gap-1.5"
               >
                 <IconArrowUpRight size={16} />
                 <span>Cash Out (Payout)</span>
@@ -113,13 +112,13 @@ export function CashInOutModal({
               aria-label="Amount"
               value={amount}
               onChange={setAmount}
-              className="flex flex-col gap-1.5"
+              fullWidth
             >
-              <Label className="text-xs font-medium text-foreground">
+              <Label>
                 Amount ($ USD)
               </Label>
-              <InputGroup variant="secondary" className="h-11">
-                <InputGroup.Prefix className="font-semibold text-foreground">
+              <InputGroup variant="secondary">
+                <InputGroup.Prefix>
                   $
                 </InputGroup.Prefix>
                 <InputGroup.Input
@@ -127,7 +126,6 @@ export function CashInOutModal({
                   type="number"
                   step="0.01"
                   autoFocus
-                  className="text-base font-semibold"
                 />
               </InputGroup>
             </TextField>
@@ -160,21 +158,21 @@ export function CashInOutModal({
               aria-label="Reason or notes"
               value={reason}
               onChange={setReason}
-              className="flex flex-col gap-1.5"
+              fullWidth
             >
-              <Label className="text-xs font-medium text-foreground">
+              <Label>
                 Reason / Note
               </Label>
-              <InputGroup variant="secondary" className="h-10">
+              <InputGroup variant="secondary">
                 <InputGroup.Input
                   placeholder="e.g. Bought fresh milk, Added morning float..."
-                  className="text-xs sm:text-sm"
                 />
               </InputGroup>
             </TextField>
+            </div>
           </Modal.Body>
 
-          <Modal.Footer className="flex items-center justify-end gap-2 border-t border-border p-4">
+          <Modal.Footer>
             <Button
               variant="outline"
               size="md"

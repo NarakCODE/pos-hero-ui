@@ -105,7 +105,7 @@ export function BrandWalletPaymentModal({
             </div>
           </Modal.Body>
 
-          <Modal.Footer className="w-full flex-col gap-2 sm:flex-row">
+          <Modal.Footer className="w-full flex-col sm:flex-row">
             <Button
               className="sm:flex-1"
               fullWidth
@@ -156,12 +156,14 @@ function BalanceCard({
   value: string;
 }) {
   return (
-    <Surface className="flex min-h-24 flex-col justify-between gap-3 p-4" variant="secondary">
-      <div className="flex items-center gap-2 text-xs text-muted">
-        {icon}
-        <span>{label}</span>
+    <Surface variant="secondary">
+      <div className="flex min-h-24 flex-col justify-between gap-3 p-4">
+        <div className="flex items-center gap-2 text-xs text-muted">
+          {icon}
+          <span>{label}</span>
+        </div>
+        <span className="text-xl font-semibold tabular-nums">{value}</span>
       </div>
-      <span className="text-xl font-semibold tabular-nums">{value}</span>
     </Surface>
   );
 }

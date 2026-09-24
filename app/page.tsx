@@ -84,7 +84,7 @@ export default function Home() {
               aria-hidden="true"
               className="absolute -inset-5 rounded-[2rem] bg-accent/10 blur-2xl"
             />
-            <Card className="relative overflow-hidden border border-border bg-surface shadow-xl">
+            <Card className="relative overflow-hidden">
               <div className="relative aspect-[4/3] overflow-hidden">
                 <Image
                   fill
@@ -117,22 +117,24 @@ export default function Home() {
                 </div>
               </div>
 
-              <Card.Footer className="grid grid-cols-2 gap-4 p-5 sm:p-6">
-                <div>
-                  <p className="text-xs font-medium text-muted">
-                    {t("previewRevenue")}
-                  </p>
-                  <p className="mt-1 text-2xl font-semibold tracking-tight text-foreground">
-                    {t("previewRevenueValue")}
-                  </p>
-                </div>
-                <div className="text-end">
-                  <p className="text-xs font-medium text-muted">
-                    {t("previewOrders")}
-                  </p>
-                  <p className="mt-1 text-sm font-semibold text-foreground">
-                    {t("previewOrdersValue")}
-                  </p>
+              <Card.Footer>
+                <div className="grid w-full grid-cols-2 gap-4">
+                  <div>
+                    <p className="text-xs font-medium text-muted">
+                      {t("previewRevenue")}
+                    </p>
+                    <p className="mt-1 text-2xl font-semibold tracking-tight text-foreground">
+                      {t("previewRevenueValue")}
+                    </p>
+                  </div>
+                  <div className="text-end">
+                    <p className="text-xs font-medium text-muted">
+                      {t("previewOrders")}
+                    </p>
+                    <p className="mt-1 text-sm font-semibold text-foreground">
+                      {t("previewOrdersValue")}
+                    </p>
+                  </div>
                 </div>
               </Card.Footer>
             </Card>
@@ -162,15 +164,17 @@ export default function Home() {
             <div className="mt-10 grid gap-4 md:grid-cols-3">
               {features.map(({ description, icon: Icon, title }) => (
                 <Card key={title} className="h-full" variant="secondary">
-                  <Card.Header className="gap-5">
-                    <div className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-accent-soft text-accent">
-                      <Icon aria-hidden="true" size={24} />
-                    </div>
-                    <div>
-                      <Card.Title className="text-lg">{title}</Card.Title>
-                      <Card.Description className="mt-2 text-sm leading-6">
-                        {description}
-                      </Card.Description>
+                  <Card.Header>
+                    <div className="flex items-start gap-4">
+                      <div className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-accent-soft text-accent">
+                        <Icon aria-hidden="true" size={24} />
+                      </div>
+                      <div>
+                        <Card.Title>{title}</Card.Title>
+                        <Card.Description>
+                          {description}
+                        </Card.Description>
+                      </div>
                     </div>
                   </Card.Header>
                 </Card>

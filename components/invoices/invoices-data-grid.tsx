@@ -1,11 +1,11 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import type { Selection, SortDescriptor } from "@heroui/react";
+import type { Key, Selection, SortDescriptor } from "@heroui/react";
 import {
-  Avatar,
   Button,
   Chip,
+  Label,
   ListBox,
   Pagination,
   Popover,
@@ -16,22 +16,16 @@ import {
   toast,
 } from "@heroui/react";
 import {
+  IconAdjustmentsHorizontal,
   IconAlertTriangle,
   IconCheck,
-  IconClock,
-  IconCreditCard,
   IconDownload,
-  IconFilter,
   IconPrinter,
-  IconQrcode,
   IconReceipt,
   IconReceiptRefund,
   IconRotateClockwise,
-  IconWallet,
 } from "@tabler/icons-react";
-import { getOrderChannelAvatarSrc } from "@/components/order-channel-select";
 import {
-  formatKhr,
   formatUsd,
   type InvoiceRecord,
   type InvoiceStatus,
@@ -44,9 +38,9 @@ type StatusFilter = "all" | InvoiceStatus;
 type ShiftFilter = "all" | OrderShift | "yesterday" | "last7days";
 type TenderFilter = "all" | PaymentMethod;
 type ChannelFilter = "all" | OrderChannel;
-type PageSize = 10 | 25 | 50;
+type PageSize = 25 | 50 | 100;
 
-const pageSizes: PageSize[] = [10, 25, 50];
+const pageSizes: PageSize[] = [25, 50, 100];
 
 const statusFilterTabs: { id: StatusFilter; label: string }[] = [
   { id: "all", label: "All Receipts" },
@@ -84,7 +78,6 @@ const channelFilterOptions: { id: ChannelFilter; label: string }[] = [
 
 interface InvoicesDataGridProps {
   invoices: InvoiceRecord[];
-  selectedInvoiceId: string | null;
   onInvoiceSelect: (invoiceId: string) => void;
   onBatchPrint?: (invoiceIds: string[]) => void;
   onBatchSettle?: (invoiceIds: string[]) => void;
@@ -94,7 +87,6 @@ interface InvoicesDataGridProps {
 
 export function InvoicesDataGrid({
   invoices,
-  selectedInvoiceId,
   onInvoiceSelect,
   onBatchPrint,
   onBatchSettle,
@@ -108,19 +100,19 @@ export function InvoicesDataGrid({
   const [channelFilter, setChannelFilter] = useState<ChannelFilter>("all");
   const [selectedKeys, setSelectedKeys] = useState<Selection>(new Set());
   const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState<PageSize>(10);
+  const [pageSize, setPageSize] = useState<PageSize>(25);
   const [sortDescriptor, setSortDescriptor] = useState<SortDescriptor>({
     column: "date",
     direction: "descending",
   });
 
   // Active filters count
-  const activeFiltersCount =
-    (statusFilter !== "all" ? 1 : 0) +
+  const activeFilterCount =
     (shiftFilter !== "all" ? 1 : 0) +
     (tenderFilter !== "all" ? 1 : 0) +
-    (channelFilter !== "all" ? 1 : 0) +
-    (query.trim() ? 1 : 0);
+    (channelFilter !== "all" ? 1 : 0);
+  const hasActiveFilters =
+    activeFilterCount > 0 || statusFilter !== "all" || query.trim() !== "";
 
   const resetFilters = () => {
     setQuery("");
@@ -308,38 +300,24 @@ export function InvoicesDataGrid({
         {/* Status Tabs with count badges */}
         <div className="flex min-w-0 items-center justify-between gap-2 border-b border-border/60">
           <Tabs
+            className="min-w-0"
             selectedKey={statusFilter}
             variant="secondary"
             onSelectionChange={(key) => {
-              setStatusFilter(key as StatusFilter);
+              setStatusFilter(String(key) as StatusFilter);
               setPage(1);
             }}
-            className="min-w-0 flex-1"
           >
-            <Tabs.ListContainer className="min-w-0">
+            <Tabs.ListContainer>
               <Tabs.List aria-label="Filter receipts by status">
                 {statusFilterTabs.map((tab) => {
-                  const count =
-                    tab.id === "all"
-                      ? invoices.length
-                      : invoices.filter((i) => i.status === tab.id).length;
-
                   return (
                     <Tabs.Tab
                       key={tab.id}
                       id={tab.id}
                       className="w-auto shrink-0 whitespace-nowrap"
                     >
-                      <span>{tab.label}</span>
-                      <span
-                        className={`rounded-full px-1.5 py-0.5 text-[10px] tabular-nums font-semibold ${
-                          statusFilter === tab.id
-                            ? "bg-accent text-accent-foreground"
-                            : "bg-surface-secondary text-muted"
-                        }`}
-                      >
-                        {count}
-                      </span>
+                      {tab.label}
                       <Tabs.Indicator />
                     </Tabs.Tab>
                   );
@@ -362,16 +340,16 @@ export function InvoicesDataGrid({
           </div>
         </div>
 
-        {/* Search Bar & Smart Filter Popovers */}
-        <div className="flex w-full min-w-0 shrink-0 flex-wrap items-center gap-2 px-[var(--pos-content-padding)] py-2.5">
+        {/* Search and advanced filters */}
+        <div className="flex w-full min-w-0 shrink-0 items-center gap-2 px-[var(--pos-content-padding)] py-3">
           <SearchField
             aria-label="Search invoices and receipts"
-            className="min-w-0 flex-1 basis-56"
+            className="min-w-0 flex-1"
             fullWidth
             value={query}
             variant="secondary"
-            onChange={(val) => {
-              setQuery(val);
+            onChange={(value) => {
+              setQuery(value);
               setPage(1);
             }}
           >
@@ -382,150 +360,87 @@ export function InvoicesDataGrid({
             </SearchField.Group>
           </SearchField>
 
-          {/* Shift / Date Popover Filter */}
           <Popover>
             <Button
-              aria-label={`Filter by date or shift: ${shiftFilterOptions.find((option) => option.id === shiftFilter)?.label ?? "All dates"}`}
-              size="md"
-              variant={shiftFilter !== "all" ? "primary" : "secondary"}
+              aria-label="Invoice filters"
+              className="relative h-10 w-10 min-w-10 shrink-0"
+              isIconOnly
+              variant="secondary"
             >
-              <IconClock aria-hidden="true" size={16} />
-              <span className="hidden max-w-48 truncate xl:inline">
-                {shiftFilterOptions.find((o) => o.id === shiftFilter)?.label ||
-                  "Date/Shift"}
-              </span>
+              <IconAdjustmentsHorizontal aria-hidden="true" size={18} />
+              {activeFilterCount > 0 ? (
+                <Chip
+                  className="absolute -inset-e-1 -top-1"
+                  color="accent"
+                  size="sm"
+                  variant="soft"
+                >
+                  {activeFilterCount}
+                </Chip>
+              ) : null}
             </Button>
+
             <Popover.Content placement="bottom end">
-              <Popover.Dialog className="w-56">
-                <div className="p-2 text-xs">
-                  <div className="mb-2 px-2 py-1 font-semibold text-foreground">
-                    Filter by Shift / Date
-                  </div>
-                  <div className="space-y-1">
-                    {shiftFilterOptions.map((opt) => (
-                      <button
-                        key={opt.id}
-                        type="button"
-                        onClick={() => {
-                          setShiftFilter(opt.id);
-                          setPage(1);
-                        }}
-                        className={`flex w-full items-center justify-between rounded-lg px-2.5 py-1.5 text-start transition-colors ${
-                          shiftFilter === opt.id
-                            ? "bg-accent font-semibold text-accent-foreground"
-                            : "text-foreground hover:bg-surface-secondary"
-                        }`}
+              <Popover.Dialog>
+                <div className="w-80 max-w-[95vw] sm:w-96">
+                  <div className="flex w-full items-center justify-between px-4 py-3">
+                    <div className="flex items-center gap-2">
+                      <Popover.Heading>Filters</Popover.Heading>
+                      {activeFilterCount > 0 ? (
+                        <Chip color="accent" size="sm" variant="soft">
+                          {activeFilterCount}
+                        </Chip>
+                      ) : null}
+                    </div>
+
+                    {hasActiveFilters ? (
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onPress={resetFilters}
                       >
-                        <span>{opt.label}</span>
-                        {shiftFilter === opt.id && <IconCheck size={14} />}
-                      </button>
-                    ))}
+                        <IconRotateClockwise aria-hidden="true" size={14} />
+                        Reset
+                      </Button>
+                    ) : null}
+                  </div>
+
+                  <div className="max-h-[70vh] space-y-4 overflow-y-auto p-4">
+                    <InvoiceFilterSelect
+                      ariaLabel="Filter by date or shift"
+                      label="Date and shift"
+                      options={shiftFilterOptions}
+                      selectedValue={shiftFilter}
+                      onChange={(value) => {
+                        setShiftFilter(value);
+                        setPage(1);
+                      }}
+                    />
+                    <InvoiceFilterSelect
+                      ariaLabel="Filter by payment tender"
+                      label="Payment tender"
+                      options={tenderFilterOptions}
+                      selectedValue={tenderFilter}
+                      onChange={(value) => {
+                        setTenderFilter(value);
+                        setPage(1);
+                      }}
+                    />
+                    <InvoiceFilterSelect
+                      ariaLabel="Filter by service channel"
+                      label="Service channel"
+                      options={channelFilterOptions}
+                      selectedValue={channelFilter}
+                      onChange={(value) => {
+                        setChannelFilter(value);
+                        setPage(1);
+                      }}
+                    />
                   </div>
                 </div>
               </Popover.Dialog>
             </Popover.Content>
           </Popover>
-
-          {/* Payment Tender Popover Filter */}
-          <Popover>
-            <Button
-              aria-label={`Filter by payment tender: ${tenderFilterOptions.find((option) => option.id === tenderFilter)?.label ?? "All payment tenders"}`}
-              size="md"
-              variant={tenderFilter !== "all" ? "primary" : "secondary"}
-            >
-              <IconWallet aria-hidden="true" size={16} />
-              <span className="hidden max-w-48 truncate xl:inline">
-                {tenderFilterOptions.find((o) => o.id === tenderFilter)?.label ||
-                  "Tender"}
-              </span>
-            </Button>
-            <Popover.Content placement="bottom end">
-              <Popover.Dialog className="w-56">
-                <div className="p-2 text-xs">
-                  <div className="mb-2 px-2 py-1 font-semibold text-foreground">
-                    Payment Tender
-                  </div>
-                  <div className="space-y-1">
-                    {tenderFilterOptions.map((opt) => (
-                      <button
-                        key={opt.id}
-                        type="button"
-                        onClick={() => {
-                          setTenderFilter(opt.id);
-                          setPage(1);
-                        }}
-                        className={`flex w-full items-center justify-between rounded-lg px-2.5 py-1.5 text-start transition-colors ${
-                          tenderFilter === opt.id
-                            ? "bg-accent font-semibold text-accent-foreground"
-                            : "text-foreground hover:bg-surface-secondary"
-                        }`}
-                      >
-                        <span>{opt.label}</span>
-                        {tenderFilter === opt.id && <IconCheck size={14} />}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              </Popover.Dialog>
-            </Popover.Content>
-          </Popover>
-
-          {/* Channel Popover Filter */}
-          <Popover>
-            <Button
-              aria-label={`Filter by service channel: ${channelFilterOptions.find((option) => option.id === channelFilter)?.label ?? "All channels"}`}
-              size="md"
-              variant={channelFilter !== "all" ? "primary" : "secondary"}
-            >
-              <IconFilter aria-hidden="true" size={16} />
-              <span className="hidden max-w-48 truncate xl:inline">
-                {channelFilterOptions.find((o) => o.id === channelFilter)
-                  ?.label || "Channel"}
-              </span>
-            </Button>
-            <Popover.Content placement="bottom end">
-              <Popover.Dialog className="w-52">
-                <div className="p-2 text-xs">
-                  <div className="mb-2 px-2 py-1 font-semibold text-foreground">
-                    Service Channel
-                  </div>
-                  <div className="space-y-1">
-                    {channelFilterOptions.map((opt) => (
-                      <button
-                        key={opt.id}
-                        type="button"
-                        onClick={() => {
-                          setChannelFilter(opt.id);
-                          setPage(1);
-                        }}
-                        className={`flex w-full items-center justify-between rounded-lg px-2.5 py-1.5 text-start transition-colors ${
-                          channelFilter === opt.id
-                            ? "bg-accent font-semibold text-accent-foreground"
-                            : "text-foreground hover:bg-surface-secondary"
-                        }`}
-                      >
-                        <span>{opt.label}</span>
-                        {channelFilter === opt.id && <IconCheck size={14} />}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              </Popover.Dialog>
-            </Popover.Content>
-          </Popover>
-
-          {/* Reset Filters */}
-          {activeFiltersCount > 0 && (
-            <Button
-              aria-label="Reset filters"
-              size="md"
-              variant="outline"
-              onPress={resetFilters}
-            >
-              <IconRotateClockwise aria-hidden="true" size={16} />
-              <span className="hidden xl:inline">Reset</span>
-            </Button>
-          )}
         </div>
 
         {/* Batch Action Bar if items are selected */}
@@ -577,52 +492,38 @@ export function InvoicesDataGrid({
               onSortChange={setSortDescriptor}
             >
               <Table.Header className="sticky top-0 z-20">
-                <Table.Column allowsSorting id="sequence" className="w-24">
+                <Table.Column allowsSorting id="sequence" className="w-36">
                   {({ sortDirection }) => (
                     <Table.SortableColumnHeader sortDirection={sortDirection}>
-                      Receipt #
+                      Receipt
                     </Table.SortableColumnHeader>
                   )}
                 </Table.Column>
 
-                <Table.Column allowsSorting id="date" className="w-32">
+                <Table.Column allowsSorting id="date" className="w-28">
                   {({ sortDirection }) => (
                     <Table.SortableColumnHeader sortDirection={sortDirection}>
-                      Time / Date
+                      Date
                     </Table.SortableColumnHeader>
                   )}
                 </Table.Column>
 
-                <Table.Column allowsSorting id="customer">
+                <Table.Column allowsSorting id="customer" className="min-w-36">
                   {({ sortDirection }) => (
                     <Table.SortableColumnHeader sortDirection={sortDirection}>
-                      Customer & Member
+                      Customer
                     </Table.SortableColumnHeader>
                   )}
-                </Table.Column>
-
-                <Table.Column id="channel" className="w-36">
-                  Table / Channel
-                </Table.Column>
-
-                <Table.Column id="cashier" className="w-32">
-                  Station / Cashier
-                </Table.Column>
-
-                <Table.Column id="items">Items Summary</Table.Column>
-
-                <Table.Column id="tender" className="w-36">
-                  Payment Tender
                 </Table.Column>
 
                 <Table.Column
                   allowsSorting
                   id="total"
-                  className="w-28 text-end"
+                  className="w-24 text-end"
                 >
                   {({ sortDirection }) => (
                     <Table.SortableColumnHeader sortDirection={sortDirection}>
-                      Total Bill
+                      Total
                     </Table.SortableColumnHeader>
                   )}
                 </Table.Column>
@@ -639,7 +540,7 @@ export function InvoicesDataGrid({
                   )}
                 </Table.Column>
 
-                <Table.Column id="actions" className="w-20 text-center">
+                <Table.Column id="actions" className="w-28 text-end">
                   Actions
                 </Table.Column>
               </Table.Header>
@@ -668,9 +569,6 @@ export function InvoicesDataGrid({
                 )}
               >
                 {(inv) => {
-                  const isSelected = selectedInvoiceId === inv.id;
-                  const channelAvatar = getOrderChannelAvatarSrc(inv.channel);
-
                   const statusColor:
                     | "success"
                     | "danger"
@@ -684,11 +582,6 @@ export function InvoicesDataGrid({
                           ? "default"
                           : "warning";
 
-                  const totalItemsCount = inv.items.reduce(
-                    (sum, i) => sum + i.quantity,
-                    0,
-                  );
-
                   return (
                     <Table.Row
                       key={inv.id}
@@ -696,26 +589,26 @@ export function InvoicesDataGrid({
                       textValue={`${inv.receiptNumber} ${inv.customer.name}`}
                       onClick={() => onInvoiceSelect(inv.id)}
                     >
-                      {/* Receipt & Sequence */}
+                      {/* Receipt */}
                       <Table.Cell>
                         <div className="flex flex-col">
-                          <span className="font-mono text-xs font-bold text-foreground">
+                          <span className="font-mono text-xs font-semibold text-foreground">
                             {inv.receiptNumber}
                           </span>
-                          <span className="text-[10px] text-muted tabular-nums">
-                            Seq #{inv.sequence} • {inv.orderCode}
+                          <span className="text-[10px] text-muted">
+                            {inv.orderCode}
                           </span>
                         </div>
                       </Table.Cell>
 
-                      {/* Date & Time */}
+                      {/* Date */}
                       <Table.Cell>
                         <div className="flex flex-col text-xs">
-                          <span className="font-medium text-foreground tabular-nums">
-                            {inv.time}
-                          </span>
-                          <span className="text-[10px] text-muted">
+                          <span className="font-medium text-foreground">
                             {inv.date}
+                          </span>
+                          <span className="text-[10px] text-muted tabular-nums">
+                            {inv.time}
                           </span>
                         </div>
                       </Table.Cell>
@@ -723,16 +616,9 @@ export function InvoicesDataGrid({
                       {/* Customer */}
                       <Table.Cell>
                         <div className="flex flex-col">
-                          <div className="flex items-center gap-1.5">
-                            <span className="font-semibold text-foreground text-xs">
-                              {inv.customer.name}
-                            </span>
-                            {inv.customer.loyaltyTier && (
-                              <span className="rounded bg-surface-secondary px-1 py-0.2 text-[9px] font-semibold uppercase text-accent">
-                                {inv.customer.loyaltyTier}
-                              </span>
-                            )}
-                          </div>
+                          <span className="text-xs font-medium text-foreground">
+                            {inv.customer.name || "Walk-in"}
+                          </span>
                           {inv.customer.phone && (
                             <span className="text-[10px] text-muted tabular-nums">
                               {inv.customer.phone}
@@ -741,82 +627,11 @@ export function InvoicesDataGrid({
                         </div>
                       </Table.Cell>
 
-                      {/* Table / Channel */}
-                      <Table.Cell>
-                        <div className="flex items-center gap-1.5">
-                          {inv.channel !== "pos" && channelAvatar ? (
-                            <Avatar size="sm">
-                              <Avatar.Image src={channelAvatar} alt={inv.channel} />
-                              <Avatar.Fallback>
-                                {inv.channel.slice(0, 2).toUpperCase()}
-                              </Avatar.Fallback>
-                            </Avatar>
-                          ) : null}
-                          <div className="flex flex-col text-xs">
-                            <span className="font-medium text-foreground">
-                              {inv.orderType === "dineIn"
-                                ? inv.tableNumber
-                                : inv.orderType === "takeaway"
-                                  ? "Takeaway"
-                                  : `Delivery (${inv.channel})`}
-                            </span>
-                            <span className="text-[10px] text-muted capitalize">
-                              {inv.channel}
-                            </span>
-                          </div>
-                        </div>
-                      </Table.Cell>
-
-                      {/* Station / Cashier */}
-                      <Table.Cell>
-                        <div className="flex flex-col text-xs">
-                          <span className="text-foreground">
-                            {inv.cashierName}
-                          </span>
-                          <span className="text-[10px] text-muted">
-                            {inv.registerId} • {inv.shift}
-                          </span>
-                        </div>
-                      </Table.Cell>
-
-                      {/* Items Summary */}
-                      <Table.Cell>
-                        <div className="max-w-[180px] truncate text-xs">
-                          <span className="font-medium text-foreground">
-                            {totalItemsCount} item{totalItemsCount > 1 ? "s" : ""}:{" "}
-                          </span>
-                          <span className="text-muted">
-                            {inv.items.map((i) => `${i.quantity}x ${i.name}`).join(", ")}
-                          </span>
-                        </div>
-                      </Table.Cell>
-
-                      {/* Payment Tender */}
-                      <Table.Cell>
-                        <div className="flex items-center gap-1.5 text-xs">
-                          {inv.paymentMethod === "cash" ? (
-                            <IconWallet size={16} className="text-emerald-500" />
-                          ) : inv.paymentMethod === "khqr" ? (
-                            <IconQrcode size={16} className="text-accent" />
-                          ) : (
-                            <IconCreditCard size={16} className="text-blue-500" />
-                          )}
-                          <span className="font-medium text-foreground">
-                            {inv.tenderLabel}
-                          </span>
-                        </div>
-                      </Table.Cell>
-
                       {/* Total Amount */}
                       <Table.Cell className="text-end">
-                        <div className="flex flex-col items-end">
-                          <span className="text-xs font-bold tabular-nums text-foreground">
-                            {formatUsd(inv.totalUsd)}
-                          </span>
-                          <span className="text-[10px] tabular-nums text-muted">
-                            {formatKhr(inv.totalKhr)}
-                          </span>
-                        </div>
+                        <span className="text-xs font-semibold tabular-nums text-foreground">
+                          {formatUsd(inv.totalUsd)}
+                        </span>
                       </Table.Cell>
 
                       {/* Status */}
@@ -826,20 +641,20 @@ export function InvoicesDataGrid({
                           size="sm"
                           variant="soft"
                         >
-                          {inv.status.toUpperCase()}
+                          {inv.status.charAt(0).toUpperCase() + inv.status.slice(1)}
                         </Chip>
                       </Table.Cell>
 
                       {/* Actions */}
-                      <Table.Cell className="text-center">
+                      <Table.Cell className="text-end">
                         <div
-                          className="flex items-center justify-center gap-1"
+                          className="flex items-center justify-end gap-1"
                           onClick={(e) => e.stopPropagation()}
                         >
                           <Button
                             isIconOnly
                             size="sm"
-                            variant="ghost"
+                            variant="outline"
                             aria-label={`Print ${inv.receiptNumber}`}
                             onPress={() => {
                               onInvoiceSelect(inv.id);
@@ -854,7 +669,7 @@ export function InvoicesDataGrid({
                             <Button
                               isIconOnly
                               size="sm"
-                              variant="ghost"
+                              variant="outline"
                               aria-label={`Refund ${inv.receiptNumber}`}
                               onPress={() => onQuickRefund(inv)}
                             >
@@ -868,7 +683,7 @@ export function InvoicesDataGrid({
                               <Button
                                 isIconOnly
                                 size="sm"
-                                variant="danger"
+                                variant="outline"
                                 aria-label={`Void ${inv.receiptNumber}`}
                                 onPress={() => onQuickVoid(inv)}
                               >
@@ -887,49 +702,42 @@ export function InvoicesDataGrid({
       </div>
 
       {/* 4. Table Pagination Footer */}
-      <div className="flex shrink-0 items-center justify-between gap-3 border-t border-border/80 bg-surface px-[var(--pos-content-padding)] py-2.5">
-        <div className="flex items-center gap-2 text-xs text-muted">
-          <span>Rows per page:</span>
-          <Select
-            aria-label="Rows per page"
-            className="w-20"
-            value={String(pageSize)}
-            variant="secondary"
-            onChange={(val) => {
-              if (val) {
-                setPageSize(Number(val) as PageSize);
-                setPage(1);
-              }
-            }}
-          >
-            <Select.Trigger>
-              <Select.Value />
-              <Select.Indicator />
-            </Select.Trigger>
-            <Select.Popover>
-              <ListBox>
-                {pageSizes.map((size) => (
-                  <ListBox.Item
-                    key={size}
-                    id={String(size)}
-                    textValue={String(size)}
-                  >
-                    {size}
-                    <ListBox.ItemIndicator />
-                  </ListBox.Item>
-                ))}
-              </ListBox>
-            </Select.Popover>
-          </Select>
+      <div className="flex w-full shrink-0 items-center justify-between gap-3 border-t border-border/80 bg-surface px-[var(--pos-content-padding)] py-2.5">
+        <Select
+          aria-label="Rows per page"
+          className="w-28 shrink-0"
+          value={String(pageSize)}
+          variant="secondary"
+          onChange={(value) => {
+            const nextPageSize = Number(normalizeFilterValue(value));
 
-          <span className="hidden sm:inline">
-            Showing {(safePage - 1) * pageSize + 1}–
-            {Math.min(safePage * pageSize, sortedInvoices.length)} of{" "}
-            {sortedInvoices.length} invoices
-          </span>
-        </div>
+            if (pageSizes.includes(nextPageSize as PageSize)) {
+              setPageSize(nextPageSize as PageSize);
+              setPage(1);
+            }
+          }}
+        >
+          <Select.Trigger>
+            <Select.Value />
+            <Select.Indicator />
+          </Select.Trigger>
+          <Select.Popover>
+            <ListBox>
+              {pageSizes.map((size) => (
+                <ListBox.Item
+                  key={size}
+                  id={String(size)}
+                  textValue={String(size)}
+                >
+                  {size}
+                  <ListBox.ItemIndicator />
+                </ListBox.Item>
+              ))}
+            </ListBox>
+          </Select.Popover>
+        </Select>
 
-        <Pagination className="justify-end" size="sm">
+        <Pagination className="justify-end">
           <Pagination.Content>
             <Pagination.Item>
               <Pagination.Previous
@@ -945,7 +753,6 @@ export function InvoicesDataGrid({
               (p) => (
                 <Pagination.Item key={p}>
                   <Pagination.Link
-                    aria-label={`Page ${p}`}
                     isActive={safePage === p}
                     onPress={() => setPage(p)}
                   >
@@ -969,4 +776,74 @@ export function InvoicesDataGrid({
       </div>
     </div>
   );
+}
+
+type InvoiceFilterOption<T extends string> = {
+  id: T;
+  label: string;
+};
+
+function InvoiceFilterSelect<T extends string>({
+  ariaLabel,
+  label,
+  onChange,
+  options,
+  selectedValue,
+}: {
+  ariaLabel: string;
+  label: string;
+  onChange: (value: T) => void;
+  options: InvoiceFilterOption<T>[];
+  selectedValue: T;
+}) {
+  const currentOption = options.find((option) => option.id === selectedValue);
+
+  return (
+    <Select
+      aria-label={ariaLabel}
+      className="w-full"
+      value={selectedValue}
+      variant="secondary"
+      onChange={(value) => {
+        const nextValue = normalizeFilterValue(value);
+
+        if (nextValue) {
+          onChange(nextValue as T);
+        }
+      }}
+    >
+      <Label>{label}</Label>
+      <Select.Trigger className="w-full justify-start text-start">
+        <Select.Value>
+          {({ defaultChildren, isPlaceholder }) => {
+            if (isPlaceholder || !currentOption) {
+              return defaultChildren;
+            }
+
+            return <span>{currentOption.label}</span>;
+          }}
+        </Select.Value>
+        <Select.Indicator />
+      </Select.Trigger>
+      <Select.Popover placement="bottom start">
+        <ListBox>
+          {options.map((option) => (
+            <ListBox.Item
+              className="text-start"
+              id={option.id}
+              key={option.id}
+              textValue={option.label}
+            >
+              {option.label}
+              <ListBox.ItemIndicator />
+            </ListBox.Item>
+          ))}
+        </ListBox>
+      </Select.Popover>
+    </Select>
+  );
+}
+
+function normalizeFilterValue(value: Key | Key[] | null): string {
+  return Array.isArray(value) ? String(value[0] ?? "") : String(value ?? "");
 }

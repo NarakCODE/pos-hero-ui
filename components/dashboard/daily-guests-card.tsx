@@ -29,7 +29,7 @@ export function DailyGuestsCard({
 
   return (
     <Card className={`relative justify-between overflow-hidden ${className}`}>
-      <Card.Header className="relative z-10 flex flex-col items-start gap-2 pb-2">
+      <Card.Header className="relative z-10 flex flex-col items-start">
         <div className="flex items-baseline gap-2">
           <span className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl tabular-nums">
             {amount}
@@ -40,7 +40,7 @@ export function DailyGuestsCard({
           </span>
         </div>
 
-        <Card.Title className="text-base font-medium text-foreground">
+        <Card.Title>
           {displayTitle}
         </Card.Title>
 

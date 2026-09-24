@@ -195,90 +195,91 @@ export function PaymentSuccessfulModal({
         <Modal.Dialog
           aria-describedby={subtitle ? subtitleId : undefined}
           aria-labelledby={headingId}
-          className={`max-w-[420px] rounded-3xl p-6 ${className ?? ""}`}
+          className={`max-w-[420px] ${className ?? ""}`.trim()}
         >
           <Modal.CloseTrigger />
 
           {/* Top circular blue badge with checkmark icon, heading & subtitle */}
-          <Modal.Header className="flex flex-col items-center p-0 text-center">
+          <Modal.Header className="flex flex-col items-center">
             <div className="flex size-16 items-center justify-center rounded-full bg-blue-600 text-white shadow-md">
               <IconCheck aria-hidden="true" size={32} stroke={2.5} />
             </div>
 
-            <Modal.Heading
-              className="mt-4 text-xl font-bold tracking-tight text-foreground sm:text-2xl"
-              id={headingId}
-            >
-              {title}
+            <Modal.Heading id={headingId}>
+              <span className="mt-4 block text-center text-xl font-bold tracking-tight text-foreground sm:text-2xl">
+                {title}
+              </span>
             </Modal.Heading>
 
             {subtitle ? (
-              <p className="mt-1.5 text-sm text-muted" id={subtitleId}>
+              <p className="mt-1.5 text-center text-sm text-muted" id={subtitleId}>
                 {subtitle}
               </p>
             ) : null}
           </Modal.Header>
 
           {/* Payment Details Section */}
-          <Modal.Body className="mt-6 space-y-4 p-0">
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <h3 className="text-sm font-semibold text-foreground">
-                  {sectionTitle}
-                </h3>
-                {orderNumber ? (
-                  <span className="text-xs font-medium text-muted">
-                    #{orderNumber}
-                  </span>
-                ) : null}
-              </div>
-
-              {/* Key-Value Breakdown Card */}
-              <div className="divide-y divide-border rounded-2xl border border-border bg-surface-secondary/50 p-4">
-                {/* Total Payment */}
-                <div className="flex items-center justify-between pb-3 text-sm">
-                  <span className="text-muted">{totalPaymentLabel}</span>
-                  <span className="font-semibold tabular-nums text-foreground">
-                    {totalPayment}
-                  </span>
+          <Modal.Body>
+            <div className="space-y-4">
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-sm font-semibold text-foreground">
+                    {sectionTitle}
+                  </h3>
+                  {orderNumber ? (
+                    <span className="text-xs font-medium text-muted">
+                      #{orderNumber}
+                    </span>
+                  ) : null}
                 </div>
 
-                {/* Payment Method with Banknote Icon */}
-                <div className="flex items-center justify-between py-3 text-sm">
-                  <span className="text-muted">{paymentMethodLabel}</span>
-                  <span className="inline-flex items-center gap-1.5 font-medium text-foreground">
-                    {paymentMethodIcon}
-                    <span>{paymentMethod}</span>
-                  </span>
+                {/* Key-Value Breakdown Card */}
+                <div className="divide-y divide-border rounded-2xl border border-border bg-surface-secondary/50 p-4">
+                  {/* Total Payment */}
+                  <div className="flex items-center justify-between pb-3 text-sm">
+                    <span className="text-muted">{totalPaymentLabel}</span>
+                    <span className="font-semibold tabular-nums text-foreground">
+                      {totalPayment}
+                    </span>
+                  </div>
+
+                  {/* Payment Method with Banknote Icon */}
+                  <div className="flex items-center justify-between py-3 text-sm">
+                    <span className="text-muted">{paymentMethodLabel}</span>
+                    <span className="inline-flex items-center gap-1.5 font-medium text-foreground">
+                      {paymentMethodIcon}
+                      <span>{paymentMethod}</span>
+                    </span>
+                  </div>
+
+                  {/* Customer Pays */}
+                  <div className="flex items-center justify-between pt-3 text-sm">
+                    <span className="text-muted">{customerPaysLabel}</span>
+                    <span className="font-medium tabular-nums text-foreground">
+                      {customerPays}
+                    </span>
+                  </div>
                 </div>
 
-                {/* Customer Pays */}
-                <div className="flex items-center justify-between pt-3 text-sm">
-                  <span className="text-muted">{customerPaysLabel}</span>
-                  <span className="font-medium tabular-nums text-foreground">
-                    {customerPays}
+                {/* Highlighted Summary Row for Change (neutral border & surface, no soft color outline) */}
+                <div className="flex items-center justify-between rounded-2xl border border-border bg-surface-secondary px-4 py-3.5">
+                  <span className="text-sm font-semibold text-foreground">
+                    {changeLabel}
+                  </span>
+                  <span className="text-lg font-bold tabular-nums text-foreground">
+                    {change}
                   </span>
                 </div>
               </div>
 
-              {/* Highlighted Summary Row for Change (neutral border & surface, no soft color outline) */}
-              <div className="flex items-center justify-between rounded-2xl border border-border bg-surface-secondary px-4 py-3.5">
-                <span className="text-sm font-semibold text-foreground">
-                  {changeLabel}
-                </span>
-                <span className="text-lg font-bold tabular-nums text-foreground">
-                  {change}
-                </span>
-              </div>
+              {children}
             </div>
-
-            {children}
           </Modal.Body>
 
           {/* Action Buttons: Secondary outlined on left, Primary solid blue on right */}
-          <Modal.Footer className="mt-6 flex w-full flex-row items-center gap-3 p-0">
+          <Modal.Footer className="flex w-full flex-row items-center">
             <Button
-              className="flex-1 font-medium"
+              className="flex-1"
               size="lg"
               variant="outline"
               onPress={handlePrintBills}
@@ -288,7 +289,7 @@ export function PaymentSuccessfulModal({
             </Button>
 
             <Button
-              className="flex-1 bg-blue-600 font-medium text-white hover:bg-blue-700 active:bg-blue-800 dark:bg-blue-600 dark:hover:bg-blue-500"
+              className="flex-1"
               size="lg"
               variant="primary"
               onPress={handlePaymentDone}

@@ -146,23 +146,31 @@ export function BankCardPaymentModal({
                 <div className="grid gap-3 sm:grid-cols-2">
                   {cardOptions.map((option) => (
                     <Radio key={option.value} value={option.value}>
-                      <Radio.Content className="relative flex min-h-24 w-full items-start gap-3 rounded-xl border border-default bg-surface p-4 data-[selected=true]:bg-surface-secondary">
-                        <IconCreditCard
-                          aria-hidden="true"
-                          className="mt-0.5 shrink-0"
-                          size={22}
-                        />
+                      {({ isSelected }) => (
+                        <Radio.Content className="w-full">
+                          <div
+                            className={`relative flex min-h-24 w-full items-start gap-3 rounded-xl border border-default p-4 ${
+                              isSelected ? "bg-surface-secondary" : "bg-surface"
+                            }`}
+                          >
+                            <IconCreditCard
+                              aria-hidden="true"
+                              className="mt-0.5 shrink-0"
+                              size={22}
+                            />
 
-                        <div className="min-w-0 flex-1 pe-7">
-                          <p className="font-medium">{option.label}</p>
+                            <div className="min-w-0 flex-1 pe-7">
+                              <p className="font-medium">{option.label}</p>
 
-                          <Description>{option.description}</Description>
-                        </div>
+                              <Description>{option.description}</Description>
+                            </div>
 
-                        <Radio.Control className="absolute end-4 top-4">
-                          <Radio.Indicator />
-                        </Radio.Control>
-                      </Radio.Content>
+                            <Radio.Control className="absolute end-4 top-4">
+                              <Radio.Indicator />
+                            </Radio.Control>
+                          </div>
+                        </Radio.Content>
+                      )}
                     </Radio>
                   ))}
                 </div>
@@ -171,7 +179,7 @@ export function BankCardPaymentModal({
               </div>
             </Modal.Body>
 
-            <Modal.Footer className="w-full flex-col gap-2 sm:flex-row">
+            <Modal.Footer className="w-full flex-col sm:flex-row">
               <Button
                 className="sm:flex-1"
                 fullWidth
@@ -372,7 +380,7 @@ function AddPaymentCardModal({
             </div>
           </Modal.Body>
 
-          <Modal.Footer className="w-full flex-col gap-2 sm:flex-row">
+          <Modal.Footer className="w-full flex-col sm:flex-row">
             <Button
               className="sm:flex-1"
               fullWidth

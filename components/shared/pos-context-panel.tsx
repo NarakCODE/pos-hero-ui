@@ -102,53 +102,61 @@ export function POSContextPanel({
         </Button>
       }
     >
-      <Surface className="flex flex-col gap-2 p-4" variant="secondary">
-        <p className="text-sm font-semibold text-foreground">
-          {t(`${translationKey}.summaryTitle`)}
-        </p>
-        <p className="text-sm leading-6 text-muted">
-          {t(`${translationKey}.summary`)}
-        </p>
+      <Surface variant="secondary">
+        <div className="flex flex-col gap-2 p-4">
+          <p className="text-sm font-semibold text-foreground">
+            {t(`${translationKey}.summaryTitle`)}
+          </p>
+          <p className="text-sm leading-6 text-muted">
+            {t(`${translationKey}.summary`)}
+          </p>
+        </div>
       </Surface>
 
       <div className="grid grid-cols-2 gap-3">
-        <Surface className="flex min-h-24 flex-col justify-between gap-3 p-4">
-          <span className="text-sm text-muted">
-            {t(`${translationKey}.metricOneLabel`)}
-          </span>
-          <strong className="text-2xl font-semibold tracking-tight text-foreground">
-            {t(`${translationKey}.metricOneValue`)}
-          </strong>
+        <Surface>
+          <div className="flex min-h-24 flex-col justify-between gap-3 p-4">
+            <span className="text-sm text-muted">
+              {t(`${translationKey}.metricOneLabel`)}
+            </span>
+            <strong className="text-2xl font-semibold tracking-tight text-foreground">
+              {t(`${translationKey}.metricOneValue`)}
+            </strong>
+          </div>
         </Surface>
-        <Surface className="flex min-h-24 flex-col justify-between gap-3 p-4">
-          <span className="text-sm text-muted">
-            {t(`${translationKey}.metricTwoLabel`)}
-          </span>
-          <strong className="text-2xl font-semibold tracking-tight text-foreground">
-            {t(`${translationKey}.metricTwoValue`)}
-          </strong>
+        <Surface>
+          <div className="flex min-h-24 flex-col justify-between gap-3 p-4">
+            <span className="text-sm text-muted">
+              {t(`${translationKey}.metricTwoLabel`)}
+            </span>
+            <strong className="text-2xl font-semibold tracking-tight text-foreground">
+              {t(`${translationKey}.metricTwoValue`)}
+            </strong>
+          </div>
         </Surface>
       </div>
 
-      <Surface className="flex flex-col gap-3 p-4" variant="secondary">
-        <p className="text-sm font-semibold text-foreground">
-          {t(`${translationKey}.detailsTitle`)}
-        </p>
-        <div className="flex items-center justify-between gap-3 text-sm">
-          <span className="text-muted">
-            {t(`${translationKey}.detailOneLabel`)}
-          </span>
-          <span className="font-medium text-foreground">
-            {t(`${translationKey}.detailOneValue`)}
-          </span>
-        </div>
-        <div className="flex items-center justify-between gap-3 text-sm">
-          <span className="text-muted">
-            {t(`${translationKey}.detailTwoLabel`)}
-          </span>
-          <span className="font-medium text-foreground">
-            {t(`${translationKey}.detailTwoValue`)}
-          </span>
+      <Surface variant="secondary">
+        <div className="flex flex-col gap-3 p-4">
+          <p className="text-sm font-semibold text-foreground">
+            {t(`${translationKey}.detailsTitle`)}
+          </p>
+          <div className="flex items-center justify-between gap-3 text-sm">
+            <span className="text-muted">
+              {t(`${translationKey}.detailOneLabel`)}
+            </span>
+            <span className="font-medium text-foreground">
+              {t(`${translationKey}.detailOneValue`)}
+            </span>
+          </div>
+          <div className="flex items-center justify-between gap-3 text-sm">
+            <span className="text-muted">
+              {t(`${translationKey}.detailTwoLabel`)}
+            </span>
+            <span className="font-medium text-foreground">
+              {t(`${translationKey}.detailTwoValue`)}
+            </span>
+          </div>
         </div>
       </Surface>
 

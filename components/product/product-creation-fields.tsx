@@ -162,7 +162,6 @@ export function ProductCreationFields({
 
               <Input
                 autoComplete="off"
-                className="font-mono"
                 placeholder={t("skuPlaceholder")}
                 spellCheck={false}
                 variant="secondary"
@@ -373,7 +372,7 @@ export function ProductCreationFields({
             })}
 
             <Button
-              className="w-full justify-center border border-dashed border-border"
+              className="w-full justify-center"
               fullWidth
               type="button"
               variant="secondary"
@@ -519,26 +518,28 @@ export function ProductCreationFields({
               </Select.Popover>
             </Select>
 
-            <Switch
-              className="w-full rounded-xl border border-border/70 bg-surface-secondary/50 p-3"
-              defaultSelected={initialValues?.available ?? true}
-              name="available"
-              value="true"
-            >
-              <Switch.Content className="flex w-full items-center justify-between gap-4">
-                <div className="min-w-0 space-y-1">
-                  <Label className="text-sm font-medium text-foreground">
-                    {t("productAvailability")}
-                  </Label>
-                  <Description className="text-xs leading-5 text-muted">
-                    {t("productAvailabilityDescription")}
-                  </Description>
-                </div>
-                <Switch.Control className="shrink-0">
-                  <Switch.Thumb />
-                </Switch.Control>
-              </Switch.Content>
-            </Switch>
+            <div className="w-full rounded-xl border border-border/70 bg-surface-secondary/50 p-3">
+              <Switch
+                className="w-full"
+                defaultSelected={initialValues?.available ?? true}
+                name="available"
+                value="true"
+              >
+                <Switch.Content className="flex w-full items-center justify-between">
+                  <div className="min-w-0 space-y-1">
+                    <Label>
+                      {t("productAvailability")}
+                    </Label>
+                    <Description>
+                      {t("productAvailabilityDescription")}
+                    </Description>
+                  </div>
+                  <Switch.Control className="shrink-0">
+                    <Switch.Thumb />
+                  </Switch.Control>
+                </Switch.Content>
+              </Switch>
+            </div>
           </div>
         </section>
       </aside>

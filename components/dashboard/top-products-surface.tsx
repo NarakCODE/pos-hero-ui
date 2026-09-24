@@ -161,10 +161,10 @@ export function TopProductsSurface({
       <Card.Header>
         <div className="flex w-full items-center justify-between gap-3">
           <div>
-            <Card.Title className="text-sm font-semibold tracking-tight sm:text-base">
+            <Card.Title>
               {cardTitle}
             </Card.Title>
-            <Card.Description className="text-xs">
+            <Card.Description>
               {t("subtitle")}
             </Card.Description>
           </div>

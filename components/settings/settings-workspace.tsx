@@ -437,7 +437,7 @@ export function SettingsWorkspace() {
                     <Card
                       key={item.id}
                       aria-pressed={isSelected}
-                      className="cursor-pointer transition-colors hover:bg-surface-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+                      className="cursor-pointer"
                       role="button"
                       tabIndex={0}
                       variant={isSelected ? "tertiary" : "default"}
@@ -466,8 +466,10 @@ export function SettingsWorkspace() {
                 })}
               </div>
             ) : (
-              <Surface className="p-4 text-sm text-muted" variant="secondary">
-                {t("pages.settings.noResults")}
+              <Surface variant="secondary">
+                <div className="p-4 text-sm text-muted">
+                  {t("pages.settings.noResults")}
+                </div>
               </Surface>
             )}
           </div>
@@ -1117,13 +1119,14 @@ function SettingsSurfaceRow({
   className?: string;
 }) {
   return (
-    <Surface
-      className={
-        className ?? "flex min-w-[320px] flex-col gap-3 rounded-3xl p-6"
-      }
-      variant="secondary"
-    >
-      {children}
+    <Surface variant="secondary">
+      <div
+        className={
+          className ?? "flex min-w-[320px] flex-col gap-3 rounded-3xl p-6"
+        }
+      >
+        {children}
+      </div>
     </Surface>
   );
 }

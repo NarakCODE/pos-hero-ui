@@ -52,8 +52,8 @@ export function LockRegisterModal({
   return (
     <Modal.Backdrop isOpen={isOpen} onOpenChange={onOpenChange}>
       <Modal.Container size="sm">
-        <Modal.Dialog className="rounded-2xl bg-surface p-6 text-center shadow-2xl">
-          <div className="flex flex-col items-center gap-4">
+        <Modal.Dialog>
+          <div className="flex flex-col items-center gap-4 p-6 text-center">
             {/* Lock Icon */}
             <div className="flex size-14 items-center justify-center rounded-2xl bg-danger/15 text-danger">
               <IconLock size={28} />
@@ -91,49 +91,49 @@ export function LockRegisterModal({
                   key={num}
                   variant="secondary"
                   size="lg"
-                  className="h-12 text-base font-semibold"
+                  className="h-12"
                   onPress={() => handleDigit(String(num))}
                 >
-                  {num}
+                  <span className="text-base font-semibold">{num}</span>
                 </Button>
               ))}
               <Button
                 variant="outline"
                 size="lg"
-                className="h-12 text-xs font-medium text-muted"
+                className="h-12"
                 onPress={handleClear}
               >
-                C
+                <span className="text-xs font-medium text-muted">C</span>
               </Button>
               <Button
                 variant="secondary"
                 size="lg"
-                className="h-12 text-base font-semibold"
+                className="h-12"
                 onPress={() => handleDigit("0")}
               >
-                0
+                <span className="text-base font-semibold">0</span>
               </Button>
               <Button
                 variant="outline"
                 size="lg"
-                className="h-12 text-muted"
+                className="h-12"
                 onPress={handleDelete}
                 aria-label="Backspace"
               >
-                <IconBackspace size={20} />
+                <IconBackspace size={20} className="text-muted" />
               </Button>
             </div>
 
             <Button
               variant="ghost"
               size="sm"
-              className="mt-2 text-xs text-muted"
+              className="mt-2"
               onPress={() => {
                 setPin("");
                 onOpenChange(false);
               }}
             >
-              Cancel / Dismiss
+              <span className="text-xs text-muted">Cancel / Dismiss</span>
             </Button>
           </div>
         </Modal.Dialog>

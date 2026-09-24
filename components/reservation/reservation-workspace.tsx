@@ -199,26 +199,28 @@ function ReservationTimeline({
       </div>
 
       <Table className="min-h-0 min-w-0 flex-1" variant="secondary">
-        <Table.ScrollContainer className="min-h-0 min-w-0 flex-1 overflow-auto overscroll-contain rounded-xl">
+        <Table.ScrollContainer className="min-h-0 min-w-0 flex-1 overflow-auto overscroll-contain">
           <Table.Content
             aria-label={t("timelineLabel")}
             className="min-w-[1880px] table-fixed"
           >
-            <Table.Header className="sticky top-0 z-20 bg-surface text-foreground">
+            <Table.Header className="sticky top-0 z-20">
               <Table.Column
-                className="sticky left-0 z-30 w-[5.25rem] min-w-[5.25rem] bg-foreground px-3 text-xs font-semibold uppercase tracking-wide text-background"
+                className="sticky left-0 z-30 w-[5.25rem] min-w-[5.25rem]"
                 id="table"
                 isRowHeader
               >
-                {t("tableAxisLabel")}
+                <div className="bg-foreground px-3 text-xs font-semibold uppercase tracking-wide text-background">
+                  {t("tableAxisLabel")}
+                </div>
               </Table.Column>
               <Table.Column
-                className="min-w-[1792px] bg-surface-secondary p-0"
+                className="min-w-[1792px]"
                 id="schedule"
               >
                 <div
                   aria-label={t("timeRangeLabel")}
-                  className="relative grid min-h-12 grid-cols-[repeat(16,minmax(7rem,1fr))] text-xs font-semibold text-muted"
+                  className="relative grid min-h-12 grid-cols-[repeat(16,minmax(7rem,1fr))] bg-surface-secondary text-xs font-semibold text-muted"
                 >
                   {timelineTimes.map((time) => (
                     <div
@@ -236,17 +238,17 @@ function ReservationTimeline({
             </Table.Header>
             <Table.Body items={reservationTableRows}>
               {({ id: tableId }) => (
-                <Table.Row className="[&>td]:p-0" id={tableId} key={tableId}>
-                  <Table.Cell className="sticky left-0 z-10 w-[5.25rem] min-w-[5.25rem] bg-foreground p-0 text-background">
-                    <div className="flex h-24 items-center justify-center border-t border-border/40 text-sm font-bold">
+                <Table.Row id={tableId} key={tableId}>
+                  <Table.Cell className="sticky left-0 z-10 w-[5.25rem] min-w-[5.25rem]">
+                    <div className="flex h-24 items-center justify-center border-t border-border/40 bg-foreground text-sm font-bold text-background">
                       {tableId}
                     </div>
                   </Table.Cell>
                   <Table.Cell
-                    className="min-w-[1792px] bg-background p-0"
+                    className="min-w-[1792px]"
                     textValue={t("tableScheduleLabel", { table: tableId })}
                   >
-                    <div className="relative h-24 overflow-hidden border-t border-border">
+                    <div className="relative h-24 overflow-hidden border-t border-border bg-background">
                       <div
                         aria-hidden="true"
                         className="pointer-events-none absolute inset-0 grid grid-cols-[repeat(16,minmax(0,1fr))]"
@@ -360,22 +362,26 @@ function ReservationAside({ reservation }: { reservation: Reservation }) {
       headerClassName="shrink-0 border-b border-border/70 p-[var(--pos-content-padding)]"
       mainClassName="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto p-[var(--pos-content-padding)]"
     >
-      <Card className="shadow-none" variant="default">
-        <Card.Header className="flex flex-row items-center gap-3 p-0">
-          <span
-            aria-hidden="true"
-            className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-accent-soft text-lg font-semibold text-accent-soft-foreground"
-          >
-            {reservation.guestName.slice(0, 1)}
-          </span>
-          <div className="min-w-0">
-            <Card.Description className="text-xs">{t("guestLabel")}</Card.Description>
-            <Card.Title className="break-words text-base font-semibold leading-snug text-foreground">
-              {reservation.guestName}
-            </Card.Title>
+      <Card variant="default">
+        <Card.Header>
+          <div className="flex flex-row items-center gap-3">
+            <span
+              aria-hidden="true"
+              className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-accent-soft text-lg font-semibold text-accent-soft-foreground"
+            >
+              {reservation.guestName.slice(0, 1)}
+            </span>
+            <div className="min-w-0">
+              <Card.Description>{t("guestLabel")}</Card.Description>
+              <Card.Title>
+                <span className="break-words text-base font-semibold leading-snug text-foreground">
+                  {reservation.guestName}
+                </span>
+              </Card.Title>
+            </div>
           </div>
         </Card.Header>
-        <Card.Content className="p-0">
+        <Card.Content>
           <dl className="grid grid-cols-2 gap-2 border-t border-border/70 pt-3">
             <ReservationDetail
               icon={<IconArmchair aria-hidden="true" size={16} />}
@@ -391,31 +397,35 @@ function ReservationAside({ reservation }: { reservation: Reservation }) {
         </Card.Content>
       </Card>
 
-      <Card className="border-0 bg-accent-soft shadow-none" variant="transparent">
-        <Card.Content className="gap-3 p-0">
-          <div className="flex items-center gap-2 text-sm font-medium text-accent-soft-foreground">
-            <IconCalendar aria-hidden="true" size={16} />
-            <span>{dateLabel}</span>
-          </div>
-          <div className="flex items-center justify-between gap-3">
-            <div className="min-w-0">
-              <Card.Description className="text-xs text-accent-soft-foreground">
-                {t("timeLabel")}
-              </Card.Description>
-              <p className="mt-1 flex flex-wrap items-center gap-x-1.5 text-xl font-semibold leading-tight text-foreground">
-                <time dateTime={reservation.startTime}>{reservation.startTime}</time>
-                <span aria-hidden="true" className="text-accent-soft-foreground">
-                  –
-                </span>
-                <time dateTime={reservation.endTime}>{reservation.endTime}</time>
-              </p>
+      <Card variant="transparent">
+        <Card.Content>
+          <div className="flex flex-col gap-3 rounded-2xl bg-accent-soft p-4">
+            <div className="flex items-center gap-2 text-sm font-medium text-accent-soft-foreground">
+              <IconCalendar aria-hidden="true" size={16} />
+              <span>{dateLabel}</span>
             </div>
-            <span
-              aria-hidden="true"
-              className="flex size-10 shrink-0 items-center justify-center rounded-full bg-background/70 text-accent-soft-foreground"
-            >
-              <IconClock size={18} />
-            </span>
+            <div className="mt-3 flex items-center justify-between gap-3">
+              <div className="min-w-0">
+                <Card.Description>
+                  <span className="text-xs text-accent-soft-foreground">
+                    {t("timeLabel")}
+                  </span>
+                </Card.Description>
+                <p className="mt-1 flex flex-wrap items-center gap-x-1.5 text-xl font-semibold leading-tight text-foreground">
+                  <time dateTime={reservation.startTime}>{reservation.startTime}</time>
+                  <span aria-hidden="true" className="text-accent-soft-foreground">
+                    –
+                  </span>
+                  <time dateTime={reservation.endTime}>{reservation.endTime}</time>
+                </p>
+              </div>
+              <span
+                aria-hidden="true"
+                className="flex size-10 shrink-0 items-center justify-center rounded-full bg-background/70 text-accent-soft-foreground"
+              >
+                <IconClock size={18} />
+              </span>
+            </div>
           </div>
         </Card.Content>
       </Card>

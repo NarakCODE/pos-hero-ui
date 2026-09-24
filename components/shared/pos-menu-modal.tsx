@@ -68,12 +68,14 @@ export function POSMenuModal({
               onPointerUp={(event) => event.stopPropagation()}
             >
               <Modal.CloseTrigger />
-              <Modal.Header className="shrink-0 px-4 py-5 pe-16 sm:px-6">
-                <Modal.Heading id="pos-menu-modal-heading">
-                  {title}
-                </Modal.Heading>
+              <Modal.Header className="shrink-0">
+                <div className="pe-12">
+                  <Modal.Heading id="pos-menu-modal-heading">
+                    {title}
+                  </Modal.Heading>
+                </div>
               </Modal.Header>
-              <Modal.Body className="min-h-0 flex-1 overflow-y-auto p-4 sm:p-6">
+              <Modal.Body className="min-h-0 flex-1 overflow-y-auto">
                 <div className="grid grid-cols-1 items-start gap-6 md:grid-cols-2">
                   <MenuList
                     activeItemId={activeItemId}
@@ -120,45 +122,45 @@ function MenuList({
       >
         {label}
       </h2>
-      <ListBox
-        aria-labelledby={headingId}
-        className="w-full rounded-xl border border-border/70 bg-surface-secondary/30 p-1"
-        selectionMode="none"
-        onAction={(key) => onItemAction(String(key))}
-      >
-        {items.map((item) => {
-          const Icon = item.icon;
-          const isActive = activeItemId === item.id;
+      <div className="w-full rounded-xl border border-border/70 bg-surface-secondary/30 p-1">
+        <ListBox
+          aria-labelledby={headingId}
+          className="w-full"
+          selectionMode="none"
+          onAction={(key) => onItemAction(String(key))}
+        >
+          {items.map((item) => {
+            const Icon = item.icon;
+            const isActive = activeItemId === item.id;
 
-          return (
-            <ListBox.Item
-              aria-current={isActive ? "page" : undefined}
-              className={`min-h-14 rounded-lg border border-border/70 bg-surface px-3 py-2.5 transition-colors hover:bg-surface-secondary ${
-                isActive ? "border-accent/40 bg-accent-soft" : ""
-              }`}
-              id={item.id}
-              key={item.id}
-              textValue={item.label}
-            >
-              <Avatar color="accent" size="sm" variant="default">
-                <Avatar.Fallback>
-                  <Icon aria-hidden="true" size={19} />
-                </Avatar.Fallback>
-              </Avatar>
-              <Label className="min-w-0 flex-1 break-words whitespace-normal text-start text-sm font-medium">
-                {item.label}
-              </Label>
-              {isActive ? (
-                <IconCheck
-                  aria-hidden="true"
-                  className="ms-auto shrink-0 text-accent"
-                  size={18}
-                />
-              ) : null}
-            </ListBox.Item>
-          );
-        })}
-      </ListBox>
+            return (
+              <ListBox.Item
+                aria-current={isActive ? "page" : undefined}
+                className="min-h-14"
+                id={item.id}
+                key={item.id}
+                textValue={item.label}
+              >
+                <Avatar color="accent" size="sm" variant="default">
+                  <Avatar.Fallback>
+                    <Icon aria-hidden="true" size={19} />
+                  </Avatar.Fallback>
+                </Avatar>
+                <Label className="min-w-0 flex-1 break-words whitespace-normal text-start">
+                  {item.label}
+                </Label>
+                {isActive ? (
+                  <IconCheck
+                    aria-hidden="true"
+                    className="ms-auto shrink-0 text-accent"
+                    size={18}
+                  />
+                ) : null}
+              </ListBox.Item>
+            );
+          })}
+        </ListBox>
+      </div>
     </section>
   );
 }

@@ -212,17 +212,16 @@ export function DigitalWalletPaymentModal({
 
           <Modal.Body className="min-h-0 overflow-y-auto">
             <div className="mx-auto flex w-full max-w-5xl flex-col gap-5">
-              <Surface
-                className="flex min-h-20 w-full items-center justify-between gap-4 p-5 sm:px-6"
-                variant="secondary"
-              >
-                <div className="min-w-0">
-                  <p className="text-sm text-muted">Amount due</p>
-                  <p className="mt-1 text-xs text-muted">Order #15306</p>
+              <Surface className="w-full" variant="secondary">
+                <div className="flex min-h-20 w-full items-center justify-between gap-4 p-5 sm:px-6">
+                  <div className="min-w-0">
+                    <p className="text-sm text-muted">Amount due</p>
+                    <p className="mt-1 text-xs text-muted">Order #15306</p>
+                  </div>
+                  <span className="shrink-0 text-3xl font-semibold tabular-nums">
+                    {formatCurrency(amountDue)}
+                  </span>
                 </div>
-                <span className="shrink-0 text-3xl font-semibold tabular-nums">
-                  {formatCurrency(amountDue)}
-                </span>
               </Surface>
 
               {paymentState === "selecting" ? (
@@ -279,7 +278,7 @@ export function DigitalWalletPaymentModal({
             </div>
           </Modal.Body>
 
-          <Modal.Footer className="w-full flex-col gap-3 sm:flex-row">
+          <Modal.Footer className="w-full flex-col sm:flex-row">
             {isSuccessful ? (
               <Button className="w-full" fullWidth size="lg" slot="close">
                 Done
@@ -406,23 +405,25 @@ function ProviderSelection({
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {providers.map((provider) => (
           <Radio key={provider.id} value={provider.id}>
-            <Radio.Content className="flex min-h-24 w-full items-center gap-3 rounded-xl border border-default bg-surface p-4">
-              <Avatar size="lg">
-                <Avatar.Image
-                  alt={`${provider.label} logo`}
-                  className="object-contain"
-                  src={walletLogoByProviderId[provider.id]}
-                />
-                <Avatar.Fallback>
-                  {provider.label.slice(0, 2).toUpperCase()}
-                </Avatar.Fallback>
-              </Avatar>
-              <span className="min-w-0 flex-1 text-sm font-medium">
-                {provider.label}
-              </span>
-              <Radio.Control>
-                <Radio.Indicator />
-              </Radio.Control>
+            <Radio.Content className="w-full">
+              <div className="flex min-h-24 w-full items-center gap-3 rounded-xl border border-default bg-surface p-4">
+                <Avatar size="lg">
+                  <Avatar.Image
+                    alt={`${provider.label} logo`}
+                    className="object-contain"
+                    src={walletLogoByProviderId[provider.id]}
+                  />
+                  <Avatar.Fallback>
+                    {provider.label.slice(0, 2).toUpperCase()}
+                  </Avatar.Fallback>
+                </Avatar>
+                <span className="min-w-0 flex-1 text-sm font-medium">
+                  {provider.label}
+                </span>
+                <Radio.Control>
+                  <Radio.Indicator />
+                </Radio.Control>
+              </div>
             </Radio.Content>
           </Radio>
         ))}
@@ -574,8 +575,8 @@ function PaymentStateSurface({
   className: string;
 }) {
   return (
-    <Surface className={`w-full ${className}`} variant="secondary">
-      {children}
+    <Surface className="w-full" variant="secondary">
+      <div className={className}>{children}</div>
     </Surface>
   );
 }

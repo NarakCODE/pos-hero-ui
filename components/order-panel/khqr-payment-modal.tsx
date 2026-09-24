@@ -51,7 +51,7 @@ export function KHQRPaymentModal({
             <Modal.Heading>{method.label}</Modal.Heading>
           </Modal.Header>
 
-          <Modal.Body className="min-h-0 p-0">
+          <Modal.Body className="min-h-0">
             <div className="flex min-h-0 flex-1 flex-col lg:flex-row">
               <section className="flex min-h-0 flex-1 flex-col items-center justify-center gap-6 p-6 text-center sm:p-10 lg:w-3/5 lg:flex-none">
                 <div className="max-w-md space-y-2">
@@ -134,7 +134,7 @@ export function KHQRPaymentModal({
             </div>
           </Modal.Body>
 
-          <Modal.Footer className="w-full flex-col gap-2 sm:flex-row">
+          <Modal.Footer className="w-full flex-col sm:flex-row">
             <Button
               className="sm:flex-1"
               fullWidth

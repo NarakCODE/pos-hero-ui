@@ -89,7 +89,6 @@ export function OrderHeader({
               size="sm"
               isDisabled={!canClear}
               onPress={onClearTicket}
-              className="text-muted hover:text-danger focus-visible:text-danger"
             >
               {clearButtonLabel}
             </Button>

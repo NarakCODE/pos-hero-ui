@@ -68,7 +68,7 @@ export function CommandSearch() {
       <Button
         aria-label={t("commandSearch.triggerLabel")}
         aria-keyshortcuts="Control+K Meta+K"
-        className="h-9 gap-2 px-2 sm:px-3"
+        className="h-9"
         onPress={() => setIsOpen(true)}
         size="md"
         variant="ghost"

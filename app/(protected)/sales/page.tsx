@@ -419,7 +419,7 @@ export default function SalesPage() {
           onSelectionChange={(key) =>
             setSelectedCategory(String(key) as CategoryId)
           }
-          className="flex min-h-0 flex-1 flex-col overflow-hidden gap-0"
+          className="flex min-h-0 flex-1 flex-col overflow-hidden"
         >
           {/* 1. Tab Categories Section */}
           <Tabs.ListContainer className="shrink-0">
@@ -452,7 +452,6 @@ export default function SalesPage() {
                 <SearchField.SearchIcon />
                 <SearchField.Input
                   placeholder={t("searchPlaceholder")}
-                  className="text-xs sm:text-sm"
                 />
                 <SearchField.ClearButton />
               </SearchField.Group>
@@ -472,32 +471,34 @@ export default function SalesPage() {
             <Tabs.Panel
               key={item.id}
               id={item.id}
-              className="mt-0 flex min-h-0 min-w-0 flex-1 flex-col overflow-y-auto overscroll-contain scrollbar p-(--pos-content-padding)"
+              className="mt-0 flex min-h-0 min-w-0 flex-1 flex-col overflow-y-auto overscroll-contain"
             >
-              {filteredProducts.length > 0 ? (
-                <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 sm:gap-3 md:grid-cols-4">
-                  {filteredProducts.map((product) => {
-                    const productName = product.name[locale];
+              <div className="flex flex-1 flex-col p-(--pos-content-padding)">
+                {filteredProducts.length > 0 ? (
+                  <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 sm:gap-3 md:grid-cols-4">
+                    {filteredProducts.map((product) => {
+                      const productName = product.name[locale];
 
-                    return (
-                      <ProductCard
-                        key={product.id}
-                        addToTicketLabel={t("addToTicket", {
-                          name: productName,
-                        })}
-                        image={getProductImage(product.id)}
-                        name={productName}
-                        onClick={() => addProduct(product)}
-                        price={formatCurrency(product.price)}
-                      />
-                    );
-                  })}
-                </div>
-              ) : (
-                <div className="flex h-full min-h-[16rem] items-center justify-center rounded-2xl border border-dashed border-border p-8 text-center text-sm text-muted">
-                  {t("catalogEmpty")}
-                </div>
-              )}
+                      return (
+                        <ProductCard
+                          key={product.id}
+                          addToTicketLabel={t("addToTicket", {
+                            name: productName,
+                          })}
+                          image={getProductImage(product.id)}
+                          name={productName}
+                          onClick={() => addProduct(product)}
+                          price={formatCurrency(product.price)}
+                        />
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <div className="flex h-full min-h-[16rem] items-center justify-center rounded-2xl border border-dashed border-border p-8 text-center text-sm text-muted">
+                    {t("catalogEmpty")}
+                  </div>
+                )}
+              </div>
             </Tabs.Panel>
           ))}
         </Tabs>
@@ -515,11 +516,11 @@ export default function SalesPage() {
                   {t("modifiers.size")}:
                 </span>
                 <ScrollShadow
-                  className="min-w-0 flex-1 pb-1"
+                  className="min-w-0 flex-1"
                   hideScrollBar
                   orientation="horizontal"
                 >
-                  <div className="flex w-max min-w-full flex-row gap-1.5">
+                  <div className="flex w-max min-w-full flex-row gap-1.5 pb-1">
                     {sizeOptions.map((option) => (
                       <div key={option.id} className="w-32 shrink-0">
                         <ChoiceButton
@@ -541,11 +542,11 @@ export default function SalesPage() {
                   {t("modifiers.sweetness")}:
                 </span>
                 <ScrollShadow
-                  className="min-w-0 flex-1 pb-1"
+                  className="min-w-0 flex-1"
                   hideScrollBar
                   orientation="horizontal"
                 >
-                  <div className="flex w-max min-w-full flex-row gap-1.5">
+                  <div className="flex w-max min-w-full flex-row gap-1.5 pb-1">
                     {sweetnessOptions.map((option) => (
                       <div key={option.id} className="w-32 shrink-0">
                         <ChoiceButton
@@ -566,11 +567,11 @@ export default function SalesPage() {
                   {t("modifiers.addOns")}:
                 </span>
                 <ScrollShadow
-                  className="min-w-0 flex-1 pb-1"
+                  className="min-w-0 flex-1"
                   hideScrollBar
                   orientation="horizontal"
                 >
-                  <div className="flex w-max min-w-full flex-row gap-1.5">
+                  <div className="flex w-max min-w-full flex-row gap-1.5 pb-1">
                     {addOnOptions.map((option) => (
                       <div key={option.id} className="w-32 shrink-0">
                         <ChoiceButton

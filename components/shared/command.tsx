@@ -269,7 +269,7 @@ function CommandInputGroup({
       variant="secondary"
       onChange={context.onInputChange}
     >
-      <SearchField.Group className="flex min-h-10 items-center gap-2">
+      <SearchField.Group className="flex min-h-10 items-center">
         {children}
       </SearchField.Group>
     </SearchField>
@@ -381,7 +381,7 @@ function CommandList({
           {...listBoxProps}
           id={context.listId}
           aria-label={listBoxProps["aria-label"] ?? "Commands"}
-          className="min-w-0 outline-none"
+          className="min-w-0"
           selectionMode="none"
           onAction={handleAction}
         >
@@ -482,8 +482,10 @@ function renderCommandChildren(
           className={joinClasses("command__group mt-2 first:mt-0", className)}
         >
           {heading ? (
-            <Header className="command__group-heading px-3 py-1 text-xs font-medium text-muted">
-              {heading}
+            <Header>
+              <span className="command__group-heading block px-3 py-1 text-xs font-medium text-muted">
+                {heading}
+              </span>
             </Header>
           ) : null}
           {renderCommandChildren(groupChildren, context)}

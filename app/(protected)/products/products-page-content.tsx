@@ -48,8 +48,6 @@ type PageSize = 25 | 50 | 100;
 
 const managedProducts = products;
 const pageSizes: PageSize[] = [25, 50, 100];
-const linkClass = "text-muted hover:bg-surface hover:text-foreground";
-const activeClass = "bg-accent text-accent-foreground hover:bg-accent-hover";
 const productVariantDetails = {
   extraSmall: {
     labelKey: "variantSizeExtraSmall",
@@ -323,7 +321,7 @@ function ProductsDataGrid({
               onSelectionChange={handleSelectionChange}
               onSortChange={setSortDescriptor}
             >
-              <Table.Header className="sticky top-0 z-20 bg-surface text-foreground">
+              <Table.Header className="sticky top-0 z-20">
                 <Table.Column allowsSorting id="product" isRowHeader>
                   {({ sortDirection }) => (
                     <Table.SortableColumnHeader sortDirection={sortDirection}>
@@ -532,18 +530,17 @@ function ProductsToolbar({
           </Button>
 
           <Popover.Content
-            className="w-[340px] max-w-[95vw] rounded-2xl border-0 bg-surface p-0 shadow-2xl sm:w-[420px]"
+            className="w-[340px] max-w-[95vw] sm:w-[420px]"
             placement="bottom end"
           >
-            <Popover.Dialog className="flex w-full flex-col p-0 text-start outline-none">
-              <div className="flex w-full items-center justify-between px-4 py-3">
+            <Popover.Dialog className="flex w-full flex-col">
+              <div className="flex w-full items-center justify-between border-b border-border/60 px-4 py-3">
                 <div className="flex items-center gap-2">
-                  <Popover.Heading className="text-start text-sm font-semibold text-foreground">
+                  <Popover.Heading>
                     {t("filters")}
                   </Popover.Heading>
                   {activeFilterCount > 0 ? (
                     <Chip
-                      className="h-5 min-w-5 justify-center px-1 text-xs font-semibold"
                       color="accent"
                       size="sm"
                       variant="soft"
@@ -554,7 +551,6 @@ function ProductsToolbar({
                 </div>
                 {activeFilterCount > 0 ? (
                   <Button
-                    className="h-7 px-2 text-xs font-medium text-muted hover:text-foreground"
                     size="sm"
                     variant="ghost"
                     onPress={onResetFilters}
@@ -623,9 +619,7 @@ function ProductFilterSelect<T extends string>({
         }
       }}
     >
-      <Label className="text-start text-xs font-semibold text-muted">
-        {label}
-      </Label>
+      <Label>{label}</Label>
       <Select.Trigger className="w-full justify-start text-start">
         <Select.Value>
           {({ defaultChildren, isPlaceholder }) =>
@@ -680,7 +674,6 @@ function ProductTableRow({
     <Table.Row
       id={product.id}
       textValue={`${productName} ${product.sku ?? ""}`}
-      className="cursor-pointer hover:bg-surface-secondary/50 data-[selected=true]:bg-accent/10 [&>td]:py-3"
       onPress={() => onProductSelect(product.id)}
     >
       <Table.Cell textValue={productName}>
@@ -696,12 +689,16 @@ function ProductTableRow({
           </div>
         </div>
       </Table.Cell>
-      <Table.Cell className="text-sm tabular-nums text-muted">
-        {product.sku ?? "--"}
+      <Table.Cell>
+        <span className="text-sm tabular-nums text-muted">
+          {product.sku ?? "--"}
+        </span>
       </Table.Cell>
       <Table.Cell>{categoryLabels[product.category]}</Table.Cell>
-      <Table.Cell className="text-end text-sm font-semibold tabular-nums text-foreground">
-        {formatter.format(product.price)}
+      <Table.Cell className="text-end">
+        <span className="text-sm font-semibold tabular-nums text-foreground">
+          {formatter.format(product.price)}
+        </span>
       </Table.Cell>
       <Table.Cell className="text-center">
         <Chip
@@ -1044,7 +1041,6 @@ function ProductsPagination({
           <Pagination.Item>
             <Pagination.Previous
               aria-label={t("paginationPrevious")}
-              className={linkClass}
               isDisabled={page === 1}
               onPress={() => onPageChange(Math.max(1, page - 1))}
             >
@@ -1055,7 +1051,6 @@ function ProductsPagination({
             (pageNumber) => (
               <Pagination.Item key={pageNumber}>
                 <Pagination.Link
-                  className={pageNumber === page ? activeClass : linkClass}
                   isActive={pageNumber === page}
                   onPress={() => onPageChange(pageNumber)}
                 >
@@ -1067,7 +1062,6 @@ function ProductsPagination({
           <Pagination.Item>
             <Pagination.Next
               aria-label={t("paginationNext")}
-              className={linkClass}
               isDisabled={page === totalPages}
               onPress={() => onPageChange(Math.min(totalPages, page + 1))}
             >

@@ -85,9 +85,9 @@ export function OrderItemsTable({
           <Table.ScrollContainer className="min-h-0 flex-1 overflow-x-auto overflow-y-auto overscroll-contain">
             <Table.Content
               aria-label={labels.item || "Order items"}
-              className="w-full min-w-[30rem] text-sm"
+              className="w-full min-w-[30rem]"
             >
-              <Table.Header className="sticky top-0 z-10 bg-surface-secondary">
+              <Table.Header className="sticky top-0 z-10">
                 <Table.Column className="w-full" isRowHeader>
                   {labels.item || "Product"}
                 </Table.Column>
@@ -107,10 +107,7 @@ export function OrderItemsTable({
                   const lineTotal = item.price * item.quantity;
 
                   return (
-                    <Table.Row
-                      key={item.id}
-                      className="[&_.table__cell]:border-0"
-                    >
+                    <Table.Row key={item.id}>
                       <Table.Cell className="align-top">
                         <div className="min-w-32 py-1">
                           <p className="font-semibold leading-5 text-foreground">
@@ -191,7 +188,7 @@ export function OrderItemsTable({
       className={`flex min-h-0 flex-1 flex-col overflow-hidden ${className}`}
       style={maxHeight ? { maxHeight } : undefined}
     >
-      <ScrollShadow className="flex-1 overflow-y-auto pr-1">
+      <ScrollShadow className="flex-1 overflow-y-auto">
         <div className="flex flex-col gap-2.5">
           {items.map((item) => {
             const modifierSummary = formatModifiers(item.modifiers);

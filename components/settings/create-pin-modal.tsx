@@ -110,7 +110,8 @@ export function CreatePinModal({
             onSubmit={handleSubmit}
             validationBehavior="aria"
           >
-            <Modal.Body className="flex flex-col items-center justify-center gap-4 text-center">
+            <Modal.Body>
+              <div className="flex flex-col items-center justify-center gap-4 text-center">
               <TextField
                 className="items-center text-center"
                 fullWidth
@@ -187,7 +188,7 @@ export function CreatePinModal({
                                 ? t("pages.settings.pinKeyBackspace")
                                 : undefined
                           }
-                          className={`h-full min-h-16 text-xl tabular-nums ${isBackspaceButton ? "w-full" : ""}`}
+                          className={`h-full min-h-16 ${isBackspaceButton ? "w-full" : ""}`}
                           fullWidth
                           isIconOnly={isBackspaceButton}
                           key={key}
@@ -201,10 +202,10 @@ export function CreatePinModal({
                               aria-hidden="true"
                               className="size-5"
                             />
-                          ) : isClearButton ? (
-                            "C"
                           ) : (
-                            key
+                            <span className="text-xl tabular-nums">
+                              {isClearButton ? "C" : key}
+                            </span>
                           )}
                         </Button>
                       );
@@ -212,9 +213,10 @@ export function CreatePinModal({
                   </div>
                 </div>
               </div>
+              </div>
             </Modal.Body>
 
-            <Modal.Footer className="w-full flex-col gap-2 sm:flex-row">
+            <Modal.Footer className="w-full flex-col sm:flex-row">
               <Button
                 className="sm:flex-1"
                 fullWidth

@@ -39,7 +39,9 @@ export default function InvoicingPage() {
 
   const handleUpdateNotes = (invoiceId: string, notes: string) => {
     setInvoices((prev) =>
-      prev.map((inv) => (inv.id === invoiceId ? { ...inv, notes } : inv)),
+      prev.map((invoice) =>
+        invoice.id === invoiceId ? { ...invoice, notes } : invoice,
+      ),
     );
   };
 
@@ -90,8 +92,9 @@ export default function InvoicingPage() {
       <POSLayout
         showSearch={false}
         headerTitle={t("title")}
-        rightPanelLabel="Receipt Inspector"
-        rightPanelWidth="38%"
+        contentPadding="compact"
+        rightPanelLabel="Invoice details"
+        rightPanelWidth="34%"
         rightPanel={
           <InvoicesAside
             selectedInvoice={selectedInvoice}
@@ -104,7 +107,6 @@ export default function InvoicingPage() {
       >
         <InvoicesDataGrid
           invoices={invoices}
-          selectedInvoiceId={selectedInvoiceId}
           onInvoiceSelect={setSelectedInvoiceId}
           onBatchPrint={handleBatchPrint}
           onBatchSettle={handleBatchSettle}
@@ -121,6 +123,7 @@ export default function InvoicingPage() {
 
       {/* Cashier Operation Modals */}
       <RefundInvoiceModal
+        key={`refund-${selectedInvoice?.id ?? "no-invoice"}`}
         isOpen={isRefundModalOpen}
         onOpenChange={setIsRefundModalOpen}
         invoice={selectedInvoice}
@@ -128,6 +131,7 @@ export default function InvoicingPage() {
       />
 
       <VoidInvoiceModal
+        key={`void-${selectedInvoice?.id ?? "no-invoice"}`}
         isOpen={isVoidModalOpen}
         onOpenChange={setIsVoidModalOpen}
         invoice={selectedInvoice}
@@ -135,6 +139,7 @@ export default function InvoicingPage() {
       />
 
       <SendReceiptModal
+        key={`send-${selectedInvoice?.id ?? "no-invoice"}`}
         isOpen={isSendModalOpen}
         onOpenChange={setIsSendModalOpen}
         invoice={selectedInvoice}

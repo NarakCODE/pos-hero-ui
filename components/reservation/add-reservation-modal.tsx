@@ -358,63 +358,65 @@ export function AddReservationModal({
             aria-labelledby="add-reservation-title"
           >
             <Modal.CloseTrigger />
-            <Modal.Header className="flex-col items-stretch gap-5">
-              <div className="pr-8">
-                <Modal.Heading id="add-reservation-title">
-                  {t("addReservation")}
-                </Modal.Heading>
-                <p
-                  className="mt-1 text-sm text-muted"
-                  id="add-reservation-description"
+            <Modal.Header>
+              <div className="flex flex-col items-stretch gap-5">
+                <div className="pr-8">
+                  <Modal.Heading id="add-reservation-title">
+                    {t("addReservation")}
+                  </Modal.Heading>
+                  <p
+                    className="mt-1 text-sm text-muted"
+                    id="add-reservation-description"
+                  >
+                    {t("wizardDescription")}
+                  </p>
+                </div>
+
+                <ol
+                  aria-label={t("workflowLabel")}
+                  className="grid grid-cols-4 gap-2"
                 >
-                  {t("wizardDescription")}
-                </p>
+                  {wizardSteps.map((wizardStep, index) => {
+                    const isCurrent = index === step;
+                    const isComplete = index < step;
+
+                    return (
+                      <li
+                        aria-current={isCurrent ? "step" : undefined}
+                        className="flex min-w-0 flex-col items-center gap-2 text-center"
+                        key={wizardStep.key}
+                      >
+                        <span
+                          className={
+                            "flex size-8 items-center justify-center rounded-full text-xs font-semibold " +
+                            (isCurrent
+                              ? "bg-accent text-accent-foreground"
+                              : isComplete
+                                ? "bg-success-soft text-success-soft-foreground"
+                                : "bg-surface-secondary text-muted")
+                          }
+                        >
+                          {isComplete ? (
+                            <IconCheck aria-hidden="true" size={16} />
+                          ) : (
+                            wizardStep.number
+                          )}
+                        </span>
+                        <span
+                          className={
+                            "text-[11px] leading-tight sm:text-xs " +
+                            (isCurrent
+                              ? "font-semibold text-foreground"
+                              : "text-muted")
+                          }
+                        >
+                          {t(wizardStep.key)}
+                        </span>
+                      </li>
+                    );
+                  })}
+                </ol>
               </div>
-
-              <ol
-                aria-label={t("workflowLabel")}
-                className="grid grid-cols-4 gap-2"
-              >
-                {wizardSteps.map((wizardStep, index) => {
-                  const isCurrent = index === step;
-                  const isComplete = index < step;
-
-                  return (
-                    <li
-                      aria-current={isCurrent ? "step" : undefined}
-                      className="flex min-w-0 flex-col items-center gap-2 text-center"
-                      key={wizardStep.key}
-                    >
-                      <span
-                        className={
-                          "flex size-8 items-center justify-center rounded-full text-xs font-semibold " +
-                          (isCurrent
-                            ? "bg-accent text-accent-foreground"
-                            : isComplete
-                              ? "bg-success-soft text-success-soft-foreground"
-                              : "bg-surface-secondary text-muted")
-                        }
-                      >
-                        {isComplete ? (
-                          <IconCheck aria-hidden="true" size={16} />
-                        ) : (
-                          wizardStep.number
-                        )}
-                      </span>
-                      <span
-                        className={
-                          "text-[11px] leading-tight sm:text-xs " +
-                          (isCurrent
-                            ? "font-semibold text-foreground"
-                            : "text-muted")
-                        }
-                      >
-                        {t(wizardStep.key)}
-                      </span>
-                    </li>
-                  );
-                })}
-              </ol>
             </Modal.Header>
 
             <Form

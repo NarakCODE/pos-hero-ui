@@ -38,9 +38,9 @@ export function POSHeader({
       aria-label="POS Header"
       className={`shrink-0 border-b border-border bg-background px-(--pos-content-padding) py-2.5 shadow-xs transition-colors sm:py-3 ${className}`}
     >
-      <div className="flex items-center justify-between gap-3 sm:gap-4">
+      <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2 sm:flex-nowrap sm:gap-4">
         {/* Brand Logo & Title */}
-        <div className="flex items-center gap-3 shrink-0">
+        <div className="flex min-w-0 flex-1 items-center gap-3 sm:flex-none">
           <Logo name={t("brandName")} size="sm" />
           {title ? (
             <span className="hidden text-sm font-semibold text-foreground md:inline border-s border-border ps-3">
@@ -51,7 +51,7 @@ export function POSHeader({
 
         {/* Search Field (Centered in Left Main Header) */}
         {showSearch && onSearchChange ? (
-          <div className="flex flex-1 max-w-md min-w-0">
+          <div className="order-last flex w-full min-w-0 max-w-md flex-1 sm:order-none sm:w-auto">
             <TextField
               aria-label={t("searchLabel")}
               fullWidth
@@ -68,13 +68,12 @@ export function POSHeader({
                 </InputGroup.Prefix>
                 <InputGroup.Input
                   placeholder={searchPlaceholder ?? t("searchPlaceholder")}
-                  className="text-xs sm:text-sm"
                 />
               </InputGroup>
             </TextField>
           </div>
         ) : (
-          <div className="flex-1" />
+          <div className="hidden flex-1 sm:block" />
         )}
 
         {/* Right: Actions & Switchers */}

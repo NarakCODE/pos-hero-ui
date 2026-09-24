@@ -253,7 +253,6 @@ export function PaymentActions({
           isPending={isCharging}
           variant={isPaid ? "secondary" : "primary"}
           onPress={handlePrimaryAction}
-          className="font-semibold"
         >
           {({ isPending }) => (
             <span className="flex items-center justify-center gap-2">
@@ -318,7 +317,7 @@ export function PaymentActions({
           ) : null}
 
           {onResetOrder && isPaid ? (
-            <Button type="button" variant="outline" size="sm" fullWidth onPress={onResetOrder} className="text-xs">
+            <Button type="button" variant="outline" size="sm" fullWidth onPress={onResetOrder}>
               <IconRefresh aria-hidden="true" size={14} />
               <span>{resetLabel}</span>
             </Button>
@@ -371,30 +370,32 @@ function AppliedMemberSummary({
 }) {
   return (
     <Surface
-      className="mt-2 flex items-center gap-3 p-3"
+      className="mt-2"
       variant="secondary"
     >
-      <Avatar size="sm">
-        <Avatar.Fallback>{getMemberInitials(member.name)}</Avatar.Fallback>
-      </Avatar>
+      <div className="flex items-center gap-3 p-3">
+        <Avatar size="sm">
+          <Avatar.Fallback>{getMemberInitials(member.name)}</Avatar.Fallback>
+        </Avatar>
 
-      <div className="min-w-0 flex-1">
-        <p className="text-xs text-muted">Member</p>
-        <p className="truncate text-sm font-medium">
-          {member.name} · {member.tier.replace(/\s+Member$/, "")}
-        </p>
-        <p className="text-xs text-muted">
-          {member.points.toLocaleString("en-US")} points
-        </p>
-      </div>
+        <div className="min-w-0 flex-1">
+          <p className="text-xs text-muted">Member</p>
+          <p className="truncate text-sm font-medium">
+            {member.name} · {member.tier.replace(/\s+Member$/, "")}
+          </p>
+          <p className="text-xs text-muted">
+            {member.points.toLocaleString("en-US")} points
+          </p>
+        </div>
 
-      <div className="flex shrink-0 gap-1">
-        <Button size="sm" variant="ghost" onPress={onChange}>
-          Change
-        </Button>
-        <Button size="sm" variant="ghost" onPress={onRemove}>
-          Remove
-        </Button>
+        <div className="flex shrink-0 gap-1">
+          <Button size="sm" variant="ghost" onPress={onChange}>
+            Change
+          </Button>
+          <Button size="sm" variant="ghost" onPress={onRemove}>
+            Remove
+          </Button>
+        </div>
       </div>
     </Surface>
   );

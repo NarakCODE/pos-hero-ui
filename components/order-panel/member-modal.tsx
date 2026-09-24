@@ -215,7 +215,7 @@ function MemberModalDialog({
         </div>
       </Modal.Body>
 
-      <Modal.Footer className="w-full flex-col gap-3 sm:flex-row">
+      <Modal.Footer className="w-full flex-col sm:flex-row">
         {selectedMember ? (
           <>
             <Button
@@ -274,22 +274,24 @@ function MemberResult({
       onClick={() => onSelect(member.id)}
     >
       <Surface
-        className="flex min-h-20 w-full items-center gap-3 p-3 outline outline-1 -outline-offset-1 outline-border hover:bg-surface-secondary"
+        className="w-full"
         variant={isSelected ? "tertiary" : "default"}
       >
-        <MemberAvatar member={member} size="lg" />
-        <div className="min-w-0 flex-1">
-          <p className="truncate text-sm font-medium">{member.name}</p>
-          <p className="text-xs text-muted">{member.tier}</p>
-          <p className="mt-1 text-xs text-muted">
-            {formatPoints(member.points)} points
-          </p>
+        <div className="flex min-h-20 w-full items-center gap-3 p-3 outline outline-1 -outline-offset-1 outline-border hover:bg-surface-secondary">
+          <MemberAvatar member={member} size="lg" />
+          <div className="min-w-0 flex-1">
+            <p className="truncate text-sm font-medium">{member.name}</p>
+            <p className="text-xs text-muted">{member.tier}</p>
+            <p className="mt-1 text-xs text-muted">
+              {formatPoints(member.points)} points
+            </p>
+          </div>
+          <IconChevronRight
+            aria-hidden="true"
+            className="shrink-0 text-muted"
+            size={18}
+          />
         </div>
-        <IconChevronRight
-          aria-hidden="true"
-          className="shrink-0 text-muted"
-          size={18}
-        />
       </Surface>
     </button>
   );
@@ -297,21 +299,23 @@ function MemberResult({
 
 function SelectedMemberProfile({ member }: { member: MemberProfile }) {
   return (
-    <Surface className="flex flex-col gap-5 p-5 sm:p-6" variant="secondary">
-      <div className="flex items-center gap-4">
-        <MemberAvatar member={member} size="lg" />
-        <div className="min-w-0">
-          <p className="truncate text-lg font-semibold">{member.name}</p>
-          <p className="text-sm text-muted">{member.tier}</p>
+    <Surface className="w-full" variant="secondary">
+      <div className="flex flex-col gap-5 p-5 sm:p-6">
+        <div className="flex items-center gap-4">
+          <MemberAvatar member={member} size="lg" />
+          <div className="min-w-0">
+            <p className="truncate text-lg font-semibold">{member.name}</p>
+            <p className="text-sm text-muted">{member.tier}</p>
+          </div>
         </div>
-      </div>
 
-      <div className="grid gap-3 sm:grid-cols-2">
-        <MemberMetric label="Points" value={formatPoints(member.points)} />
-        <MemberMetric
-          label="Available benefit"
-          value={member.availableBenefit}
-        />
+        <div className="grid gap-3 sm:grid-cols-2">
+          <MemberMetric label="Points" value={formatPoints(member.points)} />
+          <MemberMetric
+            label="Available benefit"
+            value={member.availableBenefit}
+          />
+        </div>
       </div>
     </Surface>
   );

@@ -103,7 +103,7 @@ export function CashPaymentModal({
             </div>
           </Modal.Header>
 
-          <Modal.Body className="grid min-h-0 flex-1 p-0 lg:grid-cols-[22rem_1fr]">
+          <Modal.Body className="grid min-h-0 flex-1 lg:grid-cols-[22rem_1fr]">
             {/* Order summary */}
             <aside className="flex min-h-0 flex-col p-6">
               <div className="space-y-2">
@@ -175,13 +175,15 @@ export function CashPaymentModal({
                     <Button
                       fullWidth
                       key={key}
-                      className="h-full min-h-16 text-xl tabular-nums"
+                      className="h-full min-h-16"
                       size="lg"
                       type="button"
                       variant="secondary"
                       onPress={() => handleKeypadPress(key)}
                     >
-                      {key === "clear" ? "C" : key}
+                      <span className="text-xl tabular-nums">
+                        {key === "clear" ? "C" : key}
+                      </span>
                     </Button>
                   ))}
                 </div>
@@ -192,13 +194,13 @@ export function CashPaymentModal({
                     <Button
                       fullWidth
                       key={amount}
-                      className="h-full min-h-14 text-base tabular-nums"
+                      className="h-full min-h-14"
                       size="lg"
                       type="button"
                       variant="tertiary"
                       onPress={() => setCashReceived(amount.toFixed(2))}
                     >
-                      ${amount}
+                      <span className="text-base tabular-nums">${amount}</span>
                     </Button>
                   ))}
 
@@ -229,7 +231,7 @@ export function CashPaymentModal({
             </section>
           </Modal.Body>
 
-          <Modal.Footer className="w-full flex-col gap-2 sm:flex-row">
+          <Modal.Footer className="w-full flex-col sm:flex-row">
             <Button
               className="sm:flex-1"
               fullWidth

@@ -73,17 +73,15 @@ export function OrderChannelSelect({
         }
       }}
     >
-      {label ? (
-        <Label className="text-xs font-semibold text-muted">{label}</Label>
-      ) : null}
+      {label ? <Label>{label}</Label> : null}
       <Select.Trigger
         className={
           isSm
-            ? "h-8 min-h-8 w-full justify-start ps-2 pe-7 text-xs font-medium sm:text-xs"
-            : "h-9 min-h-9 w-full justify-start ps-2.5 pe-7 text-sm font-medium"
+            ? "h-8 min-h-8 w-full justify-start text-start"
+            : "h-9 min-h-9 w-full justify-start text-start"
         }
       >
-        <Select.Value className={isSm ? "text-xs" : "text-sm"}>
+        <Select.Value>
           {({ defaultChildren, isPlaceholder, state }) => {
             if (isPlaceholder && state.selectedItems.length === 0 && !value) {
               return defaultChildren;
@@ -100,11 +98,7 @@ export function OrderChannelSelect({
             return (
               <div className="flex min-w-0 items-center gap-1.5">
                 <Avatar
-                  className={
-                    isSm
-                      ? "size-5 shrink-0 rounded-full"
-                      : "size-6 shrink-0 rounded-full"
-                  }
+                  className={isSm ? "size-5 shrink-0" : "size-6 shrink-0"}
                   size="sm"
                 >
                   <Avatar.Image
@@ -112,18 +106,26 @@ export function OrderChannelSelect({
                     className="object-contain"
                     src={getOrderChannelAvatarSrc(selectedChannel)}
                   />
-                  <Avatar.Fallback
-                    className={
-                      isSm
-                        ? "text-[10px] font-semibold"
-                        : "text-xs font-semibold"
-                    }
-                  >
-                    {orderChannelFallbacks[selectedChannel] ??
-                      selectedChannel.slice(0, 2).toUpperCase()}
+                  <Avatar.Fallback>
+                    <span
+                      className={
+                        isSm
+                          ? "text-[10px] font-semibold"
+                          : "text-xs font-semibold"
+                      }
+                    >
+                      {orderChannelFallbacks[selectedChannel] ??
+                        selectedChannel.slice(0, 2).toUpperCase()}
+                    </span>
                   </Avatar.Fallback>
                 </Avatar>
-                <span className="truncate">{selectedChannel}</span>
+                <span
+                  className={
+                    isSm ? "truncate text-xs" : "truncate text-sm"
+                  }
+                >
+                  {selectedChannel}
+                </span>
               </div>
             );
           }}
@@ -134,18 +136,14 @@ export function OrderChannelSelect({
         <ListBox>
           {orderChannels.map((channel) => (
             <ListBox.Item
-              className={isSm ? "py-1.5 text-xs" : "py-2 text-sm"}
+              className="text-start"
               id={channel}
               key={channel}
               textValue={channel}
             >
               <div className="flex min-w-0 items-center gap-2">
                 <Avatar
-                  className={
-                    isSm
-                      ? "size-5 shrink-0 rounded-full"
-                      : "size-6 shrink-0 rounded-full"
-                  }
+                  className={isSm ? "size-5 shrink-0" : "size-6 shrink-0"}
                   size="sm"
                 >
                   <Avatar.Image
@@ -153,18 +151,26 @@ export function OrderChannelSelect({
                     className="object-contain"
                     src={getOrderChannelAvatarSrc(channel)}
                   />
-                  <Avatar.Fallback
-                    className={
-                      isSm
-                        ? "text-[10px] font-semibold"
-                        : "text-xs font-semibold"
-                    }
-                  >
-                    {orderChannelFallbacks[channel] ??
-                      channel.slice(0, 2).toUpperCase()}
+                  <Avatar.Fallback>
+                    <span
+                      className={
+                        isSm
+                          ? "text-[10px] font-semibold"
+                          : "text-xs font-semibold"
+                      }
+                    >
+                      {orderChannelFallbacks[channel] ??
+                        channel.slice(0, 2).toUpperCase()}
+                    </span>
                   </Avatar.Fallback>
                 </Avatar>
-                <span className="truncate">{channel}</span>
+                <span
+                  className={
+                    isSm ? "truncate text-xs" : "truncate text-sm"
+                  }
+                >
+                  {channel}
+                </span>
               </div>
               <ListBox.ItemIndicator />
             </ListBox.Item>

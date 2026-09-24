@@ -44,44 +44,47 @@ export function KpiGroup({
             )}
 
             <Surface
-              className={`flex min-w-0 flex-1 flex-col ${
-                compact
-                  ? "gap-1 px-3.5 py-2 sm:gap-1.5 sm:px-4 sm:py-2.5"
-                  : "gap-2 p-4 sm:gap-3 sm:p-5"
-              }`}
+              className="min-w-0 flex-1"
               variant="default"
             >
-              <dt
-                className={`font-medium text-muted ${
-                  compact ? "text-xs" : "text-sm"
+              <div
+                className={`flex flex-col ${
+                  compact
+                    ? "gap-1 px-3.5 py-2 sm:gap-1.5 sm:px-4 sm:py-2.5"
+                    : "gap-2 p-4 sm:gap-3 sm:p-5"
                 }`}
               >
-                {kpi.title}
-              </dt>
-
-              <dd className="flex items-center gap-2">
-                <span
-                  className={`font-semibold tabular-nums tracking-tight ${
-                    compact ? "text-xl sm:text-2xl" : "text-2xl"
+                <dt
+                  className={`font-medium text-muted ${
+                    compact ? "text-xs" : "text-sm"
                   }`}
                 >
-                  {kpi.value}
-                </span>
+                  {kpi.title}
+                </dt>
 
-                <Chip
-                  className="gap-1"
-                  color={kpi.trend.direction === "up" ? "success" : "danger"}
-                  size="sm"
-                  variant="soft"
-                >
-                  {kpi.trend.direction === "up" ? (
-                    <IconArrowUp aria-hidden="true" className="size-3.5" />
-                  ) : (
-                    <IconArrowDown aria-hidden="true" className="size-3.5" />
-                  )}
-                  <span>{kpi.trend.value}</span>
-                </Chip>
-              </dd>
+                <dd className="flex items-center gap-2">
+                  <span
+                    className={`font-semibold tabular-nums tracking-tight ${
+                      compact ? "text-xl sm:text-2xl" : "text-2xl"
+                    }`}
+                  >
+                    {kpi.value}
+                  </span>
+
+                  <Chip
+                    color={kpi.trend.direction === "up" ? "success" : "danger"}
+                    size="sm"
+                    variant="soft"
+                  >
+                    {kpi.trend.direction === "up" ? (
+                      <IconArrowUp aria-hidden="true" className="size-3.5" />
+                    ) : (
+                      <IconArrowDown aria-hidden="true" className="size-3.5" />
+                    )}
+                    <span>{kpi.trend.value}</span>
+                  </Chip>
+                </dd>
+              </div>
             </Surface>
           </div>
         ))}

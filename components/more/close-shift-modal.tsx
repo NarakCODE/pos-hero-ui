@@ -53,14 +53,14 @@ export function CloseShiftModal({
   return (
     <Modal.Backdrop isOpen={isOpen} onOpenChange={onOpenChange}>
       <Modal.Container size="md">
-        <Modal.Dialog className="rounded-2xl bg-surface">
-          <Modal.Header className="border-b border-border p-4">
+        <Modal.Dialog>
+          <Modal.Header>
             <div className="flex items-center gap-2.5">
               <div className="flex size-9 items-center justify-center rounded-xl bg-warning/15 text-warning">
                 <IconScale size={20} />
               </div>
               <div className="flex flex-col">
-                <Modal.Heading className="text-base font-bold text-foreground">
+                <Modal.Heading>
                   Shift Reconciliation & Z-Report
                 </Modal.Heading>
                 <p className="text-xs text-muted">
@@ -71,7 +71,8 @@ export function CloseShiftModal({
             <Modal.CloseTrigger />
           </Modal.Header>
 
-          <Modal.Body className="flex flex-col gap-4 p-4">
+          <Modal.Body>
+            <div className="flex flex-col gap-4">
             {/* Shift Breakdown Box */}
             <div className="flex flex-col gap-2 rounded-xl bg-surface-secondary/60 p-3.5 text-xs">
               <div className="flex items-center justify-between text-muted">
@@ -101,10 +102,10 @@ export function CloseShiftModal({
               aria-label="Actual counted cash"
               value={countedCash}
               onChange={setCountedCash}
-              className="flex flex-col gap-1.5"
+              fullWidth
             >
               <div className="flex items-center justify-between">
-                <Label className="text-xs font-semibold text-foreground">
+                <Label>
                   Actual Counted Cash ($ USD)
                 </Label>
                 {difference !== null ? (
@@ -127,8 +128,8 @@ export function CloseShiftModal({
                   </Chip>
                 ) : null}
               </div>
-              <InputGroup variant="secondary" className="h-11">
-                <InputGroup.Prefix className="font-semibold text-foreground">
+              <InputGroup variant="secondary">
+                <InputGroup.Prefix>
                   $
                 </InputGroup.Prefix>
                 <InputGroup.Input
@@ -136,7 +137,6 @@ export function CloseShiftModal({
                   type="number"
                   step="0.01"
                   autoFocus
-                  className="text-base font-semibold"
                 />
               </InputGroup>
             </TextField>
@@ -157,9 +157,10 @@ export function CloseShiftModal({
                 <span className="text-[11px] text-muted">Thermal (80mm)</span>
               </div>
             </label>
+            </div>
           </Modal.Body>
 
-          <Modal.Footer className="flex items-center justify-end gap-2 border-t border-border p-4">
+          <Modal.Footer>
             <Button
               variant="outline"
               size="md"
@@ -171,7 +172,6 @@ export function CloseShiftModal({
               variant="primary"
               size="md"
               onPress={handleCloseShift}
-              className="gap-1.5 font-semibold"
             >
               <IconCheck size={16} />
               <span>Confirm & Close Shift</span>

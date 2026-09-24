@@ -95,8 +95,9 @@ export function DashboardAside({ onOpenRegister }: DashboardAsideProps = {}) {
           </div>
         }
       >
-        <ScrollShadow className="flex h-full flex-col gap-5 p-4">
-          {/* Shift Details */}
+        <ScrollShadow className="h-full">
+          <div className="flex flex-col gap-5 p-4">
+            {/* Shift Details */}
           <section aria-label="Shift details" className="flex flex-col gap-2.5">
             <div className="flex items-center justify-between">
               <span className="text-xs font-semibold uppercase tracking-wider text-muted">
@@ -139,7 +140,7 @@ export function DashboardAside({ onOpenRegister }: DashboardAsideProps = {}) {
               <Button
                 size="sm"
                 variant="outline"
-                className="justify-start gap-2"
+                className="justify-start"
                 onPress={handleOpenCashDrawer}
               >
                 <IconCashRegister aria-hidden="true" size={16} />
@@ -149,7 +150,7 @@ export function DashboardAside({ onOpenRegister }: DashboardAsideProps = {}) {
               <Button
                 size="sm"
                 variant="outline"
-                className="justify-start gap-2"
+                className="justify-start"
                 onPress={() => setIsCashModalOpen(true)}
               >
                 <IconScale aria-hidden="true" size={16} />
@@ -159,7 +160,7 @@ export function DashboardAside({ onOpenRegister }: DashboardAsideProps = {}) {
               <Button
                 size="sm"
                 variant="outline"
-                className="justify-start gap-2"
+                className="justify-start"
                 onPress={() => setIsLockModalOpen(true)}
               >
                 <IconLock aria-hidden="true" size={16} />
@@ -169,11 +170,11 @@ export function DashboardAside({ onOpenRegister }: DashboardAsideProps = {}) {
               <Button
                 size="sm"
                 variant="outline"
-                className="justify-start gap-2 text-danger hover:text-danger"
+                className="justify-start"
                 onPress={() => setIsCloseShiftOpen(true)}
               >
-                <IconClock aria-hidden="true" size={16} />
-                <span>End Shift</span>
+                <IconClock aria-hidden="true" className="text-danger" size={16} />
+                <span className="text-danger">End Shift</span>
               </Button>
             </div>
           </section>
@@ -227,10 +228,9 @@ export function DashboardAside({ onOpenRegister }: DashboardAsideProps = {}) {
               <Button
                 size="sm"
                 variant="ghost"
-                className="h-auto p-0 text-xs text-accent"
                 onPress={() => router.push("/orders")}
               >
-                View all
+                <span className="text-xs text-accent">View all</span>
               </Button>
             </div>
 
@@ -249,9 +249,8 @@ export function DashboardAside({ onOpenRegister }: DashboardAsideProps = {}) {
                         size="sm"
                         color={order.paymentStatus === "paid" ? "success" : "warning"}
                         variant="soft"
-                        className="h-4 px-1.5 text-[10px]"
                       >
-                        {order.paymentStatus}
+                        <span className="text-[10px]">{order.paymentStatus}</span>
                       </Chip>
                     </div>
                     <span className="text-[11px] text-muted">
@@ -266,6 +265,7 @@ export function DashboardAside({ onOpenRegister }: DashboardAsideProps = {}) {
               ))}
             </div>
           </section>
+          </div>
         </ScrollShadow>
       </POSAside>
 

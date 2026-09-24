@@ -78,18 +78,17 @@ export function TableFiltersPopover({
       </Button>
 
       <Popover.Content
-        className="w-[320px] max-w-[95vw] rounded-2xl border-0 bg-surface p-0 shadow-2xl"
+        className="w-[320px] max-w-[95vw]"
         placement="bottom end"
       >
-        <Popover.Dialog className="flex w-full flex-col p-0 text-start outline-none">
-          <div className="flex w-full items-center justify-between px-4 py-3">
+        <Popover.Dialog className="flex w-full flex-col">
+          <div className="flex w-full items-center justify-between border-b border-border/60 px-4 py-3">
             <div className="flex items-center gap-2">
-              <Popover.Heading className="text-start text-sm font-semibold text-foreground">
+              <Popover.Heading>
                 {t("pages.table.filters")}
               </Popover.Heading>
               {activeFilterCount > 0 ? (
                 <Chip
-                  className="h-5 min-w-5 justify-center px-1 text-xs font-semibold"
                   color="accent"
                   size="sm"
                   variant="soft"
@@ -101,12 +100,11 @@ export function TableFiltersPopover({
 
             {activeFilterCount > 0 ? (
               <Button
-                className="h-7 px-2 text-xs font-medium text-muted hover:text-foreground"
                 size="sm"
                 variant="ghost"
                 onPress={onResetFilters}
               >
-                <IconRefresh aria-hidden="true" className="mr-1" size={14} />
+                <IconRefresh aria-hidden="true" size={14} />
                 {t("pages.table.filterReset")}
               </Button>
             ) : null}
@@ -172,9 +170,7 @@ function TableFilterSelect<T extends string>({
         }
       }}
     >
-      <Label className="text-start text-xs font-semibold text-muted">
-        {label}
-      </Label>
+      <Label>{label}</Label>
       <Select.Trigger className="w-full justify-start text-start">
         <Select.Value>
           {({ defaultChildren, isPlaceholder }) => {

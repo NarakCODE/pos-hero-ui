@@ -152,7 +152,7 @@ export function NotificationCenterModal({
                     </Tabs.List>
                   </Tabs.ListContainer>
                   <Tabs.Panel
-                    className="min-h-0 flex-1 pt-3"
+                    className="min-h-0 flex-1"
                     id={activeFilter}
                   >
                     <ScrollShadow className="h-full min-h-0">
@@ -181,46 +181,48 @@ export function NotificationCenterModal({
                               <li key={item.id}>
                                 <Button
                                   fullWidth
-                                  className="h-auto justify-start gap-3 rounded-xl px-2.5 py-2 text-start whitespace-normal"
+                                  className="h-auto justify-start"
                                   variant="ghost"
                                   onPress={() => handleItemAction(item.id)}
                                 >
-                                  <Avatar
-                                    color={typeColorMap[item.type]}
-                                    size="sm"
-                                    variant="soft"
-                                  >
-                                    {item.avatarUrl ? (
-                                      <Avatar.Image alt="" src={item.avatarUrl} />
-                                    ) : null}
-                                    <Avatar.Fallback>
-                                      <Icon aria-hidden="true" size={16} />
-                                    </Avatar.Fallback>
-                                  </Avatar>
+                                  <div className="flex w-full items-center gap-3 px-2.5 py-2 text-start whitespace-normal">
+                                    <Avatar
+                                      color={typeColorMap[item.type]}
+                                      size="sm"
+                                      variant="soft"
+                                    >
+                                      {item.avatarUrl ? (
+                                        <Avatar.Image alt="" src={item.avatarUrl} />
+                                      ) : null}
+                                      <Avatar.Fallback>
+                                        <Icon aria-hidden="true" size={16} />
+                                      </Avatar.Fallback>
+                                    </Avatar>
 
-                                  <div className="flex min-w-0 flex-1 flex-col">
-                                    <div className="flex items-start justify-between gap-2">
-                                      <p
-                                        className={`text-sm leading-tight text-foreground ${
-                                          item.read
-                                            ? "font-medium"
-                                            : "font-semibold"
-                                        }`}
-                                      >
-                                        {item.title}
-                                      </p>
-                                      <div className="flex shrink-0 items-center gap-2">
-                                        <span className="text-[11px] text-muted">
-                                          {item.time}
-                                        </span>
-                                        {!item.read && (
-                                          <span className="size-2 rounded-full bg-accent" />
-                                        )}
+                                    <div className="flex min-w-0 flex-1 flex-col">
+                                      <div className="flex items-start justify-between gap-2">
+                                        <p
+                                          className={`text-sm leading-tight text-foreground ${
+                                            item.read
+                                              ? "font-medium"
+                                              : "font-semibold"
+                                          }`}
+                                        >
+                                          {item.title}
+                                        </p>
+                                        <div className="flex shrink-0 items-center gap-2">
+                                          <span className="text-[11px] text-muted">
+                                            {item.time}
+                                          </span>
+                                          {!item.read && (
+                                            <span className="size-2 rounded-full bg-accent" />
+                                          )}
+                                        </div>
                                       </div>
+                                      <p className="mt-1 line-clamp-2 text-xs text-muted">
+                                        {item.description}
+                                      </p>
                                     </div>
-                                    <p className="mt-1 line-clamp-2 text-xs text-muted">
-                                      {item.description}
-                                    </p>
                                   </div>
                                 </Button>
                               </li>

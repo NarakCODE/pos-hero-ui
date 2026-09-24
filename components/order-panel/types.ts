@@ -43,6 +43,7 @@ export interface OrderHeaderProps {
   orderChannel?: ReactNode;
   orderChannelLabel?: ReactNode;
   orderType?: string;
+  orderTypeLabel?: ReactNode;
   tableNumber?: string | number;
   customerName?: string;
   timestamp?: string;
@@ -257,6 +258,7 @@ export interface OrderPanelProps {
   orderChannel?: ReactNode;
   orderChannelLabel?: ReactNode;
   orderType?: string;
+  orderTypeLabel?: ReactNode;
   tableNumber?: string | number;
   customerName?: string;
   timestamp?: string;
@@ -338,3 +340,5 @@ export interface OrderPanelProps {
   actionsSlot?: ReactNode;
   footer?: ReactNode;
 }
+
+export type { PaymentSuccessfulModalProps } from "./payment-successful-modal";

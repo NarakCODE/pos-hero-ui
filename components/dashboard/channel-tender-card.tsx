@@ -1,105 +1,151 @@
 "use client";
 
 import { Card, Chip } from "@heroui/react";
-import { IconCreditCard, IconQrcode, IconReceipt } from "@tabler/icons-react";
+import { useTranslations } from "next-intl";
+import {
+  Cell,
+  Pie,
+  PieChart,
+  ResponsiveContainer,
+  Tooltip,
+} from "recharts";
+import {
+  dashboardDataByRange,
+  type SalesChannelKey,
+  type TenderKey,
+  type TimeRange,
+} from "./dashboard-data";
 
-export function ChannelTenderCard() {
+interface ChannelTenderCardProps {
+  timeRange: TimeRange;
+}
+
+const channelColors: Record<SalesChannelKey, string> = {
+  dineIn: "var(--accent)",
+  takeaway: "var(--success)",
+  delivery: "var(--warning)",
+};
+
+const channelLabelKeys: Record<SalesChannelKey, string> = {
+  dineIn: "channels.dineIn",
+  takeaway: "channels.takeaway",
+  delivery: "channels.delivery",
+};
+
+const tenderLabelKeys: Record<TenderKey, string> = {
+  cash: "tenders.cash",
+  khqr: "tenders.khqr",
+  card: "tenders.card",
+};
+
+function formatCurrency(value: number) {
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+    maximumFractionDigits: 2,
+  }).format(value);
+}
+
+export function ChannelTenderCard({ timeRange }: ChannelTenderCardProps) {
+  const t = useTranslations("Dashboard");
+  const data = dashboardDataByRange[timeRange];
+  const channelData = data.channels.map((channel) => ({
+    ...channel,
+    name: t(channelLabelKeys[channel.key]),
+  }));
+
   return (
     <Card>
       <Card.Header>
         <div className="flex w-full items-start justify-between gap-3">
-          <div>
-            <div className="text-xs font-medium text-muted">
-              Sales Channels & Tenders
-            </div>
-            <div className="text-xl font-bold tabular-nums tracking-tight text-foreground sm:text-2xl">
-              $2,480.50
-            </div>
+          <div className="min-w-0">
+            <Card.Title>{t("charts.salesChannels")}</Card.Title>
+            <Card.Description>{t("charts.salesChannelsDescription")}</Card.Description>
           </div>
           <Chip color="accent" size="sm" variant="soft">
-            48 Tickets
+            {t("charts.ordersCount", { count: data.orders })}
           </Chip>
         </div>
       </Card.Header>
 
       <Card.Content>
-        <div className="flex flex-col gap-3.5 pt-2">
-          {/* In-Store POS Channel */}
-          <div className="flex flex-col gap-1.5">
-            <div className="flex items-center justify-between text-xs">
-              <span className="font-medium text-foreground">
-                In-Store / Register (62%)
-              </span>
-              <span className="tabular-nums text-muted">
-                $1,538.00 · 30 tickets
-              </span>
-            </div>
-            <div className="h-2 w-full overflow-hidden rounded-full bg-surface-secondary">
-              <div
-                className="h-full rounded-full bg-accent"
-                style={{ width: "62%" }}
+        <div className="h-48 min-w-0 w-full" role="img" aria-label={t("charts.salesChannelsAccessibleLabel")}>
+          <ResponsiveContainer height="100%" width="100%">
+            <PieChart>
+              <Pie
+                cx="50%"
+                cy="50%"
+                data={channelData}
+                dataKey="revenue"
+                endAngle={-270}
+                innerRadius={58}
+                nameKey="name"
+                outerRadius={86}
+                paddingAngle={3}
+                startAngle={90}
+                stroke="var(--surface)"
+                strokeWidth={3}
+              >
+                {channelData.map((channel) => (
+                  <Cell
+                    key={channel.key}
+                    fill={channelColors[channel.key]}
+                  />
+                ))}
+              </Pie>
+              <Tooltip
+                contentStyle={{
+                  border: "1px solid var(--border)",
+                  borderRadius: "8px",
+                  backgroundColor: "var(--surface)",
+                  color: "var(--foreground)",
+                  fontSize: "12px",
+                  boxShadow: "0 8px 24px rgba(0, 0, 0, 0.12)",
+                }}
+                formatter={(value) => formatCurrency(Number(value))}
+                labelStyle={{
+                  color: "var(--muted)",
+                  fontWeight: 600,
+                }}
               />
-            </div>
-          </div>
+            </PieChart>
+          </ResponsiveContainer>
+        </div>
 
-          {/* Dine-In Tables Channel */}
-          <div className="flex flex-col gap-1.5">
-            <div className="flex items-center justify-between text-xs">
-              <span className="font-medium text-foreground">
-                Dine-In Tables (24%)
+        <div
+          aria-label={t("charts.salesChannelsAccessibleLabel")}
+          className="grid grid-cols-1 gap-2 sm:grid-cols-3"
+          role="list"
+        >
+          {channelData.map((channel) => (
+            <div
+              key={channel.key}
+              className="flex min-w-0 items-center justify-between gap-2 rounded-xl bg-surface-secondary/60 px-3 py-2 text-xs"
+              role="listitem"
+            >
+              <span className="flex min-w-0 items-center gap-2">
+                <span
+                  aria-hidden="true"
+                  className="size-2 shrink-0 rounded-full"
+                  style={{ backgroundColor: channelColors[channel.key] }}
+                />
+                <span className="truncate text-muted">{channel.name}</span>
               </span>
-              <span className="tabular-nums text-muted">
-                $595.00 · 12 tickets
+              <span className="shrink-0 font-semibold tabular-nums text-foreground">
+                {formatCurrency(channel.revenue)}
               </span>
             </div>
-            <div className="h-2 w-full overflow-hidden rounded-full bg-surface-secondary">
-              <div
-                className="h-full rounded-full bg-success"
-                style={{ width: "24%" }}
-              />
-            </div>
-          </div>
+          ))}
+        </div>
 
-          {/* Delivery Apps Channel */}
-          <div className="flex flex-col gap-1.5">
-            <div className="flex items-center justify-between text-xs">
-              <span className="font-medium text-foreground">
-                Delivery Apps (14%)
-              </span>
-              <span className="tabular-nums text-muted">
-                $347.50 · 6 tickets
-              </span>
-            </div>
-            <div className="h-2 w-full overflow-hidden rounded-full bg-surface-secondary">
-              <div
-                className="h-full rounded-full bg-warning"
-                style={{ width: "14%" }}
-              />
-            </div>
-          </div>
-
-          {/* Tender Breakdown Pills */}
-          <div className="mt-1 flex flex-wrap items-center gap-2 border-t border-border pt-3">
-            <div className="flex items-center gap-1.5 rounded-lg border border-border/80 bg-surface-secondary/50 px-2.5 py-1 text-xs">
-              <IconReceipt aria-hidden="true" className="text-muted" size={14} />
-              <span className="text-muted">Cash:</span>
-              <span className="font-semibold text-foreground">$780.00</span>
-            </div>
-            <div className="flex items-center gap-1.5 rounded-lg border border-border/80 bg-surface-secondary/50 px-2.5 py-1 text-xs">
-              <IconQrcode aria-hidden="true" className="text-muted" size={14} />
-              <span className="text-muted">KHQR:</span>
-              <span className="font-semibold text-foreground">$1,150.50</span>
-            </div>
-            <div className="flex items-center gap-1.5 rounded-lg border border-border/80 bg-surface-secondary/50 px-2.5 py-1 text-xs">
-              <IconCreditCard aria-hidden="true" className="text-muted" size={14} />
-              <span className="text-muted">Card:</span>
-              <span className="font-semibold text-foreground">$550.00</span>
-            </div>
-          </div>
+        <div className="mt-4 flex flex-wrap gap-2">
+          {data.tenders.map((tender) => (
+            <Chip key={tender.key} color="default" size="sm" variant="soft">
+              {t(tenderLabelKeys[tender.key])} · {formatCurrency(tender.revenue)}
+            </Chip>
+          ))}
         </div>
       </Card.Content>
     </Card>
   );
 }
-
-export default ChannelTenderCard;

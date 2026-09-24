@@ -7,6 +7,8 @@ import { LanguageSwitcher } from "@/components/shared/language-switcher";
 import { Logo } from "@/components/shared/logo";
 import { NotificationPopover } from "@/components/shared/notification-popover";
 import { ThemeSwitcher } from "@/components/shared/theme-switcher";
+import { AppSwitcher } from "@/components/shared/app-switcher";
+import { CommandSearch } from "@/components/shared/command-search";
 
 interface POSHeaderProps {
   searchQuery?: string;
@@ -14,6 +16,7 @@ interface POSHeaderProps {
   searchPlaceholder?: string;
   showSearch?: boolean;
   showNotifications?: boolean;
+  showAppSwitcher?: boolean;
   title?: string;
   className?: string;
 }
@@ -23,6 +26,7 @@ export function POSHeader({
   onSearchChange,
   searchPlaceholder,
   searchQuery,
+  showAppSwitcher = true,
   showNotifications = true,
   showSearch = true,
   title,
@@ -32,7 +36,7 @@ export function POSHeader({
   return (
     <header
       aria-label="POS Header"
-      className={`shrink-0 border-b border-border bg-background px-[var(--pos-content-padding)] py-2.5 shadow-xs transition-colors sm:py-3 ${className}`}
+      className={`shrink-0 border-b border-border bg-background px-(--pos-content-padding) py-2.5 shadow-xs transition-colors sm:py-3 ${className}`}
     >
       <div className="flex items-center justify-between gap-3 sm:gap-4">
         {/* Brand Logo & Title */}
@@ -56,7 +60,11 @@ export function POSHeader({
             >
               <InputGroup fullWidth variant="secondary" className="h-9">
                 <InputGroup.Prefix>
-                  <IconSearch aria-hidden="true" size={16} className="text-muted" />
+                  <IconSearch
+                    aria-hidden="true"
+                    size={16}
+                    className="text-muted"
+                  />
                 </InputGroup.Prefix>
                 <InputGroup.Input
                   placeholder={searchPlaceholder ?? t("searchPlaceholder")}
@@ -71,10 +79,13 @@ export function POSHeader({
 
         {/* Right: Actions & Switchers */}
         <div className="flex items-center gap-1.5 shrink-0 sm:gap-2">
-          {showNotifications ? <NotificationPopover /> : null}
+          <CommandSearch />
           <div className="hidden sm:block">
             <LanguageSwitcher className="w-28" />
           </div>
+          {showAppSwitcher ? <AppSwitcher /> : null}
+          {showNotifications ? <NotificationPopover /> : null}
+
           <ThemeSwitcher />
         </div>
       </div>

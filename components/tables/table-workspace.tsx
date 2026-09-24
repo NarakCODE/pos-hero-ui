@@ -37,7 +37,6 @@ export function TableWorkspace({
   return (
     <POSLayout
       showSearch={false}
-      headerTitle={headerTitle}
       rightPanelLabel={asideLabel}
       rightPanelClassName="overflow-hidden"
       rightPanel={
@@ -50,6 +49,7 @@ export function TableWorkspace({
       }
     >
       <TableFloor
+        headerTitle={headerTitle}
         tables={tables}
         selectedTableId={selectedTableId}
         onTableSelect={handleTableSelect}

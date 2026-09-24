@@ -63,6 +63,7 @@ export function OrderPanel({
   orderChannel,
   orderChannelLabel,
   orderNumber,
+  orderTypeLabel,
   orderType,
   paidMessage,
   paymentLabel,
@@ -159,6 +160,7 @@ export function OrderPanel({
           orderChannel={orderChannel}
           orderChannelLabel={orderChannelLabel}
           orderType={orderType}
+          orderTypeLabel={orderTypeLabel}
           tableNumber={tableNumber}
           customerName={customerName}
           timestamp={timestamp}

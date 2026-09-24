@@ -136,7 +136,7 @@ export interface NotificationPopoverProps {
 
 export function NotificationPopover({
   className = "",
-  size = "sm",
+  size,
   variant = "outline",
 }: NotificationPopoverProps = {}) {
   const router = useRouter();
@@ -192,7 +192,7 @@ export function NotificationPopover({
         </Badge.Anchor>
 
         <Popover.Content
-          className="w-[380px] max-w-[95vw] rounded-2xl border-0 bg-surface p-0 shadow-2xl"
+          className="w-95 max-w-[95vw] rounded-2xl border-0 bg-surface p-0 shadow-2xl"
           placement="bottom end"
         >
           <Popover.Dialog className="flex w-full flex-col p-0 text-start outline-none">
@@ -250,7 +250,7 @@ export function NotificationPopover({
             <Separator />
 
             {/* Notification list */}
-            <ScrollShadow className="max-h-[360px] bg-surface-secondary/40">
+            <ScrollShadow className="max-h-90 bg-surface-secondary/40">
               {filtered.length === 0 ? (
                 <div className="flex flex-col items-center justify-center gap-2 py-12 text-center">
                   <IconBell

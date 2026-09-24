@@ -52,15 +52,11 @@ export function DeleteProductAlertDialog({
         variant="blur"
       >
         <AlertDialog.Container>
-          <AlertDialog.Dialog className="sm:max-w-[420px]">
+          <AlertDialog.Dialog className="sm:max-w-105">
             <AlertDialog.CloseTrigger />
             <AlertDialog.Header className="items-center text-center">
               <AlertDialog.Icon status="danger">
-                <IconAlertTriangle
-                  aria-hidden="true"
-                  className="size-5"
-                  size={20}
-                />
+                <IconAlertTriangle aria-hidden="true" />
               </AlertDialog.Icon>
               <AlertDialog.Heading>
                 {productName
@@ -72,7 +68,7 @@ export function DeleteProductAlertDialog({
               <p>{t("deleteProductBody")}</p>
             </AlertDialog.Body>
             <AlertDialog.Footer className="flex-col-reverse gap-2">
-              <Button className="w-full" slot="close">
+              <Button className="w-full" slot="close" variant="tertiary">
                 {t("deleteProductCancel")}
               </Button>
               <Button

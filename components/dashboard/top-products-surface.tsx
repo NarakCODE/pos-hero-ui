@@ -10,7 +10,9 @@ import {
   ListBox,
 } from "@heroui/react";
 import { IconCoffee } from "@tabler/icons-react";
+import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
+import type { TimeRange } from "./dashboard-data";
 
 export interface TopProductItem {
   id: string;
@@ -81,18 +83,66 @@ export const defaultTopProducts: TopProductItem[] = [
   },
 ];
 
+const productMetricsByRange: Record<
+  TimeRange,
+  { soldCount: number; revenue: number }[]
+> = {
+  Today: [
+    { soldCount: 142, revenue: 497 },
+    { soldCount: 98, revenue: 416.5 },
+    { soldCount: 86, revenue: 387 },
+    { soldCount: 74, revenue: 351.5 },
+    { soldCount: 65, revenue: 276.25 },
+  ],
+  "7D": [
+    { soldCount: 960, revenue: 3360 },
+    { soldCount: 810, revenue: 3442.5 },
+    { soldCount: 720, revenue: 3240 },
+    { soldCount: 585, revenue: 2778.75 },
+    { soldCount: 510, revenue: 2167.5 },
+  ],
+  "1M": [
+    { soldCount: 3650, revenue: 12775 },
+    { soldCount: 2960, revenue: 12580 },
+    { soldCount: 2860, revenue: 12870 },
+    { soldCount: 2350, revenue: 11162.5 },
+    { soldCount: 1970, revenue: 8352.5 },
+  ],
+  MTD: [
+    { soldCount: 2740, revenue: 9590 },
+    { soldCount: 2220, revenue: 9435 },
+    { soldCount: 2145, revenue: 9652.5 },
+    { soldCount: 1760, revenue: 8360 },
+    { soldCount: 1475, revenue: 6256.25 },
+  ],
+};
+
 interface TopProductsSurfaceProps {
   products?: TopProductItem[];
   title?: string;
+  timeRange?: TimeRange;
   onViewAll?: () => void;
 }
 
 export function TopProductsSurface({
-  products = defaultTopProducts,
-  title = "Top Selling Products",
+  products,
+  title,
+  timeRange = "Today",
   onViewAll,
 }: TopProductsSurfaceProps = {}) {
   const router = useRouter();
+  const t = useTranslations("Dashboard.topProducts");
+  const cardTitle = title ?? t("title");
+  const visibleProducts =
+    products ??
+    defaultTopProducts.map((product, index) => ({
+      ...product,
+      ...productMetricsByRange[timeRange][index],
+    }));
+  const productRevenue = visibleProducts.reduce(
+    (total, product) => total + product.revenue,
+    0,
+  );
 
   const handleAction = (productId: string) => {
     router.push(`/products?selected=${productId}`);
@@ -112,23 +162,23 @@ export function TopProductsSurface({
         <div className="flex w-full items-center justify-between gap-3">
           <div>
             <Card.Title className="text-sm font-semibold tracking-tight sm:text-base">
-              {title}
+              {cardTitle}
             </Card.Title>
             <Card.Description className="text-xs">
-              Ranked by volume today
+              {t("subtitle")}
             </Card.Description>
           </div>
 
           <Chip color="accent" size="sm" variant="soft">
-            5 Best Sellers
+            {t("bestSellerCount", { count: visibleProducts.length })}
           </Chip>
         </div>
       </Card.Header>
 
       <Card.Content>
         <ListBox
-          aria-label="Top 5 selling products"
-          items={products}
+          aria-label={t("listLabel", { count: visibleProducts.length })}
+          items={visibleProducts}
           selectionMode="none"
           onAction={(key) => handleAction(String(key))}
         >
@@ -178,14 +228,17 @@ export function TopProductsSurface({
       <Card.Footer>
         <div className="flex w-full items-center justify-between gap-3">
           <span className="text-xs text-muted">
-            Top 5 makes up $1,928.25 of today&apos;s revenue
+            {t("revenueContribution", {
+              count: visibleProducts.length,
+              revenue: new Intl.NumberFormat("en-US", {
+                style: "currency",
+                currency: "USD",
+                maximumFractionDigits: 2,
+              }).format(productRevenue),
+            })}
           </span>
-          <Button
-            size="sm"
-            variant="ghost"
-            onPress={handleViewAll}
-          >
-            View all products
+          <Button size="sm" variant="ghost" onPress={handleViewAll}>
+            {t("viewAll")}
           </Button>
         </div>
       </Card.Footer>

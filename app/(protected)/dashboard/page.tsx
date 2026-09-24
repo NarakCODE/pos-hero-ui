@@ -4,14 +4,13 @@ import { ScrollShadow } from "@heroui/react";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { ChannelTenderCard } from "@/components/dashboard/channel-tender-card";
-import { DashboardHeroBanner } from "@/components/dashboard/dashboard-hero-banner";
-import {
-  DashboardToolbar,
-  type TimeRange,
-} from "@/components/dashboard/dashboard-toolbar";
-import { GradientKpiCards } from "@/components/dashboard/gradient-kpi-cards";
+import { DailyGuestsCard } from "@/components/dashboard/daily-guests-card";
+import { DashboardSummaryCards } from "@/components/dashboard/dashboard-summary-cards";
+import { DashboardToolbar } from "@/components/dashboard/dashboard-toolbar";
+import { OperationsSnapshot } from "@/components/dashboard/operations-snapshot";
+import { RevenueTrendCard } from "@/components/dashboard/revenue-trend-card";
 import { TopProductsSurface } from "@/components/dashboard/top-products-surface";
-import { MonthlyRevenueCard } from "@/components/shared/montly-revenue-card";
+import type { TimeRange } from "@/components/dashboard/dashboard-data";
 import { POSLayout } from "@/components/shared/pos-layout";
 
 export default function DashboardPage() {
@@ -25,45 +24,33 @@ export default function DashboardPage() {
       showSearch={false}
     >
       <ScrollShadow className="flex h-full w-full flex-col overflow-y-auto">
-        <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 p-4 sm:p-6">
-          {/* Color Admin v4 Section 1: Dashboard Toolbar (Time Range & Actions) */}
-          <section aria-label="Dashboard toolbar and filters">
-            <DashboardToolbar
-              selectedRange={selectedRange}
-              onRangeChange={setSelectedRange}
-            />
+        <div className="mx-auto flex w-full max-w-6xl flex-col gap-5 p-4 sm:p-6">
+          <DashboardToolbar
+            selectedRange={selectedRange}
+            onRangeChange={setSelectedRange}
+          />
+
+          <section aria-label={t("sections.performanceSummary")}>
+            <DashboardSummaryCards timeRange={selectedRange} />
           </section>
 
-          {/* Color Admin v4 Section 2: Executive Revenue Hero Overview Banner */}
-          <section aria-label="Executive revenue banner">
-            <DashboardHeroBanner timeRange={selectedRange} />
-          </section>
-
-          {/* Color Admin v4 Section 3: Vibrant Gradient KPI Metric Cards with Background Watermarks */}
-          <section aria-label="Occupancy and loyalty metric cards">
-            <GradientKpiCards />
-          </section>
-
-          {/* Color Admin v4 Section 4: Performance Trends & Channel Distribution */}
           <section
-            aria-label="Performance trends and channel distribution"
-            className="grid grid-cols-1 gap-5 lg:grid-cols-2"
+            aria-label={t("sections.salesAnalysis")}
+            className="grid grid-cols-1 gap-4 xl:grid-cols-[minmax(0,1.55fr)_minmax(20rem,1fr)]"
           >
-            {/* Monthly Revenue Chart */}
-            <MonthlyRevenueCard
-              currency="USD"
-              title="Monthly Sales Trend"
-              total={86400}
-              trend={{ direction: "up", value: "14.2%" }}
-            />
-
-            {/* Channel & Tender Distribution */}
-            <ChannelTenderCard />
+            <RevenueTrendCard timeRange={selectedRange} />
+            <ChannelTenderCard timeRange={selectedRange} />
           </section>
 
-          {/* Color Admin v4 Section 5: Top Selling Products */}
-          <section aria-label="Top selling products">
-            <TopProductsSurface />
+          <section
+            aria-label={t("sections.productAndOperations")}
+            className="grid grid-cols-1 gap-4 xl:grid-cols-[minmax(0,1.45fr)_minmax(20rem,1fr)]"
+          >
+            <TopProductsSurface timeRange={selectedRange} />
+            <div className="flex flex-col gap-4">
+              <DailyGuestsCard />
+              <OperationsSnapshot />
+            </div>
           </section>
         </div>
       </ScrollShadow>

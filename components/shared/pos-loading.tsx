@@ -47,15 +47,15 @@ export function TableCardSkeleton() {
   return (
     <div
       aria-hidden="true"
-      className="flex min-h-[29rem] w-full flex-col rounded-xl border border-border bg-surface p-3 shadow-xs"
+      className="flex min-h-[29rem] w-full flex-col border border-border bg-surface p-3 shadow-xs"
     >
       <div className="flex items-start justify-between gap-3 pb-2">
         <div className="flex min-w-0 flex-col gap-1.5">
-          <Skeleton className="h-3 w-10 rounded-md" />
-          <Skeleton className="h-7 w-10 rounded-md" />
-          <Skeleton className="h-3 w-20 rounded-md" />
+          <Skeleton className="h-3 w-10" />
+          <Skeleton className="h-7 w-10" />
+          <Skeleton className="h-3 w-20" />
         </div>
-        <Skeleton className="size-5 rounded-full" />
+        <Skeleton className="size-5" />
       </div>
 
       <div className="flex flex-1 flex-col">
@@ -64,9 +64,9 @@ export function TableCardSkeleton() {
             key={`table-slot-skeleton-${index}`}
             className="flex min-h-6 items-center gap-1.5 border-b border-border/40 last:border-b-0"
           >
-            <Skeleton className="h-3 w-[3.6rem] shrink-0 rounded-sm" />
-            <Skeleton className="h-3 min-w-0 flex-1 rounded-sm" />
-            <Skeleton className="size-2 shrink-0 rounded-full" />
+            <Skeleton className="h-3 w-[3.6rem] shrink-0" />
+            <Skeleton className="h-3 min-w-0 flex-1" />
+            <Skeleton className="size-2 shrink-0" />
           </div>
         ))}
       </div>
@@ -97,12 +97,12 @@ export function ProductCardSkeleton() {
   return (
     <div
       aria-hidden="true"
-      className="flex min-h-24 w-full items-center gap-3 overflow-hidden rounded-xl border border-border bg-surface p-2 shadow-xs"
+      className="flex min-h-24 w-full items-center gap-3 overflow-hidden border border-border bg-surface p-2 shadow-xs"
     >
-      <Skeleton className="size-16 shrink-0 rounded-lg sm:size-[4.5rem]" />
+      <Skeleton className="size-16 shrink-0 sm:size-[4.5rem]" />
       <div className="flex min-w-0 flex-1 flex-col gap-2 pe-1">
-        <Skeleton className="h-4 w-3/4 rounded-md" />
-        <Skeleton className="h-4 w-1/3 rounded-md" />
+        <Skeleton className="h-4 w-3/4" />
+        <Skeleton className="h-4 w-1/3" />
       </div>
     </div>
   );
@@ -127,21 +127,21 @@ function TableRowSkeleton({ rowClassName }: { rowClassName: string }) {
       aria-hidden="true"
       className={`grid items-center gap-4 border-t border-border/60 px-4 py-3.5 ${rowClassName}`}
     >
-      <Skeleton className="h-4 w-8 rounded-md" />
+      <Skeleton className="h-4 w-8" />
       <div className="flex min-w-0 items-center gap-3">
-        <Skeleton className="size-8 shrink-0 rounded-full" />
+        <Skeleton className="size-8 shrink-0" />
         <div className="flex min-w-0 flex-1 flex-col gap-1.5">
-          <Skeleton className="h-4 w-28 rounded-md" />
-          <Skeleton className="h-3 w-20 rounded-md" />
+          <Skeleton className="h-4 w-28" />
+          <Skeleton className="h-3 w-20" />
         </div>
       </div>
-      <Skeleton className="h-4 w-20 rounded-md" />
-      <Skeleton className="h-4 w-24 rounded-md" />
-      <Skeleton className="h-4 w-16 rounded-md" />
-      <Skeleton className="h-4 w-20 rounded-md" />
-      <Skeleton className="h-4 w-20 rounded-md" />
-      <Skeleton className="h-4 w-16 rounded-md" />
-      <Skeleton className="h-6 w-20 rounded-full" />
+      <Skeleton className="h-4 w-20" />
+      <Skeleton className="h-4 w-24" />
+      <Skeleton className="h-4 w-16" />
+      <Skeleton className="h-4 w-20" />
+      <Skeleton className="h-4 w-20" />
+      <Skeleton className="h-4 w-16" />
+      <Skeleton className="h-6 w-20" />
     </div>
   );
 }
@@ -152,7 +152,7 @@ export function OrdersTableSkeleton({ count = 8 }: { count?: number }) {
 
   return (
     <LoadingRegion
-      className="min-w-[68rem] overflow-hidden rounded-xl border border-border bg-surface shadow-xs"
+      className="min-w-[68rem] overflow-hidden border border-border bg-surface shadow-xs"
       label="Loading orders"
     >
       <div
@@ -162,7 +162,7 @@ export function OrdersTableSkeleton({ count = 8 }: { count?: number }) {
         {Array.from({ length: 9 }, (_, index) => (
           <Skeleton
             key={`orders-heading-skeleton-${index}`}
-            className="h-3.5 w-full rounded-md"
+            className="h-3.5 w-full"
           />
         ))}
       </div>
@@ -183,19 +183,19 @@ function CustomerRowSkeleton() {
       className="grid grid-cols-[minmax(14rem,1.5fr)_minmax(12rem,1.25fr)_minmax(7rem,0.8fr)_5rem_minmax(8rem,0.9fr)] items-center gap-4 border-t border-border/60 px-4 py-3.5"
     >
       <div className="flex items-center gap-3">
-        <Skeleton className="size-8 shrink-0 rounded-full" />
+        <Skeleton className="size-8 shrink-0" />
         <div className="flex min-w-0 flex-1 flex-col gap-1.5">
-          <Skeleton className="h-4 w-32 rounded-md" />
-          <Skeleton className="h-3 w-24 rounded-md" />
+          <Skeleton className="h-4 w-32" />
+          <Skeleton className="h-3 w-24" />
         </div>
       </div>
       <div className="flex flex-col gap-1.5">
-        <Skeleton className="h-4 w-28 rounded-md" />
-        <Skeleton className="h-3 w-36 rounded-md" />
+        <Skeleton className="h-4 w-28" />
+        <Skeleton className="h-3 w-36" />
       </div>
-      <Skeleton className="h-6 w-16 rounded-full" />
-      <Skeleton className="h-4 w-8 rounded-md" />
-      <Skeleton className="h-4 w-20 rounded-md" />
+      <Skeleton className="h-6 w-16" />
+      <Skeleton className="h-4 w-8" />
+      <Skeleton className="h-4 w-20" />
     </div>
   );
 }
@@ -203,7 +203,7 @@ function CustomerRowSkeleton() {
 export function CustomersTableSkeleton({ count = 8 }: { count?: number }) {
   return (
     <LoadingRegion
-      className="min-w-[42rem] overflow-hidden rounded-xl border border-border bg-surface shadow-xs"
+      className="min-w-[42rem] overflow-hidden border border-border bg-surface shadow-xs"
       label="Loading customers"
     >
       <div
@@ -213,7 +213,7 @@ export function CustomersTableSkeleton({ count = 8 }: { count?: number }) {
         {Array.from({ length: 5 }, (_, index) => (
           <Skeleton
             key={`customers-heading-skeleton-${index}`}
-            className="h-3.5 w-full rounded-md"
+            className="h-3.5 w-full"
           />
         ))}
       </div>
@@ -227,7 +227,7 @@ export function CustomersTableSkeleton({ count = 8 }: { count?: number }) {
 export function KpiGroupSkeleton({ count = 4 }: { count?: number }) {
   return (
     <LoadingRegion
-      className="flex w-full flex-col items-stretch overflow-hidden rounded-xl border border-border bg-surface shadow-xs sm:flex-row"
+      className="flex w-full flex-col items-stretch overflow-hidden border border-border bg-surface shadow-xs sm:flex-row"
       label="Loading metrics"
     >
       {Array.from({ length: count }, (_, index) => (
@@ -242,10 +242,10 @@ export function KpiGroupSkeleton({ count = 4 }: { count?: number }) {
             aria-hidden="true"
             className="flex min-w-0 flex-1 flex-col justify-between gap-2 p-3.5 sm:p-4"
           >
-            <Skeleton className="h-3 w-20 rounded-md" />
+            <Skeleton className="h-3 w-20" />
             <div className="flex items-center justify-between gap-3">
-              <Skeleton className="h-7 w-20 rounded-md" />
-              <Skeleton className="h-5 w-12 rounded-full" />
+              <Skeleton className="h-7 w-20" />
+              <Skeleton className="h-5 w-12" />
             </div>
           </div>
         </div>
@@ -264,14 +264,14 @@ export function OrderAsideSkeleton() {
       <div className="flex shrink-0 flex-col gap-3 border-b border-border/60 pb-3">
         <div className="flex items-center justify-between gap-3">
           <div className="flex items-center gap-2">
-            <Skeleton className="h-6 w-20 rounded-md" />
-            <Skeleton className="h-5 w-16 rounded-full" />
+            <Skeleton className="h-6 w-20" />
+            <Skeleton className="h-5 w-16" />
           </div>
-          <Skeleton className="h-8 w-16 rounded-lg" />
+          <Skeleton className="h-8 w-16" />
         </div>
         <div className="flex items-center justify-between gap-3">
-          <Skeleton className="h-3.5 w-28 rounded-md" />
-          <Skeleton className="h-3.5 w-20 rounded-md" />
+          <Skeleton className="h-3.5 w-28" />
+          <Skeleton className="h-3.5 w-20" />
         </div>
       </div>
 
@@ -280,48 +280,48 @@ export function OrderAsideSkeleton() {
         {Array.from({ length: 5 }, (_, index) => (
           <div
             key={`order-aside-skeleton-${index}`}
-            className="flex items-center justify-between gap-3 rounded-lg bg-surface-secondary/40 p-2.5"
+            className="flex items-center justify-between gap-3 bg-surface-secondary/40 p-2.5"
           >
             <div className="flex min-w-0 flex-1 items-center gap-2.5">
-              <Skeleton className="size-7 shrink-0 rounded-md" />
+              <Skeleton className="size-7 shrink-0" />
               <div className="flex min-w-0 flex-1 flex-col gap-1.5">
-                <Skeleton className="h-4 w-3/4 rounded-md" />
-                <Skeleton className="h-3 w-1/2 rounded-md" />
+                <Skeleton className="h-4 w-3/4" />
+                <Skeleton className="h-3 w-1/2" />
               </div>
             </div>
-            <Skeleton className="h-4 w-12 shrink-0 rounded-md" />
+            <Skeleton className="h-4 w-12 shrink-0" />
           </div>
         ))}
       </div>
 
       {/* Footer Billing & Actions */}
       <div className="flex shrink-0 flex-col gap-3 border-t border-border/60 pt-3">
-        <div className="flex flex-col gap-2 rounded-xl bg-surface-secondary/50 p-3">
+        <div className="flex flex-col gap-2 bg-surface-secondary/50 p-3">
           <div className="flex justify-between">
-            <Skeleton className="h-3 w-16 rounded-md" />
-            <Skeleton className="h-3 w-12 rounded-md" />
+            <Skeleton className="h-3 w-16" />
+            <Skeleton className="h-3 w-12" />
           </div>
           <div className="flex justify-between">
-            <Skeleton className="h-3 w-20 rounded-md" />
-            <Skeleton className="h-3 w-12 rounded-md" />
+            <Skeleton className="h-3 w-20" />
+            <Skeleton className="h-3 w-12" />
           </div>
           <div className="flex justify-between">
-            <Skeleton className="h-3 w-14 rounded-md" />
-            <Skeleton className="h-3 w-12 rounded-md" />
+            <Skeleton className="h-3 w-14" />
+            <Skeleton className="h-3 w-12" />
           </div>
           <div className="mt-1 flex items-center justify-between border-t border-border/60 pt-2">
-            <Skeleton className="h-4 w-20 rounded-md" />
-            <Skeleton className="h-6 w-24 rounded-md" />
+            <Skeleton className="h-4 w-20" />
+            <Skeleton className="h-6 w-24" />
           </div>
         </div>
 
         <div className="grid grid-cols-3 gap-2">
-          <Skeleton className="h-10 rounded-xl" />
-          <Skeleton className="h-10 rounded-xl" />
-          <Skeleton className="h-10 rounded-xl" />
+          <Skeleton className="h-10" />
+          <Skeleton className="h-10" />
+          <Skeleton className="h-10" />
         </div>
 
-        <Skeleton className="h-12 w-full rounded-xl" />
+        <Skeleton className="h-12 w-full" />
       </div>
     </LoadingRegion>
   );
@@ -335,30 +335,30 @@ export function CustomerAsideSkeleton() {
     >
       {/* Header */}
       <div className="flex shrink-0 items-center gap-2 border-b border-border/60 pb-3">
-        <Skeleton className="size-5 rounded-md" />
-        <Skeleton className="h-5 w-32 rounded-md" />
+        <Skeleton className="size-5" />
+        <Skeleton className="h-5 w-32" />
       </div>
 
       {/* Content */}
       <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-hidden py-3">
         {/* Profile Card */}
-        <div className="flex items-start justify-between gap-3 rounded-xl bg-surface-secondary/40 p-3.5">
+        <div className="flex items-start justify-between gap-3 bg-surface-secondary/40 p-3.5">
           <div className="flex items-center gap-3">
-            <Skeleton className="size-12 shrink-0 rounded-full sm:size-14" />
+            <Skeleton className="size-12 shrink-0 sm:size-14" />
             <div className="flex min-w-0 flex-1 flex-col gap-1.5">
-              <Skeleton className="h-5 w-32 rounded-md" />
-              <Skeleton className="h-3 w-24 rounded-md" />
-              <Skeleton className="h-3 w-28 rounded-md" />
+              <Skeleton className="h-5 w-32" />
+              <Skeleton className="h-3 w-24" />
+              <Skeleton className="h-3 w-28" />
             </div>
           </div>
-          <Skeleton className="h-6 w-16 rounded-full" />
+          <Skeleton className="h-6 w-16" />
         </div>
 
         {/* Basic Information Section */}
-        <div className="flex flex-col gap-3 rounded-xl border border-border/60 p-3.5">
+        <div className="flex flex-col gap-3 border border-border/60 p-3.5">
           <div className="flex items-center justify-between">
-            <Skeleton className="h-4 w-32 rounded-md" />
-            <Skeleton className="size-4 rounded-md" />
+            <Skeleton className="h-4 w-32" />
+            <Skeleton className="size-4" />
           </div>
           <div className="grid grid-cols-2 gap-x-4 gap-y-3 pt-2">
             {Array.from({ length: 6 }, (_, index) => (
@@ -366,8 +366,8 @@ export function CustomerAsideSkeleton() {
                 key={`customer-aside-detail-skeleton-${index}`}
                 className="flex flex-col gap-1.5"
               >
-                <Skeleton className="h-2.5 w-16 rounded-md" />
-                <Skeleton className="h-4 w-24 rounded-md" />
+                <Skeleton className="h-2.5 w-16" />
+                <Skeleton className="h-4 w-24" />
               </div>
             ))}
           </div>
@@ -378,10 +378,10 @@ export function CustomerAsideSkeleton() {
           {Array.from({ length: 3 }, (_, index) => (
             <div
               key={`customer-aside-stat-skeleton-${index}`}
-              className="flex flex-col items-center gap-1.5 rounded-xl bg-surface-secondary/30 p-2.5 text-center"
+              className="flex flex-col items-center gap-1.5 bg-surface-secondary/30 p-2.5 text-center"
             >
-              <Skeleton className="h-2.5 w-12 rounded-md" />
-              <Skeleton className="h-5 w-16 rounded-md" />
+              <Skeleton className="h-2.5 w-12" />
+              <Skeleton className="h-5 w-16" />
             </div>
           ))}
         </div>
@@ -389,9 +389,9 @@ export function CustomerAsideSkeleton() {
 
       {/* Footer Actions */}
       <div className="grid shrink-0 grid-cols-3 gap-2 border-t border-border/60 pt-3">
-        <Skeleton className="h-10 rounded-xl" />
-        <Skeleton className="h-10 rounded-xl" />
-        <Skeleton className="h-10 rounded-xl" />
+        <Skeleton className="h-10" />
+        <Skeleton className="h-10" />
+        <Skeleton className="h-10" />
       </div>
     </LoadingRegion>
   );
@@ -405,8 +405,8 @@ export function SettingsAsideSkeleton() {
     >
       {/* Header */}
       <div className="flex shrink-0 items-center justify-between gap-3 border-b border-border/60 pb-3">
-        <Skeleton className="h-5 w-32 rounded-md" />
-        <Skeleton className="h-6 w-24 rounded-full" />
+        <Skeleton className="h-5 w-32" />
+        <Skeleton className="h-6 w-24" />
       </div>
 
       {/* Form Fields */}
@@ -416,15 +416,15 @@ export function SettingsAsideSkeleton() {
             key={`settings-aside-skeleton-${index}`}
             className="flex flex-col gap-2"
           >
-            <Skeleton className="h-3.5 w-28 rounded-md" />
-            <Skeleton className="h-10 w-full rounded-xl" />
+            <Skeleton className="h-3.5 w-28" />
+            <Skeleton className="h-10 w-full" />
           </div>
         ))}
       </div>
 
       {/* Footer */}
       <div className="flex shrink-0 justify-end border-t border-border/60 pt-3">
-        <Skeleton className="h-11 w-36 rounded-xl" />
+        <Skeleton className="h-11 w-36" />
       </div>
     </LoadingRegion>
   );
@@ -438,32 +438,32 @@ export function ContextAsideSkeleton() {
     >
       {/* Header */}
       <div className="flex shrink-0 items-center gap-3 border-b border-border/60 pb-3">
-        <Skeleton className="size-10 shrink-0 rounded-xl" />
+        <Skeleton className="size-10 shrink-0" />
         <div className="flex min-w-0 flex-1 flex-col gap-1.5">
-          <Skeleton className="h-4 w-32 rounded-md" />
-          <Skeleton className="h-3 w-20 rounded-md" />
+          <Skeleton className="h-4 w-32" />
+          <Skeleton className="h-3 w-20" />
         </div>
-        <Skeleton className="h-6 w-16 rounded-full" />
+        <Skeleton className="h-6 w-16" />
       </div>
 
       {/* Main Content */}
       <div className="flex min-h-0 flex-1 flex-col gap-3.5 overflow-hidden py-3">
-        <Skeleton className="h-28 w-full rounded-xl" />
+        <Skeleton className="h-28 w-full" />
         <div className="grid grid-cols-2 gap-2.5">
-          <Skeleton className="h-20 rounded-xl" />
-          <Skeleton className="h-20 rounded-xl" />
+          <Skeleton className="h-20" />
+          <Skeleton className="h-20" />
         </div>
-        <Skeleton className="h-24 w-full rounded-xl" />
-        <div className="flex flex-col gap-2 rounded-xl bg-surface-secondary/40 p-3">
-          <Skeleton className="h-3 w-24 rounded-md" />
-          <Skeleton className="h-3 w-40 rounded-md" />
-          <Skeleton className="h-3 w-32 rounded-md" />
+        <Skeleton className="h-24 w-full" />
+        <div className="flex flex-col gap-2 bg-surface-secondary/40 p-3">
+          <Skeleton className="h-3 w-24" />
+          <Skeleton className="h-3 w-40" />
+          <Skeleton className="h-3 w-32" />
         </div>
       </div>
 
       {/* Footer */}
       <div className="shrink-0 border-t border-border/60 pt-3">
-        <Skeleton className="h-11 w-full rounded-xl" />
+        <Skeleton className="h-11 w-full" />
       </div>
     </LoadingRegion>
   );
@@ -478,20 +478,20 @@ export function POSHeaderSkeleton({ className = "" }: { className?: string }) {
       <div className="flex items-center justify-between gap-3 sm:gap-4">
         {/* Brand Logo & Title */}
         <div className="flex shrink-0 items-center gap-3">
-          <Skeleton className="size-8 rounded-lg" />
-          <Skeleton className="hidden h-5 w-24 rounded-md sm:block" />
+          <Skeleton className="size-8" />
+          <Skeleton className="hidden h-5 w-24 sm:block" />
         </div>
 
         {/* Search Field (Centered) */}
         <div className="flex min-w-0 max-w-md flex-1">
-          <Skeleton className="h-9 w-full rounded-xl" />
+          <Skeleton className="h-9 w-full" />
         </div>
 
         {/* Right: Actions & Switchers */}
         <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
-          <Skeleton className="size-8 rounded-xl" />
-          <Skeleton className="hidden h-8 w-24 rounded-xl sm:block" />
-          <Skeleton className="size-8 rounded-xl" />
+          <Skeleton className="size-8" />
+          <Skeleton className="hidden h-8 w-24 sm:block" />
+          <Skeleton className="size-8" />
         </div>
       </div>
     </header>
@@ -517,7 +517,7 @@ export function POSTabsSkeleton({
       {Array.from({ length: count }, (_, index) => (
         <Skeleton
           key={`tab-skeleton-${index}`}
-          className="h-8 w-20 shrink-0 rounded-lg sm:w-24"
+          className="h-8 w-20 shrink-0 sm:w-24"
         />
       ))}
     </div>
@@ -536,8 +536,8 @@ export function POSSearchBarSkeleton({
       aria-hidden="true"
       className={`flex shrink-0 items-center gap-2 px-[var(--pos-content-padding)] py-3 ${className}`}
     >
-      <Skeleton className="h-10 flex-1 rounded-xl" />
-      {hasAction && <Skeleton className="size-10 shrink-0 rounded-xl" />}
+      <Skeleton className="h-10 flex-1" />
+      {hasAction && <Skeleton className="size-10 shrink-0" />}
     </div>
   );
 }

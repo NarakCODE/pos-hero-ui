@@ -1,36 +1,26 @@
 "use client";
 
-import { Button, Card, Chip, ScrollShadow } from "@heroui/react";
-import { IconCheck, IconClock } from "@tabler/icons-react";
+import { Button, Card, Chip, InputGroup, ScrollShadow } from "@heroui/react";
+import { IconCheck, IconClock, IconSearch } from "@tabler/icons-react";
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import { POSAside } from "@/components/shared/pos-aside";
 import { POSLayout } from "@/components/shared/pos-layout";
 
-type DishStatus = "pending" | "completed" | "cancelled";
+import type {
+  DishStatus,
+  KitchenTicket,
+} from "./kitchen-data";
+import { kitchenTickets as defaultTickets } from "./kitchen-data";
+
 type TicketListOrientation = "horizontal" | "vertical";
-
-interface KitchenDish {
-  id: string;
-  title: string;
-  quantity: number;
-  modifiers: string[];
-  image: string;
-  status: DishStatus;
-}
-
-interface KitchenTicket {
-  id: string;
-  orderCode: string;
-  tableNumber: string;
-  elapsedSeconds: number;
-  dishes: KitchenDish[];
-}
+type KitchenFilter = "all" | "active" | "rush" | "completed";
 
 interface KitchenWorkspaceProps {
   asideLabel: string;
   headerTitle: string;
+  tickets?: KitchenTicket[];
 }
 
 interface KitchenTicketListProps {
@@ -40,109 +30,13 @@ interface KitchenTicketListProps {
   tickets: KitchenTicket[];
 }
 
-interface KitchenAsideProps extends Omit<KitchenTicketListProps, "orientation"> {
+interface KitchenAsideProps extends Omit<
+  KitchenTicketListProps,
+  "orientation"
+> {
   elapsedTick: number;
   selectedTicket: KitchenTicket;
 }
-
-const initialTickets: KitchenTicket[] = [
-  {
-    id: "ticket-1082",
-    orderCode: "ORD-1082",
-    tableNumber: "Table 02/05",
-    elapsedSeconds: 12 * 60 + 42,
-    dishes: [
-      {
-        id: "lok-lak-1082",
-        title: "Beef Lok Lak",
-        quantity: 1,
-        modifiers: ["Medium rare", "Pepper-lime sauce on the side"],
-        image: "/kitchen/lok-lak.jpg",
-        status: "completed",
-      },
-      {
-        id: "curry-1082",
-        title: "Khmer Chicken Curry",
-        quantity: 2,
-        modifiers: ["Mild spice", "Rice on the side"],
-        image: "/kitchen/chicken-curry.jpg",
-        status: "completed",
-      },
-      {
-        id: "spring-rolls-1082",
-        title: "Crispy Spring Rolls",
-        quantity: 1,
-        modifiers: ["Extra herbs", "Chili sauce on the side"],
-        image: "/kitchen/spring-rolls.jpg",
-        status: "completed",
-      },
-      {
-        id: "mango-sticky-rice-1082",
-        title: "Mango Sticky Rice",
-        quantity: 1,
-        modifiers: ["Coconut cream on the side", "No sesame"],
-        image: "/kitchen/mango-sticky-rice.jpg",
-        status: "pending",
-      },
-    ],
-  },
-  {
-    id: "ticket-1086",
-    orderCode: "ORD-1086",
-    tableNumber: "Table 08/05",
-    elapsedSeconds: 8 * 60 + 16,
-    dishes: [
-      {
-        id: "lok-lak-1086",
-        title: "Beef Lok Lak",
-        quantity: 1,
-        modifiers: ["Well done", "Extra pepper-lime sauce"],
-        image: "/kitchen/lok-lak.jpg",
-        status: "pending",
-      },
-      {
-        id: "spring-rolls-1086",
-        title: "Crispy Spring Rolls",
-        quantity: 2,
-        modifiers: ["Chili sauce on the side"],
-        image: "/kitchen/spring-rolls.jpg",
-        status: "pending",
-      },
-      {
-        id: "curry-1086",
-        title: "Khmer Chicken Curry",
-        quantity: 1,
-        modifiers: ["Extra mild", "Jasmine rice"],
-        image: "/kitchen/chicken-curry.jpg",
-        status: "pending",
-      },
-    ],
-  },
-  {
-    id: "ticket-1088",
-    orderCode: "ORD-1088",
-    tableNumber: "Table 04/05",
-    elapsedSeconds: 4 * 60 + 9,
-    dishes: [
-      {
-        id: "mango-sticky-rice-1088",
-        title: "Mango Sticky Rice",
-        quantity: 1,
-        modifiers: ["Coconut cream on the side"],
-        image: "/kitchen/mango-sticky-rice.jpg",
-        status: "pending",
-      },
-      {
-        id: "lok-lak-1088",
-        title: "Beef Lok Lak",
-        quantity: 2,
-        modifiers: ["Medium", "No fried egg"],
-        image: "/kitchen/lok-lak.jpg",
-        status: "pending",
-      },
-    ],
-  },
-];
 
 function formatElapsedTime(totalSeconds: number) {
   const hours = Math.floor(totalSeconds / 3600);
@@ -168,9 +62,7 @@ function KitchenTicketList({
   return (
     <div
       className={
-        isHorizontal
-          ? "flex w-max gap-2"
-          : "flex w-full flex-col gap-2.5"
+        isHorizontal ? "flex w-max gap-2" : "flex w-full flex-col gap-2"
       }
     >
       {tickets.map((ticket) => {
@@ -178,36 +70,57 @@ function KitchenTicketList({
         const isCompleted =
           ticket.dishes.length > 0 &&
           ticket.dishes.every((dish) => dish.status === "completed");
+        const completedCount = ticket.dishes.filter(
+          (d) => d.status === "completed",
+        ).length;
 
         return (
           <div
-            className={isHorizontal ? "w-60 shrink-0" : "w-full"}
+            className={isHorizontal ? "w-64 shrink-0" : "w-full"}
+            data-ticket-nav-id={ticket.id}
             key={ticket.id}
           >
             <Button
               aria-pressed={isSelected}
+              className="h-auto px-3 py-2.5"
               fullWidth
               onPress={() => onSelect(ticket.id)}
               size="lg"
               type="button"
               variant={isSelected ? "primary" : "secondary"}
             >
-              <span className="flex w-full items-center justify-between gap-3">
-                <span className="flex min-w-0 items-center gap-2">
-                  <span className="truncate text-start font-semibold">
+              <div className="flex w-full flex-col gap-1 text-start">
+                <div className="flex items-center justify-between gap-2">
+                  <span className="truncate text-sm font-semibold">
                     {ticket.tableNumber}
                   </span>
-                  {isCompleted ? (
-                    <>
-                      <IconCheck aria-hidden="true" size={18} />
-                      <span className="sr-only">{t("completed")}</span>
-                    </>
-                  ) : null}
-                </span>
-                <span className="shrink-0 font-mono text-xs text-muted">
-                  {ticket.orderCode}
-                </span>
-              </span>
+                  <span className="shrink-0 font-mono text-xs opacity-75">
+                    {ticket.orderCode}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between gap-1 text-xs opacity-80">
+                  <span className="flex items-center gap-1.5">
+                    {ticket.priority === "rush" && (
+                      <span className="rounded bg-danger/20 px-1 py-0.5 text-[10px] font-bold text-danger">
+                        RUSH
+                      </span>
+                    )}
+                    <span>
+                      {t("readyCount", {
+                        completed: completedCount,
+                        total: ticket.dishes.length,
+                      })}
+                    </span>
+                  </span>
+                  {isCompleted && (
+                    <IconCheck
+                      aria-hidden="true"
+                      className="text-success"
+                      size={15}
+                    />
+                  )}
+                </div>
+              </div>
             </Button>
           </div>
         );
@@ -225,37 +138,57 @@ function KitchenTicketAside({
 }: KitchenAsideProps) {
   const t = useTranslations("SalesMenu.pages.kitchen");
 
+  const serviceBadgeLabel =
+    selectedTicket.serviceType === "takeaway"
+      ? "Takeaway"
+      : selectedTicket.serviceType === "delivery"
+        ? (selectedTicket.channel ?? "Delivery")
+        : t("serviceTypeDineIn");
+
   return (
     <POSAside
       ariaLabelledBy="kitchen-aside-title"
       headerClassName="border-b border-border p-4"
       mainClassName="flex min-h-0 flex-col p-4"
       header={
-        <div className="flex flex-col gap-3">
-          <p className="text-xs font-medium uppercase tracking-wide text-muted">
-            {t("selectedTicketLabel")}
-          </p>
+        <div className="flex flex-col gap-2.5">
           <div className="flex items-center justify-between gap-3">
             <h2
-              className="min-w-0 truncate text-lg font-semibold text-foreground"
+              className="min-w-0 truncate text-base font-semibold text-foreground"
               id="kitchen-aside-title"
             >
               {selectedTicket.tableNumber}
             </h2>
-            <Chip color="accent" size="sm" variant="soft">
-              {t("serviceTypeDineIn")}
-            </Chip>
+            <div className="flex items-center gap-1.5 shrink-0">
+              {selectedTicket.priority === "rush" && (
+                <Chip color="danger" size="sm" variant="soft">
+                  Rush
+                </Chip>
+              )}
+              <Chip color="accent" size="sm" variant="soft">
+                {serviceBadgeLabel}
+              </Chip>
+            </div>
           </div>
-          <p className="font-mono text-sm text-muted">
-            {selectedTicket.orderCode}
-          </p>
-          <div className="flex items-center gap-2 rounded-lg bg-surface-secondary px-3 py-2 text-sm text-muted">
-            <IconClock aria-hidden="true" size={16} />
-            <span>{t("prepTimerLabel")}</span>
-            <time className="ms-auto font-semibold tabular-nums text-foreground">
-              {formatElapsedTime(selectedTicket.elapsedSeconds + elapsedTick)}
-            </time>
+          <div className="flex items-center justify-between text-xs text-muted">
+            <span className="font-mono text-foreground/80">
+              {selectedTicket.orderCode}
+            </span>
+            <div className="flex items-center gap-1.5">
+              <IconClock aria-hidden="true" size={14} />
+              <time className="font-mono font-medium text-foreground">
+                {formatElapsedTime(selectedTicket.elapsedSeconds + elapsedTick)}
+              </time>
+            </div>
           </div>
+          {selectedTicket.notes && (
+            <p className="rounded-md bg-surface-secondary px-2.5 py-1.5 text-xs text-muted">
+              <span className="font-medium text-foreground">
+                {t("notesLabel")}{" "}
+              </span>
+              {selectedTicket.notes}
+            </p>
+          )}
         </div>
       }
     >
@@ -265,13 +198,13 @@ function KitchenTicketAside({
       >
         <div className="flex shrink-0 items-center justify-between gap-2">
           <h3
-            className="text-sm font-semibold text-foreground"
+            className="text-sm font-medium text-foreground"
             id="kitchen-ticket-list-title"
           >
             {t("ticketListLabel")}
           </h3>
-          <Chip color="accent" size="sm" variant="soft">
-            {t("ticketCount", { count: tickets.length })}
+          <Chip size="sm" variant="secondary">
+            {tickets.length}
           </Chip>
         </div>
         <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
@@ -290,13 +223,19 @@ function KitchenTicketAside({
 export function KitchenWorkspace({
   asideLabel,
   headerTitle,
+  tickets: initialTicketsProp,
 }: KitchenWorkspaceProps) {
   const t = useTranslations("SalesMenu.pages.kitchen");
-  const [tickets, setTickets] = useState(initialTickets);
+  const [tickets, setTickets] = useState(initialTicketsProp ?? defaultTickets);
   const [selectedTicketId, setSelectedTicketId] = useState(
-    initialTickets[0].id,
+    (initialTicketsProp ?? defaultTickets)[0]?.id ?? "",
   );
   const [elapsedTick, setElapsedTick] = useState(0);
+  const [filter, setFilter] = useState<KitchenFilter>("all");
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const isClickScrollingRef = useRef(false);
 
   useEffect(() => {
     const intervalId = window.setInterval(() => {
@@ -306,13 +245,66 @@ export function KitchenWorkspace({
     return () => window.clearInterval(intervalId);
   }, []);
 
-  const selectedTicket =
-    tickets.find((ticket) => ticket.id === selectedTicketId) ?? tickets[0];
+  const counts = useMemo(() => {
+    let active = 0;
+    let rush = 0;
+    let completed = 0;
 
-  const updateDishStatus = (dishId: string, status: DishStatus) => {
+    for (const ticket of tickets) {
+      const isDone =
+        ticket.dishes.length > 0 &&
+        ticket.dishes.every((d) => d.status === "completed");
+      if (isDone) {
+        completed++;
+      } else {
+        active++;
+        if (ticket.priority === "rush") rush++;
+      }
+    }
+
+    return { all: tickets.length, active, rush, completed };
+  }, [tickets]);
+
+  const filteredTickets = useMemo(() => {
+    return tickets.filter((ticket) => {
+      const isCompleted =
+        ticket.dishes.length > 0 &&
+        ticket.dishes.every((d) => d.status === "completed");
+
+      if (filter === "active" && isCompleted) return false;
+      if (filter === "rush" && ticket.priority !== "rush") return false;
+      if (filter === "completed" && !isCompleted) return false;
+
+      if (searchQuery.trim()) {
+        const q = searchQuery.toLowerCase();
+        const matchTable = ticket.tableNumber.toLowerCase().includes(q);
+        const matchOrder = ticket.orderCode.toLowerCase().includes(q);
+        const matchServer = ticket.serverName?.toLowerCase().includes(q);
+        const matchDish = ticket.dishes.some((d) =>
+          d.title.toLowerCase().includes(q),
+        );
+        if (!matchTable && !matchOrder && !matchServer && !matchDish) {
+          return false;
+        }
+      }
+
+      return true;
+    });
+  }, [tickets, filter, searchQuery]);
+
+  const selectedTicket =
+    filteredTickets.find((ticket) => ticket.id === selectedTicketId) ??
+    tickets.find((ticket) => ticket.id === selectedTicketId) ??
+    tickets[0];
+
+  const updateDishStatus = (
+    ticketId: string,
+    dishId: string,
+    status: DishStatus,
+  ) => {
     setTickets((currentTickets) =>
       currentTickets.map((ticket) =>
-        ticket.id === selectedTicket.id
+        ticket.id === ticketId
           ? {
               ...ticket,
               dishes: ticket.dishes.map((dish) =>
@@ -324,155 +316,424 @@ export function KitchenWorkspace({
     );
   };
 
+  const toggleCompleteAll = (ticketId: string) => {
+    setTickets((currentTickets) =>
+      currentTickets.map((ticket) => {
+        if (ticket.id !== ticketId) return ticket;
+        const allCompleted = ticket.dishes.every(
+          (d) => d.status === "completed",
+        );
+        const nextStatus: DishStatus = allCompleted ? "pending" : "completed";
+        return {
+          ...ticket,
+          dishes: ticket.dishes.map((dish) => ({
+            ...dish,
+            status: nextStatus,
+          })),
+        };
+      }),
+    );
+  };
+
+  const scrollToTicket = useCallback((ticketId: string) => {
+    setSelectedTicketId(ticketId);
+    isClickScrollingRef.current = true;
+
+    const targetEl = document.getElementById(`ticket-${ticketId}`);
+    if (targetEl && scrollContainerRef.current) {
+      targetEl.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    }
+
+    setTimeout(() => {
+      isClickScrollingRef.current = false;
+    }, 600);
+  }, []);
+
+  // Scroll spy: track the active ticket section based on scroll position
+  useEffect(() => {
+    const container = scrollContainerRef.current;
+    if (!container) return;
+
+    const handleScroll = () => {
+      if (isClickScrollingRef.current) return;
+
+      const ticketEls =
+        container.querySelectorAll<HTMLElement>("[data-ticket-id]");
+      if (!ticketEls.length) return;
+
+      const containerRect = container.getBoundingClientRect();
+      const targetY = containerRect.top + 120;
+
+      let activeId = "";
+      let closestDistance = Infinity;
+
+      for (let i = 0; i < ticketEls.length; i++) {
+        const el = ticketEls[i];
+        const rect = el.getBoundingClientRect();
+
+        if (rect.top <= targetY && rect.bottom > containerRect.top + 60) {
+          activeId = el.getAttribute("data-ticket-id") ?? "";
+          break;
+        }
+
+        const dist = Math.abs(rect.top - targetY);
+        if (dist < closestDistance) {
+          closestDistance = dist;
+          activeId = el.getAttribute("data-ticket-id") ?? "";
+        }
+      }
+
+      if (activeId && activeId !== selectedTicketId) {
+        setSelectedTicketId(activeId);
+      }
+    };
+
+    container.addEventListener("scroll", handleScroll, { passive: true });
+    return () => {
+      container.removeEventListener("scroll", handleScroll);
+    };
+  }, [selectedTicketId]);
+
+  // Keep active ticket button in view inside sidebar / horizontal rail
+  useEffect(() => {
+    const navItems = document.querySelectorAll<HTMLElement>(
+      `[data-ticket-nav-id="${selectedTicketId}"]`,
+    );
+    navItems.forEach((item) => {
+      item.scrollIntoView({
+        behavior: "smooth",
+        block: "nearest",
+        inline: "nearest",
+      });
+    });
+  }, [selectedTicketId]);
+
   return (
     <POSLayout
-      headerTitle={headerTitle}
       rightPanel={
         <KitchenTicketAside
           elapsedTick={elapsedTick}
-          onSelect={setSelectedTicketId}
+          onSelect={scrollToTicket}
           selectedTicket={selectedTicket}
           selectedTicketId={selectedTicketId}
-          tickets={tickets}
+          tickets={filteredTickets}
         />
       }
+      rightPanelClassName="overflow-hidden"
       rightPanelLabel={asideLabel}
       rightPanelWidth="24rem"
-      rightPanelClassName="overflow-hidden"
       showSearch={false}
     >
       <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
-        <div className="shrink-0 border-b border-border p-3 lg:hidden">
-          <div className="mb-2 flex items-center justify-between gap-2">
-            <h2 className="text-sm font-semibold text-foreground">
-              {t("ticketListLabel")}
-            </h2>
-            <Chip color="accent" size="sm" variant="soft">
-              {t("ticketCount", { count: tickets.length })}
-            </Chip>
+        {/* Top Kitchen Filter Toolbar */}
+        <div className="flex shrink-0 flex-col gap-3 border-b border-border/60 bg-background/95 p-3.5 backdrop-blur-xs sm:flex-row sm:items-center sm:justify-between sm:px-5">
+          <div className="flex flex-wrap items-center gap-2">
+            <h1 className="text-base font-bold text-foreground sm:text-lg">
+              {headerTitle}
+            </h1>
+            <div className="flex flex-wrap items-center gap-1.5">
+              <Button
+                size="sm"
+                variant={filter === "all" ? "primary" : "secondary"}
+                onPress={() => setFilter("all")}
+              >
+                {t("filterAll")} ({counts.all})
+              </Button>
+              <Button
+                size="sm"
+                variant={filter === "active" ? "primary" : "secondary"}
+                onPress={() => setFilter("active")}
+              >
+                {t("filterActive")} ({counts.active})
+              </Button>
+              <Button
+                size="sm"
+                variant={filter === "rush" ? "primary" : "secondary"}
+                onPress={() => setFilter("rush")}
+              >
+                {t("filterRush")} ({counts.rush})
+              </Button>
+              <Button
+                size="sm"
+                variant={filter === "completed" ? "primary" : "secondary"}
+                onPress={() => setFilter("completed")}
+              >
+                {t("filterCompleted")} ({counts.completed})
+              </Button>
+            </div>
           </div>
-          <div className="overflow-x-auto pb-2">
+
+          <div className="w-full sm:w-56">
+            <InputGroup className="h-8" variant="secondary">
+              <InputGroup.Prefix>
+                <IconSearch
+                  aria-hidden="true"
+                  className="text-muted"
+                  size={15}
+                />
+              </InputGroup.Prefix>
+              <InputGroup.Input
+                placeholder={t("searchPlaceholder")}
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            </InputGroup>
+          </div>
+        </div>
+
+        {/* Mobile ticket rail */}
+        <div className="shrink-0 border-b border-border p-3 lg:hidden">
+          <div className="overflow-x-auto pb-1">
             <KitchenTicketList
-              onSelect={setSelectedTicketId}
+              onSelect={scrollToTicket}
               orientation="horizontal"
               selectedTicketId={selectedTicketId}
-              tickets={tickets}
+              tickets={filteredTickets}
             />
           </div>
         </div>
 
+        {/* Continuous Card Listing */}
         <section
           aria-label={t("ticketItemsLabel")}
           className="flex min-h-0 min-w-0 flex-1 flex-col"
         >
-          <ScrollShadow className="min-h-0 min-w-0 flex-1 overscroll-contain">
-            <div className="grid w-full grid-cols-1 gap-4 p-4 sm:grid-cols-2 sm:p-5 2xl:grid-cols-3 2xl:p-6">
-              {selectedTicket.dishes.map((dish) => {
-                const isCompleted = dish.status === "completed";
-                const isCancelled = dish.status === "cancelled";
-                const isResolved = isCompleted || isCancelled;
+          <ScrollShadow
+            ref={scrollContainerRef}
+            className="min-h-0 min-w-0 flex-1 overscroll-contain"
+          >
+            <div className="flex flex-col gap-4 p-4 sm:p-5 2xl:p-6">
+              {filteredTickets.length === 0 ? (
+                <div className="flex flex-col items-center justify-center gap-2 py-16 text-center">
+                  <IconCheck
+                    aria-hidden="true"
+                    className="text-success"
+                    size={36}
+                  />
+                  <p className="text-base font-semibold text-foreground">
+                    {t("noTicketsFound")}
+                  </p>
+                  <p className="text-sm text-muted">
+                    {t("noTicketsMatchingFilter")}
+                  </p>
+                </div>
+              ) : (
+                filteredTickets.map((ticket) => {
+                  const completedCount = ticket.dishes.filter(
+                    (d) => d.status === "completed",
+                  ).length;
+                  const isAllCompleted =
+                    ticket.dishes.length > 0 &&
+                    completedCount === ticket.dishes.length;
+                  const isOverdue =
+                    ticket.elapsedSeconds + elapsedTick > 20 * 60;
 
-                return (
-                  <div className="grid min-w-0" key={dish.id}>
-                    <Card variant="default">
-                      <div className="relative aspect-[4/3] w-full overflow-hidden bg-surface-secondary">
-                        <Image
-                          alt={dish.title}
-                          className="object-cover"
-                          fill
-                          sizes="(max-width: 639px) 100vw, (max-width: 1023px) 50vw, (max-width: 1535px) 40vw, 30vw"
-                          src={dish.image}
-                        />
-                        {isResolved ? (
-                          <div
-                            aria-hidden="true"
-                            className={`absolute inset-0 ${isCompleted ? "bg-slate-950/45" : "bg-slate-950/55 grayscale"}`}
-                          />
-                        ) : null}
-                        {isCompleted || isCancelled ? (
-                          <div className="absolute end-3 top-3">
-                            <Chip
-                              color={isCompleted ? "success" : "danger"}
-                              size="sm"
-                              variant={isCompleted ? "primary" : "soft"}
-                            >
-                              {isCompleted ? t("completed") : t("cancelled")}
-                            </Chip>
+                  return (
+                    <Card
+                      className={`overflow-hidden rounded scroll-mt-4 transition-all duration-200 ${
+                        isAllCompleted
+                          ? "border-success/30 bg-success/5"
+                          : ticket.priority === "rush"
+                            ? "border-danger/30"
+                            : ""
+                      }`}
+                      data-ticket-id={ticket.id}
+                      id={`ticket-${ticket.id}`}
+                      key={ticket.id}
+                    >
+                      <Card.Header className="flex flex-col gap-3 border-b border-border/60 bg-surface-secondary/20 px-4 py-3 sm:flex-row sm:items-start sm:justify-between sm:px-5">
+                        <div className="flex min-w-0 flex-1 flex-col items-start gap-1 text-start">
+                          <div className="flex flex-wrap items-center gap-2 sm:gap-2.5 text-start">
+                            <Card.Title className="text-base font-bold text-foreground text-start">
+                              {ticket.tableNumber}
+                            </Card.Title>
+                            <span className="font-mono text-xs text-muted">
+                              {ticket.orderCode}
+                            </span>
+                            {ticket.priority === "rush" && (
+                              <Chip color="danger" size="sm" variant="soft">
+                                Rush
+                              </Chip>
+                            )}
+                            {ticket.priority === "vip" && (
+                              <Chip color="warning" size="sm" variant="soft">
+                                VIP
+                              </Chip>
+                            )}
+                            {ticket.serviceType &&
+                              ticket.serviceType !== "dineIn" && (
+                                <Chip color="accent" size="sm" variant="soft">
+                                  {ticket.serviceType === "takeaway"
+                                    ? "Takeaway"
+                                    : (ticket.channel ?? "Delivery")}
+                                </Chip>
+                              )}
+                            {ticket.guestCount ? (
+                              <span className="text-xs text-muted">
+                                · {ticket.guestCount} guests
+                              </span>
+                            ) : null}
+                            {ticket.serverName ? (
+                              <span className="text-xs text-muted">
+                                · {ticket.serverName}
+                              </span>
+                            ) : null}
                           </div>
-                        ) : null}
-                      </div>
+                        </div>
 
-                      <Card.Header>
-                        <div className="flex min-w-0 items-start justify-between gap-3">
-                          <Card.Title>{dish.title}</Card.Title>
-                          <Chip size="sm" variant="secondary">
-                            x{dish.quantity}
-                          </Chip>
+                        <div className="flex shrink-0 flex-wrap items-center gap-3 sm:self-start sm:pt-0.5">
+                          <span className="text-xs text-muted">
+                            {t("readyCount", {
+                              completed: completedCount,
+                              total: ticket.dishes.length,
+                            })}
+                          </span>
+
+                          <div
+                            className={`flex items-center gap-1.5 text-xs ${
+                              isOverdue
+                                ? "text-danger font-semibold"
+                                : "text-muted"
+                            }`}
+                          >
+                            <IconClock aria-hidden="true" size={14} />
+                            <time className="font-mono font-medium text-foreground">
+                              {formatElapsedTime(
+                                ticket.elapsedSeconds + elapsedTick,
+                              )}
+                            </time>
+                          </div>
+
+                          <Button
+                            className={
+                              isAllCompleted
+                                ? "border border-success/30 bg-success-soft text-success-soft-foreground hover:bg-success-soft-hover active:bg-success-soft/90 [--button-bg:var(--success-soft)] [--button-fg:var(--success-soft-foreground)] [--button-bg-hover:var(--success-soft-hover)] [--button-bg-pressed:var(--success-soft-hover)]"
+                                : "bg-success text-white hover:bg-success/90 active:bg-success/80 [--button-bg:var(--success)] [--button-fg:white] [--button-bg-hover:color-mix(in_oklab,var(--success)_90%,black)] [--button-bg-pressed:color-mix(in_oklab,var(--success)_80%,black)]"
+                            }
+                            size="sm"
+                            variant="ghost"
+                            onPress={() => toggleCompleteAll(ticket.id)}
+                          >
+                            <IconCheck aria-hidden="true" size={15} />
+                            <span>
+                              {isAllCompleted
+                                ? t("allReady")
+                                : t("completeAll")}
+                            </span>
+                          </Button>
                         </div>
                       </Card.Header>
 
-                      <Card.Content>
-                        <div className="flex flex-col gap-2">
-                          <p className="text-xs font-semibold uppercase tracking-wide text-muted">
-                            {t("modifiersLabel")}
-                          </p>
-                          {dish.modifiers.length > 0 ? (
-                            <ul className="flex flex-col gap-1.5">
-                              {dish.modifiers.map((modifier) => (
-                                <li
-                                  className="flex gap-2 text-sm leading-snug text-foreground/85"
-                                  key={modifier}
-                                >
-                                  <span
-                                    aria-hidden="true"
-                                    className="mt-1.5 size-1.5 shrink-0 rounded-full bg-accent"
-                                  />
-                                  <span>{modifier}</span>
-                                </li>
-                              ))}
-                            </ul>
-                          ) : (
-                            <p className="text-sm text-muted">
-                              {t("noModifiers")}
-                            </p>
-                          )}
+                      {ticket.notes && (
+                        <div className="border-b border-border/40 bg-surface-secondary/30 px-4 py-2 text-xs text-muted sm:px-5">
+                          <span className="font-medium text-foreground">
+                            {t("notesLabel")}{" "}
+                          </span>
+                          {ticket.notes}
+                        </div>
+                      )}
+
+                      <Card.Content className="p-4 sm:p-5">
+                        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
+                          {ticket.dishes.map((dish) => {
+                            const isDishCompleted = dish.status === "completed";
+
+                            return (
+                              <div
+                                key={dish.id}
+                                className={`flex flex-col justify-between overflow-hidden rounded border border-border/60 bg-surface-secondary/20 p-3 transition-opacity ${
+                                  isDishCompleted ? "opacity-60" : ""
+                                }`}
+                              >
+                                <div className="flex gap-3">
+                                  <div className="relative size-16 shrink-0 overflow-hidden rounded bg-surface-secondary">
+                                    <Image
+                                      alt={dish.title}
+                                      className="object-cover"
+                                      fill
+                                      sizes="64px"
+                                      src={dish.image}
+                                    />
+                                    {isDishCompleted && (
+                                      <div className="absolute inset-0 flex items-center justify-center bg-slate-950/40">
+                                        <IconCheck
+                                          className="text-white"
+                                          size={18}
+                                        />
+                                      </div>
+                                    )}
+                                  </div>
+
+                                  <div className="flex min-w-0 flex-1 flex-col justify-center gap-1">
+                                    <div className="flex items-start justify-between gap-2">
+                                      <h4
+                                        className={`truncate text-sm font-medium leading-snug ${
+                                          isDishCompleted
+                                            ? "text-muted line-through"
+                                            : "text-foreground"
+                                        }`}
+                                      >
+                                        {dish.title}
+                                      </h4>
+                                      <span className="shrink-0 rounded bg-surface-secondary px-1.5 py-0.5 font-mono text-xs font-semibold text-foreground">
+                                        ×{dish.quantity}
+                                      </span>
+                                    </div>
+
+                                    {dish.modifiers.length > 0 && (
+                                      <div className="flex flex-wrap gap-1">
+                                        {dish.modifiers.map((modifier) => (
+                                          <span
+                                            className="max-w-full truncate rounded bg-surface-secondary px-1.5 py-0.5 text-[11px] text-muted"
+                                            key={modifier}
+                                          >
+                                            {modifier}
+                                          </span>
+                                        ))}
+                                      </div>
+                                    )}
+                                  </div>
+                                </div>
+
+                                <div className="mt-3 flex items-center justify-end border-t border-border/40 pt-2.5">
+                                  <Button
+                                    className={
+                                      isDishCompleted
+                                        ? "border border-success/30 bg-success-soft text-success-soft-foreground hover:bg-success-soft-hover active:bg-success-soft/90 [--button-bg:var(--success-soft)] [--button-fg:var(--success-soft-foreground)] [--button-bg-hover:var(--success-soft-hover)] [--button-bg-pressed:var(--success-soft-hover)]"
+                                        : "bg-success text-white hover:bg-success/90 active:bg-success/80 [--button-bg:var(--success)] [--button-fg:white] [--button-bg-hover:color-mix(in_oklab,var(--success)_90%,black)] [--button-bg-pressed:color-mix(in_oklab,var(--success)_80%,black)]"
+                                    }
+                                    size="sm"
+                                    variant="ghost"
+                                    onPress={() =>
+                                      updateDishStatus(
+                                        ticket.id,
+                                        dish.id,
+                                        isDishCompleted
+                                          ? "pending"
+                                          : "completed",
+                                      )
+                                    }
+                                  >
+                                    <IconCheck aria-hidden="true" size={15} />
+                                    <span>
+                                      {isDishCompleted
+                                        ? t("completed")
+                                        : t("complete")}
+                                    </span>
+                                  </Button>
+                                </div>
+                              </div>
+                            );
+                          })}
                         </div>
                       </Card.Content>
-
-                      <Card.Footer>
-                        <div className="grid w-full grid-cols-2 gap-2">
-                          <Button
-                            aria-label={t("completeItem", { item: dish.title })}
-                            fullWidth
-                            isDisabled={isResolved}
-                            onPress={() =>
-                              updateDishStatus(dish.id, "completed")
-                            }
-                            size="lg"
-                            type="button"
-                            variant="primary"
-                          >
-                            {t("complete")}
-                          </Button>
-                          <Button
-                            aria-label={t("cancelItem", { item: dish.title })}
-                            fullWidth
-                            isDisabled={isResolved}
-                            onPress={() =>
-                              updateDishStatus(dish.id, "cancelled")
-                            }
-                            size="lg"
-                            type="button"
-                            variant="secondary"
-                          >
-                            {t("cancel")}
-                          </Button>
-                        </div>
-                      </Card.Footer>
                     </Card>
-                  </div>
-                );
-              })}
+                  );
+                })
+              )}
             </div>
           </ScrollShadow>
         </section>

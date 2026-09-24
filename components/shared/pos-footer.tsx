@@ -5,51 +5,27 @@ import { useTranslations } from "next-intl";
 import { usePathname, useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
-  IconBox,
+  IconCashBanknoteMove,
   IconCashRegister,
-  IconChefHat,
   IconChevronLeft,
   IconChevronRight,
-  IconClipboardList,
   IconClock,
-  IconLayoutDashboard,
-  IconLock,
   IconLogout,
   IconMotorbike,
   IconPrinter,
   IconReceipt,
-  IconScale,
-  IconSettings,
-  IconTable,
-  IconUsers,
-  type TablerIcon,
 } from "@tabler/icons-react";
 import { authSessionStorageKey } from "@/config/auth";
 import { SignOutAlertDialog } from "@/components/order-panel";
 import { CashInOutModal } from "@/components/more/cash-in-out-modal";
 import { CloseShiftModal } from "@/components/more/close-shift-modal";
-import { LockRegisterModal } from "@/components/more/lock-register-modal";
+import { POSMenuModal, type POSMenuItem } from "@/components/shared/pos-menu-modal";
+import {
+  morePageNavigation,
+  primaryPageNavigation,
+} from "@/components/shared/pos-page-navigation";
 
-type NavigationId =
-  | "sales"
-  | "orders"
-  | "table"
-  | "customer"
-  | "settings";
-
-interface NavigationItem {
-  id: NavigationId;
-  href: string;
-  icon: TablerIcon;
-}
-
-const navigationItems: NavigationItem[] = [
-  { id: "sales", href: "/sales", icon: IconCashRegister },
-  { id: "orders", href: "/orders", icon: IconClipboardList },
-  { id: "table", href: "/table", icon: IconTable },
-  { id: "customer", href: "/customer", icon: IconUsers },
-  { id: "settings", href: "/settings", icon: IconSettings },
-];
+type NavigationId = (typeof primaryPageNavigation)[number]["id"];
 
 export function POSFooter({ className = "" }: { className?: string }) {
   const t = useTranslations("SalesMenu");
@@ -59,7 +35,6 @@ export function POSFooter({ className = "" }: { className?: string }) {
   // Quick action state
   const [isCashModalOpen, setIsCashModalOpen] = useState(false);
   const [isCloseShiftOpen, setIsCloseShiftOpen] = useState(false);
-  const [isLockModalOpen, setIsLockModalOpen] = useState(false);
 
   // Desktop horizontal scroll & drag-to-slide state
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -200,8 +175,8 @@ export function POSFooter({ className = "" }: { className?: string }) {
     }
   };
 
-  const currentNav = navigationItems.find((item) =>
-    pathname.startsWith(item.href),
+  const currentNav = primaryPageNavigation.find((item) =>
+    matchesRoute(pathname, item.href),
   );
   const activeId = currentNav?.id;
 
@@ -209,6 +184,7 @@ export function POSFooter({ className = "" }: { className?: string }) {
     sales: t("navigation.sales"),
     orders: t("navigation.orders"),
     table: t("navigation.table"),
+    reservation: t("navigation.reservation"),
     customer: t("navigation.customer"),
     settings: t("navigation.settings"),
   };
@@ -242,11 +218,6 @@ export function POSFooter({ className = "" }: { className?: string }) {
     });
   };
 
-  const handleKitchenQueue = () => {
-    toast.info("Kitchen queue synced", {
-      description: "4 active orders currently on the kitchen line.",
-    });
-  };
 
   const handleDeliveryStatus = () => {
     toast.info("Delivery aggregators active", {
@@ -254,28 +225,15 @@ export function POSFooter({ className = "" }: { className?: string }) {
     });
   };
 
-  const menuItems = [
-    {
-      id: "dashboard",
-      icon: IconLayoutDashboard,
-      label: t("navigation.dashboard"),
-      href: "/dashboard",
-      onPress: () => handleNavigate("/dashboard"),
-    },
-    {
-      id: "products",
-      icon: IconBox,
-      label: "Products",
-      href: "/products",
-      onPress: () => handleNavigate("/products"),
-    },
-    {
-      id: "kitchen",
-      icon: IconChefHat,
-      label: t("navigation.kitchen"),
-      href: "/kitchen",
-      onPress: () => handleNavigate("/kitchen"),
-    },
+  const pageItems: POSMenuItem[] = morePageNavigation.map((item) => ({
+    id: item.id,
+    icon: item.icon,
+    label: t(`navigation.${item.labelKey}`),
+    href: item.href,
+    onPress: () => handleNavigate(item.href),
+  }));
+
+  const actionItems: POSMenuItem[] = [
     {
       id: "drawer-kick",
       icon: IconCashRegister,
@@ -290,7 +248,7 @@ export function POSFooter({ className = "" }: { className?: string }) {
     },
     {
       id: "cash-in-out",
-      icon: IconScale,
+      icon: IconCashBanknoteMove,
       label: "Cash In / Out",
       onPress: () => {
         setIsCashModalOpen(true);
@@ -305,24 +263,10 @@ export function POSFooter({ className = "" }: { className?: string }) {
       },
     },
     {
-      id: "lock",
-      icon: IconLock,
-      label: "Lock Register",
-      onPress: () => {
-        setIsLockModalOpen(true);
-      },
-    },
-    {
       id: "test-printer",
       icon: IconPrinter,
       label: "Test Printer",
       onPress: handleTestPrinter,
-    },
-    {
-      id: "kitchen-queue",
-      icon: IconChefHat,
-      label: "Kitchen Queue",
-      onPress: handleKitchenQueue,
     },
     {
       id: "delivery-status",
@@ -331,12 +275,15 @@ export function POSFooter({ className = "" }: { className?: string }) {
       onPress: handleDeliveryStatus,
     },
   ];
+  const activeMenuItemId = [...pageItems, ...actionItems].find(
+    (item) => item.href && matchesRoute(pathname, item.href),
+  )?.id;
 
   return (
     <>
       <footer
         aria-label="POS Navigation"
-        className={`sticky bottom-0 z-30 shrink-0 border-t border-border bg-card px-[var(--pos-content-padding)] py-2 shadow-xs transition-colors sm:py-2.5 ${className}`}
+        className={`sticky bottom-0 z-30 shrink-0 border-t border-border bg-card px-(--pos-content-padding) py-2 shadow-xs transition-colors sm:py-2.5 ${className}`}
       >
         <div className="flex min-w-0 items-center gap-3">
           <SignOutAlertDialog
@@ -389,9 +336,8 @@ export function POSFooter({ className = "" }: { className?: string }) {
               aria-label={t("navigation.label")}
               className={`flex min-w-full w-max items-center justify-start gap-1 px-1 sm:gap-2 ${isDragging ? "pointer-events-none" : ""}`}
             >
-              {navigationItems.map((item) => {
-                const isActive =
-                  pathname.startsWith(item.href) || activeId === item.id;
+              {primaryPageNavigation.map((item) => {
+                const isActive = activeId === item.id;
                 const Icon = item.icon;
 
                 return (
@@ -414,26 +360,14 @@ export function POSFooter({ className = "" }: { className?: string }) {
                 className="mx-1 h-6 w-px shrink-0 bg-border/70"
               />
 
-              {menuItems.map((menuItem) => {
-                const MenuIcon = menuItem.icon;
-                const isActive = Boolean(
-                  menuItem.href && pathname.startsWith(menuItem.href),
-                );
-
-                return (
-                  <Button
-                    key={menuItem.id}
-                    size="lg"
-                    variant={isActive ? "primary" : "ghost"}
-                    onPress={menuItem.onPress}
-                    aria-current={isActive ? "page" : undefined}
-                    className="shrink-0"
-                  >
-                    <MenuIcon aria-hidden="true" size={20} />
-                    <span>{menuItem.label}</span>
-                  </Button>
-                );
-              })}
+              <POSMenuModal
+                actionItems={actionItems}
+                activeItemId={activeMenuItemId}
+                actionListLabel={t("navigation.quickActions")}
+                pageItems={pageItems}
+                pageListLabel={t("navigation.pages")}
+                title={t("navigation.more")}
+              />
             </nav>
           </ScrollShadow>
 
@@ -462,10 +396,10 @@ export function POSFooter({ className = "" }: { className?: string }) {
         isOpen={isCloseShiftOpen}
         onOpenChange={setIsCloseShiftOpen}
       />
-      <LockRegisterModal
-        isOpen={isLockModalOpen}
-        onOpenChange={setIsLockModalOpen}
-      />
     </>
   );
+}
+
+function matchesRoute(pathname: string, href: string) {
+  return pathname === href || pathname.startsWith(`${href}/`);
 }

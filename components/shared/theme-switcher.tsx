@@ -73,7 +73,7 @@ export interface ThemeSwitcherProps {
   size?: "sm" | "md" | "lg";
 }
 
-export function ThemeSwitcher({ className, size = "sm" }: ThemeSwitcherProps) {
+export function ThemeSwitcher({ className, size }: ThemeSwitcherProps) {
   const [mounted, setMounted] = React.useState(false);
   const { theme, resolvedTheme, setTheme } = useTheme();
 
@@ -137,17 +137,17 @@ export function ThemeSwitcher({ className, size = "sm" }: ThemeSwitcherProps) {
         >
           <Dropdown.Item id="light" textValue="Light">
             <Dropdown.ItemIndicator />
-            <SunIcon className="size-4 shrink-0 text-muted" />
+            <SunIcon />
             <Label>Light</Label>
           </Dropdown.Item>
           <Dropdown.Item id="dark" textValue="Dark">
             <Dropdown.ItemIndicator />
-            <MoonIcon className="size-4 shrink-0 text-muted" />
+            <MoonIcon />
             <Label>Dark</Label>
           </Dropdown.Item>
           <Dropdown.Item id="system" textValue="System">
             <Dropdown.ItemIndicator />
-            <MonitorIcon className="size-4 shrink-0 text-muted" />
+            <MonitorIcon />
             <Label>System</Label>
           </Dropdown.Item>
         </Dropdown.Menu>

@@ -143,11 +143,14 @@ through `next-intl`.
 ## Design and component conventions
 
 - Use HeroUI v3 compound components and semantic variants such as `primary`, `secondary`, `ghost`, and `danger`.
+- HeroUI components may receive layout classes such as width, margin, and flex placement. `shadcn/no-restyle` rejects appearance overrides on imports from `@heroui/react`; use HeroUI props or the theme in `app/globals.css` for those changes.
 - Use `onPress` for HeroUI interactive controls.
 - Use `@tabler/icons-react` for application icons and mark decorative icons with `aria-hidden="true"`.
 - Prefer shared layout primitives in `components/shared` for page structure.
 - Keep settings and other dense workstation controls usable with touch targets, wrapping labels, and responsive layouts.
 - Use theme tokens such as `bg-background`, `bg-surface`, `text-foreground`, `text-muted`, and `border-border` instead of hard-coded interface colors.
+
+Run `pnpm lint` to list HeroUI appearance overrides. Existing overrides are reported as errors until their classes are removed or replaced with HeroUI props or theme styles.
 
 ## MVP boundaries
 

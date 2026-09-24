@@ -19,8 +19,8 @@ export default function Loading() {
         <div className="flex shrink-0 flex-col gap-2 border-t border-border px-[var(--pos-content-padding)] py-3">
           {Array.from({ length: 3 }, (_, index) => (
             <div key={`modifier-skeleton-${index}`} className="flex items-center gap-3">
-              <Skeleton className="h-4 w-20 shrink-0 rounded-md" />
-              <Skeleton className="h-10 flex-1 rounded-xl" />
+              <Skeleton className="h-4 w-20 shrink-0" />
+              <Skeleton className="h-10 flex-1" />
             </div>
           ))}
         </div>

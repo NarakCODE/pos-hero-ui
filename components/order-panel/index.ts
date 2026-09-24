@@ -15,5 +15,6 @@ export {
 } from "./order-panel-footer";
 export { PaymentActions } from "./payment-actions";
 export { PaymentMethodDrawer } from "./payment-method-drawer";
+export { PaymentSuccessfulModal } from "./payment-successful-modal";
 export { PromotionModal, DEFAULT_PROMOTIONS } from "./promotion-modal";
 export * from "./types";

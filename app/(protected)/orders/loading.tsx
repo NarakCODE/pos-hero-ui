@@ -17,8 +17,8 @@ export default function Loading() {
           <OrdersTableSkeleton count={8} />
         </div>
         <div className="flex shrink-0 items-center justify-between gap-3 px-[var(--pos-content-padding)] pb-[var(--pos-content-padding)]">
-          <Skeleton className="h-10 w-28 rounded-xl" />
-          <Skeleton className="h-8 w-48 rounded-xl" />
+          <Skeleton className="h-10 w-28" />
+          <Skeleton className="h-8 w-48" />
         </div>
       </div>
     </POSPageLoading>

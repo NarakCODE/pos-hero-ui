@@ -17,6 +17,7 @@ export function OrderHeader({
   onClearTicket,
   orderChannel,
   orderChannelLabel = "Order channel",
+  orderTypeLabel,
   orderNumber,
   orderType,
   sequenceLabel = "Seq.",
@@ -44,8 +45,15 @@ export function OrderHeader({
         : `Table ${tableNumber}`
       : formattedOrderNumber);
   const sequenceValue = sequenceNumber ?? orderNumber;
-  const statusValue = status ?? orderType;
-  const metadataItems = [tableTicketValue, sequenceValue, statusValue, orderChannel];
+  const statusValue = status ?? (orderTypeLabel ? undefined : orderType);
+  const orderTypeValue = orderTypeLabel ? orderType : undefined;
+  const metadataItems = [
+    tableTicketValue,
+    sequenceValue,
+    statusValue,
+    orderChannel,
+    orderTypeValue,
+  ];
   const hasMetadata = metadataItems.some((value) => value !== undefined && value !== null);
 
   return (
@@ -104,6 +112,9 @@ export function OrderHeader({
             }
           />
           <MetadataItem align="end" label={orderChannelLabel} value={orderChannel} />
+          {orderTypeLabel && orderTypeValue ? (
+            <MetadataItem label={orderTypeLabel} value={orderTypeValue} />
+          ) : null}
         </div>
       ) : null}
 

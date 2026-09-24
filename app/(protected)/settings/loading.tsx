@@ -16,7 +16,7 @@ export default function Loading() {
           {Array.from({ length: 8 }, (_, index) => (
             <Skeleton
               key={`settings-tile-skeleton-${index}`}
-              className="min-h-32 rounded-xl"
+              className="min-h-32"
             />
           ))}
         </div>

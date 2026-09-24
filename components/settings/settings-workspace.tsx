@@ -1,9 +1,11 @@
 "use client";
 
 import {
+  AlertDialog,
   Button,
   Card,
   Chip,
+  Description,
   Input,
   Label,
   ListBox,
@@ -12,184 +14,128 @@ import {
   Surface,
   Spinner,
   Switch,
-  Tabs,
   TextField,
 } from "@heroui/react";
 import { useTranslations } from "next-intl";
 import { useState, useTransition } from "react";
 import { POSAside } from "@/components/shared/pos-aside";
 import { POSLayout } from "@/components/shared/pos-layout";
+import { CreatePinModal } from "./create-pin-modal";
 import {
-  IconArchive,
+  IconBell,
   IconBarcode,
-  IconBuilding,
-  IconBuildingStore,
-  IconCoin,
   IconCreditCard,
   IconDeviceDesktop,
   IconDeviceTablet,
   IconDevices,
   IconLock,
+  IconPhoto,
   IconPrinter,
-  IconReceipt,
+  IconRefresh,
   IconRouter,
   IconSettings,
-  IconUser,
-  IconUsers,
+  IconShieldLock,
+  IconTruck,
   IconWorld,
   type TablerIcon,
 } from "@tabler/icons-react";
 
-type SettingsCategory =
-  | "company"
-  | "userManagement"
-  | "menuProducts"
-  | "inventory"
-  | "customer"
-  | "reports"
-  | "integrations";
-type SettingsTileId =
-  | "company"
-  | "store"
-  | "stations"
-  | "currency"
-  | "staff"
-  | "menu"
-  | "inventory"
-  | "customer"
-  | "reports"
-  | "integrations";
+type SettingsSectionId =
+  | "general"
+  | "notifications"
+  | "privacySecurity"
+  | "payment"
+  | "shipping"
+  | "mediaFiles"
+  | "languages"
+  | "system"
+  | "reset";
 type Currency = "usd" | "khr";
 type Timezone = "phnomPenh" | "bangkok";
+type Language = "en" | "km";
 
-const settingsCategories: ReadonlyArray<{
-  id: SettingsCategory;
-  labelKey: string;
-}> = [
-  {
-    id: "company",
-    labelKey: "categoryCompany",
-  },
-  {
-    id: "userManagement",
-    labelKey: "categoryUserManagement",
-  },
-  {
-    id: "menuProducts",
-    labelKey: "categoryMenuProducts",
-  },
-  {
-    id: "inventory",
-    labelKey: "categoryInventory",
-  },
-  {
-    id: "customer",
-    labelKey: "categoryCustomer",
-  },
-  {
-    id: "reports",
-    labelKey: "categoryReports",
-  },
-  {
-    id: "integrations",
-    labelKey: "categoryIntegrations",
-  },
-];
-
-const settingsTiles: ReadonlyArray<{
-  id: SettingsTileId;
-  category: SettingsCategory;
+const settingsMenu: ReadonlyArray<{
+  id: SettingsSectionId;
   icon: TablerIcon;
   labelKey: string;
-  descriptionKey: string;
 }> = [
   {
-    id: "company",
-    category: "company",
-    icon: IconBuilding,
-    labelKey: "tileCompany",
-    descriptionKey: "tileCompanyDescription",
+    id: "general",
+    icon: IconSettings,
+    labelKey: "menuGeneral",
   },
   {
-    id: "store",
-    category: "company",
-    icon: IconBuildingStore,
-    labelKey: "tileStore",
-    descriptionKey: "tileStoreDescription",
+    id: "notifications",
+    icon: IconBell,
+    labelKey: "menuNotifications",
   },
   {
-    id: "stations",
-    category: "company",
-    icon: IconDevices,
-    labelKey: "tileStations",
-    descriptionKey: "tileStationsDescription",
+    id: "privacySecurity",
+    icon: IconShieldLock,
+    labelKey: "menuPrivacySecurity",
   },
   {
-    id: "currency",
-    category: "company",
-    icon: IconCoin,
-    labelKey: "tileCurrency",
-    descriptionKey: "tileCurrencyDescription",
+    id: "payment",
+    icon: IconCreditCard,
+    labelKey: "menuPayment",
   },
   {
-    id: "staff",
-    category: "userManagement",
-    icon: IconUsers,
-    labelKey: "tileStaff",
-    descriptionKey: "tileStaffDescription",
+    id: "shipping",
+    icon: IconTruck,
+    labelKey: "menuShipping",
   },
   {
-    id: "menu",
-    category: "menuProducts",
-    icon: IconReceipt,
-    labelKey: "tileMenu",
-    descriptionKey: "tileMenuDescription",
+    id: "mediaFiles",
+    icon: IconPhoto,
+    labelKey: "menuMediaFiles",
   },
   {
-    id: "inventory",
-    category: "inventory",
-    icon: IconArchive,
-    labelKey: "tileInventory",
-    descriptionKey: "tileInventoryDescription",
-  },
-  {
-    id: "customer",
-    category: "customer",
-    icon: IconUser,
-    labelKey: "tileCustomer",
-    descriptionKey: "tileCustomerDescription",
-  },
-  {
-    id: "reports",
-    category: "reports",
-    icon: IconReceipt,
-    labelKey: "tileReports",
-    descriptionKey: "tileReportsDescription",
-  },
-  {
-    id: "integrations",
-    category: "integrations",
+    id: "languages",
     icon: IconWorld,
-    labelKey: "tileIntegrations",
-    descriptionKey: "tileIntegrationsDescription",
+    labelKey: "menuLanguages",
+  },
+  {
+    id: "system",
+    icon: IconDevices,
+    labelKey: "menuSystem",
+  },
+  {
+    id: "reset",
+    icon: IconRefresh,
+    labelKey: "menuReset",
   },
 ];
 
 export function SettingsWorkspace() {
   const t = useTranslations("SalesMenu");
-  const [activeCategory, setActiveCategory] =
-    useState<SettingsCategory>("company");
-  const [selectedTile, setSelectedTile] = useState<SettingsTileId | null>(null);
+  const [selectedSection, setSelectedSection] =
+    useState<SettingsSectionId | null>(null);
   const [settingsSearch, setSettingsSearch] = useState("");
   const [isSaved, setIsSaved] = useState(false);
+  const [isResetDialogOpen, setIsResetDialogOpen] = useState(false);
   const [storeName, setStoreName] = useState("RakPOS Café");
   const [storePhone, setStorePhone] = useState("+855 12 345 678");
   const [currency, setCurrency] = useState<Currency>("usd");
   const [timezone, setTimezone] = useState<Timezone>("phnomPenh");
+  const [language, setLanguage] = useState<Language>("en");
   const [autoLock, setAutoLock] = useState(true);
   const [soundFeedback, setSoundFeedback] = useState(true);
+  const [orderNotifications, setOrderNotifications] = useState(true);
+  const [inventoryNotifications, setInventoryNotifications] = useState(true);
+  const [cashEnabled, setCashEnabled] = useState(true);
+  const [khqrEnabled, setKhqrEnabled] = useState(true);
+  const [bankCardEnabled, setBankCardEnabled] = useState(true);
+  const [shippingEnabled, setShippingEnabled] = useState(false);
+  const [deliveryFee, setDeliveryFee] = useState("2.50");
+  const [mediaFileName, setMediaFileName] = useState("");
   const [requirePin, setRequirePin] = useState(true);
   const [managerApproval, setManagerApproval] = useState(false);
+  const [accountName, setAccountName] = useState("Store Owner");
+  const [accountEmail, setAccountEmail] = useState("owner@rakpos.example");
+  const [pinEnabled, setPinEnabled] = useState(true);
+  const [pinConfigured, setPinConfigured] = useState(false);
+  const [multiFactorEnabled, setMultiFactorEnabled] = useState(false);
+  const [multiFactorMethod, setMultiFactorMethod] = useState("authenticator");
   const [isSaving, startSaving] = useTransition();
 
   const markChanged = () => setIsSaved(false);
@@ -209,129 +155,246 @@ export function SettingsWorkspace() {
     setTimezone(value);
     markChanged();
   };
+  const selectSection = (sectionId: SettingsSectionId) => {
+    setSelectedSection(sectionId);
+    setIsSaved(false);
+  };
 
-  const visibleTiles = settingsTiles.filter((tile) => {
-    if (tile.category !== activeCategory) {
-      return false;
-    }
-
+  const visibleSettings = settingsMenu.filter((item) => {
     const search = settingsSearch.trim().toLocaleLowerCase();
-
-    if (!search) {
-      return true;
-    }
-
-    return `${t(`pages.settings.${tile.labelKey}`)} ${t(
-      `pages.settings.${tile.descriptionKey}`,
-    )}`
+    return t("pages.settings." + item.labelKey)
       .toLocaleLowerCase()
       .includes(search);
   });
-
-  const selectedTileData = settingsTiles.find(
-    (tile) => tile.id === selectedTile,
+  const selectedSettings = settingsMenu.find(
+    (item) => item.id === selectedSection,
   );
 
+  const resetSettings = () => {
+    setStoreName("RakPOS Café");
+    setStorePhone("+855 12 345 678");
+    setCurrency("usd");
+    setTimezone("phnomPenh");
+    setLanguage("en");
+    setAutoLock(true);
+    setSoundFeedback(true);
+    setOrderNotifications(true);
+    setInventoryNotifications(true);
+    setCashEnabled(true);
+    setKhqrEnabled(true);
+    setBankCardEnabled(true);
+    setShippingEnabled(false);
+    setDeliveryFee("2.50");
+    setMediaFileName("");
+    setRequirePin(true);
+    setManagerApproval(false);
+    setAccountName("Store Owner");
+    setAccountEmail("owner@rakpos.example");
+    setPinEnabled(true);
+    setPinConfigured(false);
+    setMultiFactorEnabled(false);
+    setMultiFactorMethod("authenticator");
+    setIsSaved(false);
+  };
+
   return (
-    <POSLayout
-      showSearch={false}
-      headerTitle={t("pages.settings.title")}
-      rightPanelLabel={t("pages.settings.panelTitle")}
-      rightPanelClassName="overflow-hidden"
-      rightPanel={
-        <POSAside
-          ariaLabelledBy="settings-detail-title"
-          headerClassName="flex items-center gap-2 p-[var(--pos-content-padding)]"
-          mainClassName="flex min-h-0 flex-col overflow-hidden px-[var(--pos-content-padding)]"
-          footerClassName="px-[var(--pos-content-padding)] pb-[var(--pos-content-padding)] pt-3"
-          footer={
-            selectedTile ? (
-              <div className="flex justify-end">
-                <Button
-                  isDisabled={isSaved || isSaving}
-                  isPending={isSaving}
-                  size="lg"
-                  type="button"
-                  variant="primary"
-                  onPress={() => startSaving(() => setIsSaved(true))}
-                >
-                  {({ isPending }) =>
-                    isPending ? (
-                      <>
-                        <Spinner color="current" size="sm" />
-                        {t("pages.settings.saveChanges")}
-                      </>
-                    ) : (
-                      t("pages.settings.saveChanges")
-                    )}
-                </Button>
-              </div>
-            ) : null
-          }
-          header={
-            <h2
-              id="settings-detail-title"
-              className="text-base font-semibold text-foreground sm:text-lg"
-            >
-              {selectedTileData
-                ? t(`pages.settings.${selectedTileData.labelKey}`)
-                : t("pages.settings.panelTitle")}
-            </h2>
-          }
-        >
-          <div className="min-h-0 flex-1 overflow-y-auto">
-              {selectedTile === "company" || selectedTile === "store" ? (
+    <>
+      <POSLayout
+        showSearch={false}
+        headerTitle={t("pages.settings.title")}
+        rightPanelLabel={t("pages.settings.panelTitle")}
+        rightPanel={
+          <POSAside
+            ariaLabelledBy="settings-detail-title"
+            headerClassName="flex items-center gap-2 p-[var(--pos-content-padding)]"
+            mainClassName="flex min-h-0 flex-col px-[var(--pos-content-padding)]"
+            footerClassName="px-[var(--pos-content-padding)] pb-[var(--pos-content-padding)] pt-3"
+            footer={
+              selectedSection && selectedSection !== "reset" ? (
+                <div className="flex justify-end">
+                  <Button
+                    isDisabled={isSaved || isSaving}
+                    isPending={isSaving}
+                    size="lg"
+                    type="button"
+                    variant="primary"
+                    onPress={() => startSaving(() => setIsSaved(true))}
+                  >
+                    {({ isPending }) =>
+                      isPending ? (
+                        <>
+                          <Spinner color="current" size="sm" />
+                          {t("pages.settings.saveChanges")}
+                        </>
+                      ) : (
+                        t("pages.settings.saveChanges")
+                      )
+                    }
+                  </Button>
+                </div>
+              ) : null
+            }
+            header={
+              <h2
+                id="settings-detail-title"
+                className="text-base font-semibold text-foreground sm:text-lg"
+              >
+                {selectedSettings
+                  ? t("pages.settings." + selectedSettings.labelKey)
+                  : t("pages.settings.panelTitle")}
+              </h2>
+            }
+          >
+            <div className="min-h-0 flex-1 overflow-y-auto">
+              {selectedSection === "general" ? (
                 <GeneralSettings
-                  autoLock={autoLock}
-                  currency={currency}
-                  onAutoLockChange={(value) => {
-                    setAutoLock(value);
-                    markChanged();
-                  }}
-                  onCurrencyChange={updateCurrency}
-                  onSoundFeedbackChange={(value) => {
-                    setSoundFeedback(value);
-                    markChanged();
-                  }}
                   onStoreNameChange={updateStoreName}
                   onStorePhoneChange={updateStorePhone}
                   onTimezoneChange={updateTimezone}
-                  soundFeedback={soundFeedback}
                   storeName={storeName}
                   storePhone={storePhone}
                   timezone={timezone}
                 />
               ) : null}
-              {selectedTile === "currency" ? (
-                <CurrencySettings
+              {selectedSection === "notifications" ? (
+                <NotificationSettings
+                  inventoryNotifications={inventoryNotifications}
+                  onInventoryNotificationsChange={(value) => {
+                    setInventoryNotifications(value);
+                    markChanged();
+                  }}
+                  onOrderNotificationsChange={(value) => {
+                    setOrderNotifications(value);
+                    markChanged();
+                  }}
+                  onSoundFeedbackChange={(value) => {
+                    setSoundFeedback(value);
+                    markChanged();
+                  }}
+                  orderNotifications={orderNotifications}
+                  soundFeedback={soundFeedback}
+                />
+              ) : null}
+              {selectedSection === "privacySecurity" ? (
+                <div className="grid gap-5">
+                  <AccountSecuritySettings
+                    accountEmail={accountEmail}
+                    accountName={accountName}
+                    onAccountEmailChange={(value) => {
+                      setAccountEmail(value);
+                      markChanged();
+                    }}
+                    onAccountNameChange={(value) => {
+                      setAccountName(value);
+                      markChanged();
+                    }}
+                  />
+                  <StaffSettings
+                    managerApproval={managerApproval}
+                    onManagerApprovalChange={(value) => {
+                      setManagerApproval(value);
+                      markChanged();
+                    }}
+                    onRequirePinChange={(value) => {
+                      setRequirePin(value);
+                      markChanged();
+                    }}
+                    requirePin={requirePin}
+                  />
+                  <PinSettings
+                    isEnabled={pinEnabled}
+                    isConfigured={pinConfigured}
+                    onPinCreated={() => {
+                      setPinConfigured(true);
+                      markChanged();
+                    }}
+                    onEnabledChange={(value) => {
+                      setPinEnabled(value);
+                      markChanged();
+                    }}
+                  />
+                  <MultiFactorSettings
+                    isEnabled={multiFactorEnabled}
+                    method={multiFactorMethod}
+                    onEnabledChange={(value) => {
+                      setMultiFactorEnabled(value);
+                      markChanged();
+                    }}
+                    onMethodChange={(value) => {
+                      setMultiFactorMethod(value);
+                      markChanged();
+                    }}
+                  />
+                </div>
+              ) : null}
+              {selectedSection === "payment" ? (
+                <PaymentSettings
+                  bankCardEnabled={bankCardEnabled}
+                  cashEnabled={cashEnabled}
                   currency={currency}
+                  khqrEnabled={khqrEnabled}
+                  onBankCardEnabledChange={(value) => {
+                    setBankCardEnabled(value);
+                    markChanged();
+                  }}
+                  onCashEnabledChange={(value) => {
+                    setCashEnabled(value);
+                    markChanged();
+                  }}
                   onCurrencyChange={updateCurrency}
-                />
-              ) : null}
-              {selectedTile === "stations" ? <DeviceSettings /> : null}
-              {selectedTile === "staff" ? (
-                <StaffSettings
-                  managerApproval={managerApproval}
-                  onManagerApprovalChange={(value) => {
-                    setManagerApproval(value);
+                  onKhqrEnabledChange={(value) => {
+                    setKhqrEnabled(value);
                     markChanged();
                   }}
-                  onRequirePinChange={(value) => {
-                    setRequirePin(value);
-                    markChanged();
-                  }}
-                  requirePin={requirePin}
                 />
               ) : null}
-              {selectedTileData &&
-              selectedTile !== "company" &&
-              selectedTile !== "store" &&
-              selectedTile !== "currency" &&
-              selectedTile !== "stations" &&
-              selectedTile !== "staff" ? (
-                <SettingsPlaceholder />
+              {selectedSection === "shipping" ? (
+                <ShippingSettings
+                  deliveryFee={deliveryFee}
+                  isEnabled={shippingEnabled}
+                  onDeliveryFeeChange={(value) => {
+                    setDeliveryFee(value);
+                    markChanged();
+                  }}
+                  onEnabledChange={(value) => {
+                    setShippingEnabled(value);
+                    markChanged();
+                  }}
+                />
               ) : null}
-              {!selectedTile ? (
+              {selectedSection === "mediaFiles" ? (
+                <MediaFilesSettings
+                  fileName={mediaFileName}
+                  onFileChange={(value) => {
+                    setMediaFileName(value);
+                    markChanged();
+                  }}
+                />
+              ) : null}
+              {selectedSection === "languages" ? (
+                <LanguageSettings
+                  language={language}
+                  onLanguageChange={(value) => {
+                    setLanguage(value);
+                    markChanged();
+                  }}
+                />
+              ) : null}
+              {selectedSection === "system" ? (
+                <SystemSettings
+                  autoLock={autoLock}
+                  onAutoLockChange={(value) => {
+                    setAutoLock(value);
+                    markChanged();
+                  }}
+                />
+              ) : null}
+              {selectedSection === "reset" ? (
+                <ResetSettings
+                  onResetRequest={() => setIsResetDialogOpen(true)}
+                />
+              ) : null}
+              {!selectedSection ? (
                 <div className="flex min-h-full flex-col items-center justify-center p-8 text-center">
                   <div className="flex size-20 items-center justify-center rounded-3xl bg-default text-muted">
                     <IconSettings aria-hidden="true" size={40} />
@@ -341,40 +404,12 @@ export function SettingsWorkspace() {
                   </h3>
                 </div>
               ) : null}
-          </div>
-        </POSAside>
-      }
-    >
-      <section className="min-h-0 flex-1 overflow-y-auto bg-background">
-        <div className="flex min-w-0 flex-col">
-          <Tabs
-            className="min-w-0"
-            selectedKey={activeCategory}
-            variant="secondary"
-            onSelectionChange={(key) => {
-              setActiveCategory(String(key) as SettingsCategory);
-              setSelectedTile(null);
-            }}
-          >
-            <Tabs.ListContainer>
-              <Tabs.List aria-label={t("pages.settings.categoryLabel")}>
-                {settingsCategories.map((category) => {
-                  return (
-                    <Tabs.Tab
-                      key={category.id}
-                      id={category.id}
-                      className="w-auto shrink-0 whitespace-nowrap"
-                    >
-                      <span>{t(`pages.settings.${category.labelKey}`)}</span>
-                      <Tabs.Indicator />
-                    </Tabs.Tab>
-                  );
-                })}
-              </Tabs.List>
-            </Tabs.ListContainer>
-          </Tabs>
-
-          <div className="flex min-w-0 flex-col gap-4 px-[var(--pos-content-padding)] pb-[var(--pos-content-padding)] pt-3">
+            </div>
+          </POSAside>
+        }
+      >
+        <section className="min-h-0 flex-1 overflow-y-auto bg-background">
+          <div className="flex min-w-0 flex-col gap-4 px-[var(--pos-content-padding)] pb-[var(--pos-content-padding)] pt-4">
             <SearchField
               aria-label={t("pages.settings.searchLabel")}
               className="w-full"
@@ -392,25 +427,25 @@ export function SettingsWorkspace() {
               </SearchField.Group>
             </SearchField>
 
-            {visibleTiles.length > 0 ? (
-              <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-                {visibleTiles.map((tile) => {
-                  const Icon = tile.icon;
-                  const isSelected = selectedTile === tile.id;
+            {visibleSettings.length > 0 ? (
+              <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+                {visibleSettings.map((item) => {
+                  const Icon = item.icon;
+                  const isSelected = selectedSection === item.id;
 
                   return (
                     <Card
-                      key={tile.id}
+                      key={item.id}
                       aria-pressed={isSelected}
-                      className="transition-colors hover:bg-surface-hover"
+                      className="cursor-pointer transition-colors hover:bg-surface-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
                       role="button"
                       tabIndex={0}
-                      variant={isSelected ? "default" : "secondary"}
-                      onClick={() => setSelectedTile(tile.id)}
+                      variant={isSelected ? "tertiary" : "default"}
+                      onClick={() => selectSection(item.id)}
                       onKeyDown={(event) => {
                         if (event.key === "Enter" || event.key === " ") {
                           event.preventDefault();
-                          setSelectedTile(tile.id);
+                          selectSection(item.id);
                         }
                       }}
                     >
@@ -422,7 +457,7 @@ export function SettingsWorkspace() {
                             size={32}
                           />
                           <span className="font-semibold">
-                            {t(`pages.settings.${tile.labelKey}`)}
+                            {t("pages.settings." + item.labelKey)}
                           </span>
                         </span>
                       </Card.Content>
@@ -436,9 +471,43 @@ export function SettingsWorkspace() {
               </Surface>
             )}
           </div>
-        </div>
-      </section>
-    </POSLayout>
+        </section>
+      </POSLayout>
+
+      <AlertDialog.Backdrop
+        isOpen={isResetDialogOpen}
+        onOpenChange={setIsResetDialogOpen}
+      >
+        <AlertDialog.Container>
+          <AlertDialog.Dialog>
+            <AlertDialog.CloseTrigger />
+            <AlertDialog.Header>
+              <AlertDialog.Icon status="danger" />
+              <AlertDialog.Heading>
+                {t("pages.settings.resetDialogTitle")}
+              </AlertDialog.Heading>
+            </AlertDialog.Header>
+            <AlertDialog.Body>
+              <p className="text-sm leading-relaxed text-muted">
+                {t("pages.settings.resetDialogDescription")}
+              </p>
+            </AlertDialog.Body>
+            <AlertDialog.Footer>
+              <Button slot="close" variant="tertiary">
+                {t("pages.settings.resetCancel")}
+              </Button>
+              <Button
+                slot="close"
+                variant="danger"
+                onPress={resetSettings}
+              >
+                {t("pages.settings.resetConfirm")}
+              </Button>
+            </AlertDialog.Footer>
+          </AlertDialog.Dialog>
+        </AlertDialog.Container>
+      </AlertDialog.Backdrop>
+    </>
   );
 }
 
@@ -466,42 +535,418 @@ function CurrencySettings({
   );
 }
 
-function SettingsPlaceholder() {
+function AccountSecuritySettings({
+  accountEmail,
+  accountName,
+  onAccountEmailChange,
+  onAccountNameChange,
+}: {
+  accountEmail: string;
+  accountName: string;
+  onAccountEmailChange: (value: string) => void;
+  onAccountNameChange: (value: string) => void;
+}) {
+  const t = useTranslations("SalesMenu");
+
   return (
     <SettingsSection>
-      <Surface
-        className="flex min-h-40 items-center justify-center p-6"
-        variant="secondary"
-      >
-        <IconSettings aria-hidden="true" className="text-muted" size={28} />
-      </Surface>
+      <SettingsSurfaceRow className="flex min-w-[320px] items-center gap-3 rounded-3xl p-6">
+        <span className="flex size-11 shrink-0 items-center justify-center rounded-full bg-accent text-sm font-semibold text-accent-foreground">
+          SO
+        </span>
+        <div className="min-w-0">
+          <p className="truncate font-semibold text-foreground">{accountName}</p>
+          <p className="text-xs text-muted">
+            {t("pages.settings.accountSummaryDescription")}
+          </p>
+        </div>
+      </SettingsSurfaceRow>
+
+      <div className="grid gap-4">
+        <SettingsSurfaceRow>
+          <TextField
+            fullWidth
+            value={accountName}
+            onChange={onAccountNameChange}
+          >
+            <Label>{t("pages.settings.accountName")}</Label>
+            <Input autoComplete="name" variant="secondary" />
+          </TextField>
+        </SettingsSurfaceRow>
+        <SettingsSurfaceRow>
+          <TextField
+            fullWidth
+            value={accountEmail}
+            onChange={onAccountEmailChange}
+          >
+            <Label>{t("pages.settings.accountEmail")}</Label>
+            <Input autoComplete="email" type="email" variant="secondary" />
+          </TextField>
+        </SettingsSurfaceRow>
+      </div>
+    </SettingsSection>
+  );
+}
+
+function PinSettings({
+  isEnabled,
+  isConfigured,
+  onEnabledChange,
+  onPinCreated,
+}: {
+  isEnabled: boolean;
+  isConfigured: boolean;
+  onEnabledChange: (value: boolean) => void;
+  onPinCreated: () => void;
+}) {
+  const t = useTranslations("SalesMenu");
+  const [isPinModalOpen, setIsPinModalOpen] = useState(false);
+
+  return (
+    <SettingsSection>
+      <SettingsToggle
+        description={t("pages.settings.pinEnabledDescription")}
+        isSelected={isEnabled}
+        label={t("pages.settings.pinEnabled")}
+        onChange={onEnabledChange}
+      />
+
+      {isEnabled ? (
+        <>
+          <SettingsSurfaceRow className="grid min-w-[320px] gap-4 rounded-3xl p-6">
+            <div>
+              <h3 className="font-semibold text-foreground">
+                {t("pages.settings.pinChangeTitle")}
+              </h3>
+              <p className="mt-1 text-sm leading-relaxed text-muted">
+                {t("pages.settings.pinChangeDescription")}
+              </p>
+            </div>
+            <p className="text-sm text-muted" role="status">
+              {t(
+                isConfigured
+                  ? "pages.settings.pinConfigured"
+                  : "pages.settings.pinNotConfigured",
+              )}
+            </p>
+            <Button
+              fullWidth
+              size="md"
+              type="button"
+              variant="secondary"
+              onPress={() => setIsPinModalOpen(true)}
+            >
+              {t("pages.settings.changePin")}
+            </Button>
+          </SettingsSurfaceRow>
+          <CreatePinModal
+            isOpen={isPinModalOpen}
+            onCreatePin={onPinCreated}
+            onOpenChange={setIsPinModalOpen}
+          />
+        </>
+      ) : null}
+    </SettingsSection>
+  );
+}
+
+function MultiFactorSettings({
+  isEnabled,
+  method,
+  onEnabledChange,
+  onMethodChange,
+}: {
+  isEnabled: boolean;
+  method: string;
+  onEnabledChange: (value: boolean) => void;
+  onMethodChange: (value: string) => void;
+}) {
+  const t = useTranslations("SalesMenu");
+
+  return (
+    <SettingsSection>
+      <SettingsToggle
+        description={t("pages.settings.multiFactorDescription")}
+        isSelected={isEnabled}
+        label={t("pages.settings.multiFactorEnabled")}
+        onChange={onEnabledChange}
+      />
+
+      {isEnabled ? (
+        <SettingsSelect
+          label={t("pages.settings.verificationMethod")}
+          options={[
+            {
+              id: "authenticator",
+              label: t("pages.settings.authenticatorApp"),
+            },
+            { id: "sms", label: t("pages.settings.sms") },
+          ]}
+          value={method}
+          onChange={onMethodChange}
+        />
+      ) : null}
+    </SettingsSection>
+  );
+}
+
+function NotificationSettings({
+  inventoryNotifications,
+  onInventoryNotificationsChange,
+  onOrderNotificationsChange,
+  onSoundFeedbackChange,
+  orderNotifications,
+  soundFeedback,
+}: {
+  inventoryNotifications: boolean;
+  onInventoryNotificationsChange: (value: boolean) => void;
+  onOrderNotificationsChange: (value: boolean) => void;
+  onSoundFeedbackChange: (value: boolean) => void;
+  orderNotifications: boolean;
+  soundFeedback: boolean;
+}) {
+  const t = useTranslations("SalesMenu");
+
+  return (
+    <SettingsSection>
+      <SettingsToggle
+        description={t("pages.settings.orderNotificationsDescription")}
+        isSelected={orderNotifications}
+        label={t("pages.settings.orderNotifications")}
+        onChange={onOrderNotificationsChange}
+      />
+      <SettingsToggle
+        description={t("pages.settings.inventoryNotificationsDescription")}
+        isSelected={inventoryNotifications}
+        label={t("pages.settings.inventoryNotifications")}
+        onChange={onInventoryNotificationsChange}
+      />
+      <SettingsToggle
+        description={t("pages.settings.soundFeedbackDescription")}
+        isSelected={soundFeedback}
+        label={t("pages.settings.soundFeedback")}
+        onChange={onSoundFeedbackChange}
+      />
+    </SettingsSection>
+  );
+}
+
+function PaymentSettings({
+  bankCardEnabled,
+  cashEnabled,
+  currency,
+  khqrEnabled,
+  onBankCardEnabledChange,
+  onCashEnabledChange,
+  onCurrencyChange,
+  onKhqrEnabledChange,
+}: {
+  bankCardEnabled: boolean;
+  cashEnabled: boolean;
+  currency: Currency;
+  khqrEnabled: boolean;
+  onBankCardEnabledChange: (value: boolean) => void;
+  onCashEnabledChange: (value: boolean) => void;
+  onCurrencyChange: (value: Currency) => void;
+  onKhqrEnabledChange: (value: boolean) => void;
+}) {
+  const t = useTranslations("SalesMenu");
+
+  return (
+    <SettingsSection>
+      <CurrencySettings
+        currency={currency}
+        onCurrencyChange={onCurrencyChange}
+      />
+      <SettingsToggle
+        description={t("pages.settings.cashDescription")}
+        isSelected={cashEnabled}
+        label={t("pages.settings.cash")}
+        onChange={onCashEnabledChange}
+      />
+      <SettingsToggle
+        description={t("pages.settings.khqrDescription")}
+        isSelected={khqrEnabled}
+        label={t("pages.settings.khqr")}
+        onChange={onKhqrEnabledChange}
+      />
+      <SettingsToggle
+        description={t("pages.settings.bankCardDescription")}
+        isSelected={bankCardEnabled}
+        label={t("pages.settings.bankCard")}
+        onChange={onBankCardEnabledChange}
+      />
+    </SettingsSection>
+  );
+}
+
+function ShippingSettings({
+  deliveryFee,
+  isEnabled,
+  onDeliveryFeeChange,
+  onEnabledChange,
+}: {
+  deliveryFee: string;
+  isEnabled: boolean;
+  onDeliveryFeeChange: (value: string) => void;
+  onEnabledChange: (value: boolean) => void;
+}) {
+  const t = useTranslations("SalesMenu");
+
+  return (
+    <SettingsSection>
+      <SettingsToggle
+        description={t("pages.settings.shippingEnabledDescription")}
+        isSelected={isEnabled}
+        label={t("pages.settings.shippingEnabled")}
+        onChange={onEnabledChange}
+      />
+      {isEnabled ? (
+        <SettingsSurfaceRow>
+          <TextField
+            fullWidth
+            value={deliveryFee}
+            onChange={onDeliveryFeeChange}
+          >
+            <Label>{t("pages.settings.deliveryFee")}</Label>
+            <Input
+              min={0}
+              placeholder={t("pages.settings.deliveryFeePlaceholder")}
+              step="0.25"
+              type="number"
+              variant="secondary"
+            />
+            <Description>
+              {t("pages.settings.deliveryFeeDescription")}
+            </Description>
+          </TextField>
+        </SettingsSurfaceRow>
+      ) : null}
+    </SettingsSection>
+  );
+}
+
+function MediaFilesSettings({
+  fileName,
+  onFileChange,
+}: {
+  fileName: string;
+  onFileChange: (value: string) => void;
+}) {
+  const t = useTranslations("SalesMenu");
+
+  return (
+      <SettingsSection>
+      <SettingsSurfaceRow>
+        <div className="grid gap-3">
+          <div>
+            <h3 className="font-semibold text-foreground">
+              {t("pages.settings.mediaUploadLabel")}
+            </h3>
+            <p className="mt-1 text-sm leading-relaxed text-muted">
+              {t("pages.settings.mediaUploadDescription")}
+            </p>
+          </div>
+          <Label htmlFor="settings-media-file">
+            {t("pages.settings.mediaFile")}
+          </Label>
+          <Input
+            accept="image/*,.pdf,.csv,.xlsx"
+            id="settings-media-file"
+            type="file"
+            variant="secondary"
+            onChange={(event) =>
+              onFileChange(event.currentTarget.files?.[0]?.name ?? "")
+            }
+          />
+          <p aria-live="polite" className="text-sm text-muted">
+            {fileName || t("pages.settings.mediaNoSelection")}
+          </p>
+        </div>
+      </SettingsSurfaceRow>
+    </SettingsSection>
+  );
+}
+
+function LanguageSettings({
+  language,
+  onLanguageChange,
+}: {
+  language: Language;
+  onLanguageChange: (value: Language) => void;
+}) {
+  const t = useTranslations("SalesMenu");
+
+  return (
+    <SettingsSection>
+      <SettingsSelect
+        label={t("pages.settings.language")}
+        options={[
+          { id: "en", label: t("pages.settings.languageEnglish") },
+          { id: "km", label: t("pages.settings.languageKhmer") },
+        ]}
+        value={language}
+        onChange={(value) => onLanguageChange(value as Language)}
+      />
+    </SettingsSection>
+  );
+}
+
+function SystemSettings({
+  autoLock,
+  onAutoLockChange,
+}: {
+  autoLock: boolean;
+  onAutoLockChange: (value: boolean) => void;
+}) {
+  const t = useTranslations("SalesMenu");
+
+  return (
+    <SettingsSection>
+      <SettingsToggle
+        description={t("pages.settings.autoLockDescription")}
+        isSelected={autoLock}
+        label={t("pages.settings.autoLock")}
+        onChange={onAutoLockChange}
+      />
+      <DeviceSettings />
+    </SettingsSection>
+  );
+}
+
+function ResetSettings({ onResetRequest }: { onResetRequest: () => void }) {
+  const t = useTranslations("SalesMenu");
+
+  return (
+    <SettingsSection>
+      <SettingsSurfaceRow className="grid min-w-[320px] gap-4 rounded-3xl p-6">
+        <div>
+          <h3 className="font-semibold text-foreground">
+            {t("pages.settings.resetPanelTitle")}
+          </h3>
+          <p className="mt-1 text-sm leading-relaxed text-muted">
+            {t("pages.settings.resetPanelDescription")}
+          </p>
+        </div>
+        <Button className="w-fit" variant="danger" onPress={onResetRequest}>
+          {t("pages.settings.resetButton")}
+        </Button>
+      </SettingsSurfaceRow>
     </SettingsSection>
   );
 }
 
 function GeneralSettings({
-  autoLock,
-  currency,
-  onAutoLockChange,
-  onCurrencyChange,
-  onSoundFeedbackChange,
   onStoreNameChange,
   onStorePhoneChange,
   onTimezoneChange,
-  soundFeedback,
   storeName,
   storePhone,
   timezone,
 }: {
-  autoLock: boolean;
-  currency: Currency;
-  onAutoLockChange: (value: boolean) => void;
-  onCurrencyChange: (value: Currency) => void;
-  onSoundFeedbackChange: (value: boolean) => void;
   onStoreNameChange: (value: string) => void;
   onStorePhoneChange: (value: string) => void;
   onTimezoneChange: (value: Timezone) => void;
-  soundFeedback: boolean;
   storeName: string;
   storePhone: string;
   timezone: Timezone;
@@ -510,30 +955,25 @@ function GeneralSettings({
 
   return (
     <SettingsSection>
-      <div className="grid gap-4 sm:grid-cols-2">
-        <TextField fullWidth value={storeName} onChange={onStoreNameChange}>
-          <Label>{t("pages.settings.storeName")}</Label>
-          <Input
-            placeholder={t("pages.settings.storeNamePlaceholder")}
-            variant="secondary"
-          />
-        </TextField>
-        <TextField fullWidth value={storePhone} onChange={onStorePhoneChange}>
-          <Label>{t("pages.settings.storePhone")}</Label>
-          <Input
-            placeholder={t("pages.settings.storePhonePlaceholder")}
-            variant="secondary"
-          />
-        </TextField>
-        <SettingsSelect
-          label={t("pages.settings.currency")}
-          options={[
-            { id: "usd", label: t("pages.settings.currencyUsd") },
-            { id: "khr", label: t("pages.settings.currencyKhr") },
-          ]}
-          value={currency}
-          onChange={(value) => onCurrencyChange(value as Currency)}
-        />
+      <div className="grid gap-4">
+        <SettingsSurfaceRow>
+          <TextField fullWidth value={storeName} onChange={onStoreNameChange}>
+            <Label>{t("pages.settings.storeName")}</Label>
+            <Input
+              placeholder={t("pages.settings.storeNamePlaceholder")}
+              variant="secondary"
+            />
+          </TextField>
+        </SettingsSurfaceRow>
+        <SettingsSurfaceRow>
+          <TextField fullWidth value={storePhone} onChange={onStorePhoneChange}>
+            <Label>{t("pages.settings.storePhone")}</Label>
+            <Input
+              placeholder={t("pages.settings.storePhonePlaceholder")}
+              variant="secondary"
+            />
+          </TextField>
+        </SettingsSurfaceRow>
         <SettingsSelect
           label={t("pages.settings.timezone")}
           options={[
@@ -542,19 +982,6 @@ function GeneralSettings({
           ]}
           value={timezone}
           onChange={(value) => onTimezoneChange(value as Timezone)}
-        />
-      </div>
-
-      <div className="grid gap-3 md:grid-cols-2">
-        <SettingsToggle
-          isSelected={autoLock}
-          label={t("pages.settings.autoLock")}
-          onChange={onAutoLockChange}
-        />
-        <SettingsToggle
-          isSelected={soundFeedback}
-          label={t("pages.settings.soundFeedback")}
-          onChange={onSoundFeedbackChange}
         />
       </div>
     </SettingsSection>
@@ -576,7 +1003,7 @@ function StaffSettings({
 
   return (
     <SettingsSection>
-      <div className="grid gap-3 md:grid-cols-2">
+      <div className="grid gap-3">
         <SettingsToggle
           isSelected={requirePin}
           label={t("pages.settings.requirePin")}
@@ -589,7 +1016,7 @@ function StaffSettings({
         />
       </div>
 
-      <div className="grid gap-3 sm:grid-cols-3">
+      <div className="grid gap-3">
         <RoleCard label={t("pages.settings.cashierRole")} value="4" />
         <RoleCard label={t("pages.settings.managerRole")} value="2" />
         <RoleCard label={t("pages.settings.ownerRole")} value="1" />
@@ -660,7 +1087,7 @@ function DeviceSettings() {
         />
       </div>
 
-      <div className="flex items-start gap-3 rounded-xl bg-surface-secondary/65 p-4 text-sm">
+      <SettingsSurfaceRow className="flex min-w-[320px] items-start gap-3 rounded-3xl p-6 text-sm">
         <IconWorld
           aria-hidden="true"
           className="mt-0.5 shrink-0 text-accent"
@@ -669,7 +1096,7 @@ function DeviceSettings() {
         <p className="font-semibold text-foreground">
           {t("pages.settings.deviceSyncTitle")}
         </p>
-      </div>
+      </SettingsSurfaceRow>
     </SettingsSection>
   );
 }
@@ -682,26 +1109,48 @@ function SettingsSection({ children }: { children: React.ReactNode }) {
   );
 }
 
+function SettingsSurfaceRow({
+  children,
+  className,
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) {
+  return (
+    <Surface
+      className={
+        className ?? "flex min-w-[320px] flex-col gap-3 rounded-3xl p-6"
+      }
+      variant="secondary"
+    >
+      {children}
+    </Surface>
+  );
+}
+
 function SettingsToggle({
+  description,
   isSelected,
   label,
   onChange,
 }: {
+  description?: string;
   isSelected: boolean;
   label: string;
   onChange: (value: boolean) => void;
 }) {
   return (
-    <Surface className="p-3.5 sm:p-4" variant="secondary">
+    <SettingsSurfaceRow>
       <Switch isSelected={isSelected} size="lg" onChange={onChange}>
         <Switch.Content>
           <Switch.Control>
             <Switch.Thumb />
           </Switch.Control>
-          <Label>{label}</Label>
+          {label}
         </Switch.Content>
+        {description ? <Description>{description}</Description> : null}
       </Switch>
-    </Surface>
+    </SettingsSurfaceRow>
   );
 }
 
@@ -717,45 +1166,44 @@ function SettingsSelect({
   value: string;
 }) {
   return (
-    <Select
-      className="w-full"
-      value={value}
-      variant="secondary"
-      onChange={(nextValue) => {
-        if (typeof nextValue === "string") {
-          onChange(nextValue);
-        }
-      }}
-    >
-      <Label>{label}</Label>
-      <Select.Trigger className="w-full justify-start text-start">
-        <Select.Value />
-        <Select.Indicator />
-      </Select.Trigger>
-      <Select.Popover placement="bottom start">
-        <ListBox>
-          {options.map((option) => (
-            <ListBox.Item
-              key={option.id}
-              id={option.id}
-              textValue={option.label}
-            >
-              {option.label}
-              <ListBox.ItemIndicator />
-            </ListBox.Item>
-          ))}
-        </ListBox>
-      </Select.Popover>
-    </Select>
+    <SettingsSurfaceRow>
+      <Select
+        className="w-full"
+        value={value}
+        variant="secondary"
+        onChange={(nextValue) => {
+          if (typeof nextValue === "string") {
+            onChange(nextValue);
+          }
+        }}
+      >
+        <Label>{label}</Label>
+        <Select.Trigger className="w-full justify-start text-start">
+          <Select.Value />
+          <Select.Indicator />
+        </Select.Trigger>
+        <Select.Popover placement="bottom start">
+          <ListBox>
+            {options.map((option) => (
+              <ListBox.Item
+                key={option.id}
+                id={option.id}
+                textValue={option.label}
+              >
+                {option.label}
+                <ListBox.ItemIndicator />
+              </ListBox.Item>
+            ))}
+          </ListBox>
+        </Select.Popover>
+      </Select>
+    </SettingsSurfaceRow>
   );
 }
 
 function RoleCard({ label, value }: { label: string; value: string }) {
   return (
-    <Surface
-      className="flex items-center justify-between gap-3 p-4"
-      variant="secondary"
-    >
+    <SettingsSurfaceRow className="flex min-w-[320px] items-center justify-between gap-3 rounded-3xl p-6">
       <div className="flex min-w-0 items-center gap-3">
         <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-default text-muted">
           <IconLock aria-hidden="true" size={19} />
@@ -765,7 +1213,7 @@ function RoleCard({ label, value }: { label: string; value: string }) {
       <span className="text-xl font-bold tabular-nums text-foreground">
         {value}
       </span>
-    </Surface>
+    </SettingsSurfaceRow>
   );
 }
 
@@ -781,10 +1229,7 @@ function DeviceRow({
   statusColor: "success" | "default";
 }) {
   return (
-    <Surface
-      className="flex min-h-20 items-center justify-between gap-4 p-4"
-      variant="secondary"
-    >
+    <SettingsSurfaceRow className="flex min-h-20 min-w-[320px] items-center justify-between gap-4 rounded-3xl p-6">
       <div className="flex min-w-0 items-center gap-3">
         <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-default text-muted">
           <Icon aria-hidden="true" size={20} />
@@ -794,6 +1239,6 @@ function DeviceRow({
       <Chip color={statusColor} size="sm" variant="soft">
         {status}
       </Chip>
-    </Surface>
+    </SettingsSurfaceRow>
   );
 }

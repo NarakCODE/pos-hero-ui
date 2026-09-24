@@ -12,6 +12,7 @@ export {
   OrderPanelFooter,
   PaymentActions,
   PaymentMethodDrawer,
+  PaymentSuccessfulModal,
   PromotionModal,
   DEFAULT_PROMOTIONS,
   SignOutAlertDialog,

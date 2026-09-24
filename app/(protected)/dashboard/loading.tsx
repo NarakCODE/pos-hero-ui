@@ -5,58 +5,37 @@ export default function Loading() {
   return (
     <POSPageLoading>
       <div className="flex h-full w-full flex-col overflow-y-auto">
-        <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 p-4 sm:p-6">
-          {/* Toolbar Skeleton */}
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <div className="flex flex-col gap-1.5">
-              <Skeleton className="h-6 w-48 rounded-md" />
-              <Skeleton className="h-4 w-72 rounded-md" />
+        <div className="mx-auto flex w-full max-w-6xl flex-col gap-5 p-4 sm:p-6">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+            <div className="flex flex-col gap-2">
+              <Skeleton className="h-5 w-40" />
+              <Skeleton className="h-4 w-72 max-w-full" />
             </div>
             <div className="flex items-center gap-2">
-              <Skeleton className="h-9 w-48 rounded-lg" />
-              <Skeleton className="h-9 w-28 rounded-lg" />
+              <Skeleton className="h-10 w-44" />
+              <Skeleton className="h-9 w-32" />
             </div>
           </div>
 
-          {/* Hero Revenue Banner Skeleton */}
-          <div className="flex flex-col gap-4 rounded-2xl border border-border bg-surface p-5">
-            <div className="flex items-center justify-between">
-              <Skeleton className="h-5 w-56 rounded-md" />
-              <Skeleton className="h-6 w-28 rounded-full" />
-            </div>
-            <Skeleton className="h-36 w-full rounded-2xl" />
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-              <Skeleton className="h-20 w-full rounded-xl" />
-              <Skeleton className="h-20 w-full rounded-xl" />
-              <Skeleton className="h-20 w-full rounded-xl" />
-            </div>
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
+            {Array.from({ length: 4 }, (_, index) => (
+              <Skeleton
+                key={`dashboard-metric-${index}`}
+                className="h-28 w-full"
+              />
+            ))}
           </div>
 
-          {/* Gradient KPI Cards Skeleton */}
-          <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
-            <Skeleton className="h-40 w-full rounded-2xl" />
-            <Skeleton className="h-40 w-full rounded-2xl" />
+          <div className="grid grid-cols-1 gap-4 xl:grid-cols-[minmax(0,1.55fr)_minmax(20rem,1fr)]">
+            <Skeleton className="h-[23rem] w-full" />
+            <Skeleton className="h-[23rem] w-full" />
           </div>
 
-          {/* Charts & Products Grid Skeleton */}
-          <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
-            <Skeleton className="h-72 w-full rounded-2xl" />
-            <Skeleton className="h-72 w-full rounded-2xl" />
-          </div>
-
-          {/* Channel & Tender Skeleton */}
-          <Skeleton className="h-52 w-full rounded-2xl" />
-
-          {/* Quick Modules Skeleton */}
-          <div className="flex flex-col gap-3">
-            <Skeleton className="h-5 w-44 rounded-md" />
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-              {Array.from({ length: 6 }, (_, index) => (
-                <Skeleton
-                  key={`module-skeleton-${index}`}
-                  className="h-28 w-full rounded-xl"
-                />
-              ))}
+          <div className="grid grid-cols-1 gap-4 xl:grid-cols-[minmax(0,1.45fr)_minmax(20rem,1fr)]">
+            <Skeleton className="h-[29rem] w-full" />
+            <div className="grid grid-cols-1 gap-4">
+              <Skeleton className="h-[13rem] w-full" />
+              <Skeleton className="h-[13rem] w-full" />
             </div>
           </div>
         </div>

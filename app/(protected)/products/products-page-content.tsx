@@ -17,8 +17,10 @@ import {
 import type { Key, Selection, SortDescriptor } from "@heroui/react";
 import { useLocale, useTranslations } from "next-intl";
 import { useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   IconAdjustmentsHorizontal,
+  IconCategory,
   IconPackage,
   IconRefresh,
 } from "@tabler/icons-react";
@@ -449,32 +451,47 @@ function ProductsToolbar({
   stockOptions: Array<{ id: StockFilter; label: string }>;
 }) {
   const t = useTranslations("Product");
+  const router = useRouter();
 
   return (
     <div className="flex shrink-0 flex-col space-y-3">
-      <Tabs
-        className="min-w-0"
-        selectedKey={statusFilter}
-        variant="secondary"
-        onSelectionChange={(key) =>
-          onStatusFilterChange(String(key) as ProductStatusFilter)
-        }
-      >
-        <Tabs.ListContainer>
-          <Tabs.List aria-label={t("statusLabel")}>
-            {statusOptions.map((option) => (
-              <Tabs.Tab
-                key={option.id}
-                id={option.id}
-                className="w-auto shrink-0 whitespace-nowrap"
-              >
-                {option.label}
-                <Tabs.Indicator />
-              </Tabs.Tab>
-            ))}
-          </Tabs.List>
-        </Tabs.ListContainer>
-      </Tabs>
+      <div className="flex items-center justify-between gap-2">
+        <Tabs
+          className="min-w-0"
+          selectedKey={statusFilter}
+          variant="secondary"
+          onSelectionChange={(key) =>
+            onStatusFilterChange(String(key) as ProductStatusFilter)
+          }
+        >
+          <Tabs.ListContainer>
+            <Tabs.List aria-label={t("statusLabel")}>
+              {statusOptions.map((option) => (
+                <Tabs.Tab
+                  key={option.id}
+                  id={option.id}
+                  className="w-auto shrink-0 whitespace-nowrap"
+                >
+                  {option.label}
+                  <Tabs.Indicator />
+                </Tabs.Tab>
+              ))}
+            </Tabs.List>
+          </Tabs.ListContainer>
+        </Tabs>
+
+        <Button
+          aria-label={t("manageCategories")}
+          className="shrink-0"
+          size="sm"
+          type="button"
+          variant="secondary"
+          onPress={() => router.push("/categories")}
+        >
+          <IconCategory aria-hidden="true" size={18} />
+          <span className="hidden sm:inline">{t("manageCategories")}</span>
+        </Button>
+      </div>
 
       <div className="flex w-full shrink-0 items-center gap-2">
         <SearchField

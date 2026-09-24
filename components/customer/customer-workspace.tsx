@@ -3,8 +3,8 @@
 import {
   Avatar,
   Button,
+  Card,
   Chip,
-  Disclosure,
   Label,
   ListBox,
   Pagination,
@@ -13,6 +13,7 @@ import {
   Select,
   Table,
   Tabs,
+  toast,
 } from "@heroui/react";
 import type { Key, Selection, SortDescriptor } from "@heroui/react";
 import { useTranslations } from "next-intl";
@@ -21,6 +22,7 @@ import {
   IconAdjustmentsHorizontal,
   IconCalendar,
   IconCash,
+  IconCopy,
   IconDots,
   IconEdit,
   IconMessage,
@@ -34,6 +36,10 @@ import {
   CreateCustomerModal,
   type CreateCustomerFormData,
 } from "./create-customer-modal";
+import {
+  CustomerActionModal,
+  type CustomerProfileAction,
+} from "./customer-action-modal";
 import {
   customerRecords,
   type CustomerRecord,
@@ -104,6 +110,17 @@ export function CustomerPageClient({
     setSelectedCustomerId(nextCustomer.id);
   };
 
+  const handleCustomerUpdate = (
+    customerId: string,
+    updates: Partial<CustomerRecord>,
+  ) => {
+    setCustomers((currentCustomers) =>
+      currentCustomers.map((customer) =>
+        customer.id === customerId ? { ...customer, ...updates } : customer,
+      ),
+    );
+  };
+
   return (
     <POSLayout
       showSearch={false}
@@ -112,6 +129,7 @@ export function CustomerPageClient({
       rightPanel={
         <CustomerAside
           customers={customers}
+          onCustomerUpdate={handleCustomerUpdate}
           selectedCustomerId={selectedCustomerId}
         />
       }
@@ -615,14 +633,19 @@ function CustomerTableRow({
 
 export function CustomerAside({
   customers,
+  onCustomerUpdate,
   selectedCustomerId,
 }: {
   customers: CustomerRecord[];
+  onCustomerUpdate: (
+    customerId: string,
+    updates: Partial<CustomerRecord>,
+  ) => void;
   selectedCustomerId: string | null;
 }) {
   const t = useTranslations("Customer");
-  const [isBasicInformationExpanded, setIsBasicInformationExpanded] =
-    useState(true);
+  const [activeAction, setActiveAction] =
+    useState<CustomerProfileAction | null>(null);
   const customer =
     customers.find((record) => record.id === selectedCustomerId) ??
     customers[0];
@@ -631,11 +654,30 @@ export function CustomerAside({
     return null;
   }
 
+  const customerCode = getCustomerCode(customer, customers);
+
+  const handleCopyCustomerId = () => {
+    if (!navigator.clipboard?.writeText) {
+      toast.warning(t("actions.copyFailed"));
+      return;
+    }
+
+    void navigator.clipboard
+      .writeText(customerCode)
+      .then(() => toast.success(t("actions.customerIdCopied")))
+      .catch(() => toast.warning(t("actions.copyFailed")));
+  };
+
   return (
     <POSAside
       ariaLabelledBy="customer-aside-title"
       footerClassName="p-[var(--pos-content-padding)] pt-0"
-      footer={<CustomerAsideFooter t={t} />}
+      footer={
+        <CustomerAsideFooter
+          onActionSelect={setActiveAction}
+          t={t}
+        />
+      }
       headerClassName="p-[var(--pos-content-padding)]"
       header={
         <div className="flex items-center gap-2">
@@ -649,8 +691,9 @@ export function CustomerAside({
         </div>
       }
     >
-      <div className="min-h-0 flex-1 overflow-y-auto px-[var(--pos-content-padding)] pb-[var(--pos-content-padding)]">
-        <div className="flex items-start justify-between gap-3">
+      <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto px-[var(--pos-content-padding)] pb-[var(--pos-content-padding)]">
+        {/* Customer Header Identity Card */}
+        <div className="flex items-start justify-between gap-3 rounded-2xl border border-border/60 bg-surface-secondary/40 p-4">
           <div className="flex min-w-0 items-center gap-3">
             <Avatar color="accent" size="lg" variant="soft">
               <Avatar.Image
@@ -660,81 +703,201 @@ export function CustomerAside({
               <Avatar.Fallback>{customer.initials}</Avatar.Fallback>
             </Avatar>
             <div className="min-w-0">
-              <h3 className="truncate text-lg font-bold text-foreground">
-                {customer.name}
-              </h3>
-              <p className="text-xs text-muted">
-                {t("customerId")}:{" "}
-                {getCustomerCode(customer, customers)}
-              </p>
-              <p className="text-xs text-muted">
-                {t("telephone")}: {customer.phone}
-              </p>
+              <div className="flex flex-wrap items-center gap-2">
+                <h3 className="truncate text-base font-bold text-foreground">
+                  {customer.name}
+                </h3>
+                <Chip
+                  color={tierColors[customer.tier]}
+                  size="sm"
+                  variant="soft"
+                >
+                  {t(tierLabels[customer.tier])}
+                </Chip>
+              </div>
+              <div className="mt-1 flex items-center gap-1.5 text-xs text-muted">
+                <span>{customerCode}</span>
+                <button
+                  aria-label={t("actions.copyCustomerId")}
+                  className="inline-flex items-center text-muted hover:text-foreground cursor-pointer transition-colors"
+                  type="button"
+                  onClick={handleCopyCustomerId}
+                >
+                  <IconCopy aria-hidden="true" size={13} />
+                </button>
+                <span>•</span>
+                <span className="truncate">{customer.phone}</span>
+              </div>
             </div>
           </div>
-          <Chip color="success" size="sm" variant="soft">
-            {t("statusActive")}
+          <Chip
+            color={customer.status === "inactive" ? "default" : "success"}
+            size="sm"
+            variant="soft"
+          >
+            {t(customer.status === "inactive" ? "statusInactive" : "statusActive")}
           </Chip>
         </div>
 
-        <Disclosure
-          className="mt-6"
-          isExpanded={isBasicInformationExpanded}
-          onExpandedChange={setIsBasicInformationExpanded}
-        >
-          <Disclosure.Heading>
-            <Disclosure.Trigger className="flex w-full items-center justify-between gap-3 py-3 text-start">
-              <span className="text-sm font-semibold text-foreground">
-                {t("basicInformation")}
-              </span>
-              <Disclosure.Indicator />
-            </Disclosure.Trigger>
-          </Disclosure.Heading>
-          <Disclosure.Content className="border-t border-border/60 pt-4">
-            <div className="grid grid-cols-2 gap-x-4 gap-y-4">
-              <CustomerDetail
-                label={t("email")}
-                value={customer.email}
-              />
-              <CustomerDetail
-                label={t("gender")}
-                value={customer.gender ?? "--"}
-              />
-              <CustomerDetail
-                label={t("dateOfBirth")}
-                value={customer.dateOfBirth ?? "--"}
-              />
-              <CustomerDetail
-                label={t("tier")}
-                value={t(tierLabels[customer.tier])}
-              />
-              <CustomerDetail
-                label={t("payLater")}
-                value={customer.payLater ?? "--"}
-              />
-              <CustomerDetail
-                label={t("payLaterLimit")}
-                value={customer.payLaterLimit ?? "--"}
-              />
-              <CustomerDetail
-                label={t("joinedDate")}
-                value={customer.joinedDate ?? customer.memberSince}
-              />
-              <CustomerDetail
-                label={t("tags")}
-                value={customer.tags?.join(", ") || "--"}
-              />
+        {/* Quick Stats: Visits, Points, Lifetime Spend */}
+        <div className="grid grid-cols-3 gap-2">
+          <div className="flex flex-col items-center justify-center rounded-xl border border-border/50 bg-surface-secondary/40 p-2.5 text-center">
+            <span className="text-[11px] text-muted">{t("profileVisits")}</span>
+            <span className="mt-0.5 text-sm font-bold text-foreground tabular-nums">
+              {customer.visits}
+            </span>
+          </div>
+          <div className="flex flex-col items-center justify-center rounded-xl border border-border/50 bg-surface-secondary/40 p-2.5 text-center">
+            <span className="text-[11px] text-muted">{t("profilePoints")}</span>
+            <span className="mt-0.5 text-sm font-bold text-foreground tabular-nums">
+              {customer.points.toLocaleString()}
+            </span>
+          </div>
+          <div className="flex flex-col items-center justify-center rounded-xl border border-border/50 bg-surface-secondary/40 p-2.5 text-center">
+            <span className="text-[11px] text-muted">{t("profileSpend")}</span>
+            <span className="mt-0.5 text-sm font-bold text-accent tabular-nums">
+              {customer.lifetimeSpend}
+            </span>
+          </div>
+        </div>
+
+        {/* Basic Information / Contact & Personal */}
+        <Card variant="secondary">
+          <Card.Header>
+            <Card.Title>{t("basicInformation")}</Card.Title>
+          </Card.Header>
+          <Card.Content>
+            <div className="flex flex-col divide-y divide-border/40 text-xs">
+              <div className="flex items-center justify-between py-2">
+                <span className="text-muted">{t("customerId")}</span>
+                <div className="flex items-center gap-1.5 font-medium text-foreground">
+                  <span>{customerCode}</span>
+                  <button
+                    aria-label={t("actions.copyCustomerId")}
+                    className="inline-flex items-center text-muted hover:text-foreground cursor-pointer transition-colors"
+                    type="button"
+                    onClick={handleCopyCustomerId}
+                  >
+                    <IconCopy aria-hidden="true" size={13} />
+                  </button>
+                </div>
+              </div>
+              <div className="flex items-center justify-between py-2">
+                <span className="text-muted">{t("telephone")}</span>
+                <span className="font-medium text-foreground">{customer.phone}</span>
+              </div>
+              <div className="flex items-center justify-between py-2">
+                <span className="text-muted">{t("email")}</span>
+                <span className="truncate max-w-[65%] font-medium text-foreground text-end">
+                  {customer.email}
+                </span>
+              </div>
+              <div className="flex items-center justify-between py-2">
+                <span className="text-muted">{t("gender")}</span>
+                <span className="font-medium text-foreground">
+                  {customer.gender ?? "--"}
+                </span>
+              </div>
+              <div className="flex items-center justify-between py-2">
+                <span className="text-muted">{t("dateOfBirth")}</span>
+                <span className="font-medium text-foreground">
+                  {customer.dateOfBirth ?? "--"}
+                </span>
+              </div>
             </div>
-          </Disclosure.Content>
-        </Disclosure>
+          </Card.Content>
+        </Card>
+
+        {/* Membership & Activity Details */}
+        <Card variant="secondary">
+          <Card.Header>
+            <Card.Title>{t("tier")}</Card.Title>
+          </Card.Header>
+          <Card.Content>
+            <div className="flex flex-col divide-y divide-border/40 text-xs">
+              <div className="flex items-center justify-between py-2">
+                <span className="text-muted">{t("tier")}</span>
+                <Chip color={tierColors[customer.tier]} size="sm" variant="soft">
+                  {t(tierLabels[customer.tier])}
+                </Chip>
+              </div>
+              <div className="flex items-center justify-between py-2">
+                <span className="text-muted">{t("memberSince")}</span>
+                <span className="font-medium text-foreground">{customer.memberSince}</span>
+              </div>
+              <div className="flex items-center justify-between py-2">
+                <span className="text-muted">{t("joinedDate")}</span>
+                <span className="font-medium text-foreground">
+                  {customer.joinedDate ?? customer.memberSince}
+                </span>
+              </div>
+              <div className="flex items-center justify-between py-2">
+                <span className="text-muted">{t("profileFavorite")}</span>
+                <span className="truncate max-w-[65%] font-medium text-foreground text-end">
+                  {customer.favorite}
+                </span>
+              </div>
+            </div>
+          </Card.Content>
+        </Card>
+
+        {/* Financial / Pay Later */}
+        <Card variant="secondary">
+          <Card.Header>
+            <Card.Title>{t("payLater")}</Card.Title>
+          </Card.Header>
+          <Card.Content>
+            <div className="flex flex-col divide-y divide-border/40 text-xs">
+              <div className="flex items-center justify-between py-2">
+                <span className="text-muted">{t("payLater")}</span>
+                <span className="font-semibold text-foreground">
+                  {customer.payLater ?? "--"}
+                </span>
+              </div>
+              <div className="flex items-center justify-between py-2">
+                <span className="text-muted">{t("payLaterLimit")}</span>
+                <span className="font-medium text-muted">
+                  {customer.payLaterLimit ?? "--"}
+                </span>
+              </div>
+            </div>
+          </Card.Content>
+        </Card>
+
+        {/* Customer Tags */}
+        {customer.tags && customer.tags.length > 0 ? (
+          <Card variant="secondary">
+            <Card.Header>
+              <Card.Title>{t("tags")}</Card.Title>
+            </Card.Header>
+            <Card.Content>
+              <div className="flex flex-wrap gap-1.5">
+                {customer.tags.map((tag) => (
+                  <Chip key={tag} size="sm" variant="soft">
+                    {tag}
+                  </Chip>
+                ))}
+              </div>
+            </Card.Content>
+          </Card>
+        ) : null}
       </div>
+      <CustomerActionModal
+        action={activeAction}
+        customer={customer}
+        customerCode={customerCode}
+        onClose={() => setActiveAction(null)}
+        onCustomerUpdate={onCustomerUpdate}
+      />
     </POSAside>
   );
 }
 
 function CustomerAsideFooter({
+  onActionSelect,
   t,
 }: {
+  onActionSelect: (action: CustomerProfileAction) => void;
   t: ReturnType<typeof useTranslations<"Customer">>;
 }) {
   return (
@@ -746,6 +909,7 @@ function CustomerAsideFooter({
           size="lg"
           type="button"
           variant="secondary"
+          onPress={() => onActionSelect("startOrder")}
         >
           <IconShoppingCart aria-hidden="true" size={17} />
           {t("startOrder")}
@@ -756,6 +920,7 @@ function CustomerAsideFooter({
           size="lg"
           type="button"
           variant="secondary"
+          onPress={() => onActionSelect("editCustomer")}
         >
           <IconEdit aria-hidden="true" size={17} />
           {t("editCustomer")}
@@ -766,6 +931,7 @@ function CustomerAsideFooter({
           size="lg"
           type="button"
           variant="secondary"
+          onPress={() => onActionSelect("payBack")}
         >
           <IconCash aria-hidden="true" size={17} />
           {t("payBack")}
@@ -778,6 +944,7 @@ function CustomerAsideFooter({
           size="lg"
           type="button"
           variant="secondary"
+          onPress={() => onActionSelect("reservation")}
         >
           <IconCalendar aria-hidden="true" size={18} />
           {t("reservation")}
@@ -789,6 +956,7 @@ function CustomerAsideFooter({
           size="lg"
           type="button"
           variant="ghost"
+          onPress={() => onActionSelect("callCustomer")}
         >
           <IconPhone aria-hidden="true" size={18} />
         </Button>
@@ -799,6 +967,7 @@ function CustomerAsideFooter({
           size="lg"
           type="button"
           variant="ghost"
+          onPress={() => onActionSelect("messageCustomer")}
         >
           <IconMessage aria-hidden="true" size={18} />
         </Button>
@@ -809,21 +978,11 @@ function CustomerAsideFooter({
           size="lg"
           type="button"
           variant="ghost"
+          onPress={() => onActionSelect("moreActions")}
         >
           <IconDots aria-hidden="true" size={18} />
         </Button>
       </div>
-    </div>
-  );
-}
-
-function CustomerDetail({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="min-w-0">
-      <p className="truncate text-xs text-muted">{label}</p>
-      <p className="mt-1 break-words text-sm font-medium text-foreground">
-        {value}
-      </p>
     </div>
   );
 }

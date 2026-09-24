@@ -24,10 +24,19 @@ import {
 } from "@/components/order-channel-select";
 import {
   OrderPanel,
+  PaymentSuccessfulModal,
   type AppliedPromotion,
   type OrderPanelItem,
 } from "@/components/order-panel";
-import { Button, ScrollShadow, SearchField, Tabs } from "@heroui/react";
+import {
+  Button,
+  Modal,
+  Radio,
+  RadioGroup,
+  ScrollShadow,
+  SearchField,
+  Tabs,
+} from "@heroui/react";
 import { POSLayout } from "@/components/shared/pos-layout";
 import { defaultLocale, isLocale, type Locale } from "@/config/i18n";
 
@@ -55,6 +64,8 @@ const sizeIconById: Record<SizeId, TablerIcon> = {
   large: IconLetterLSmall,
 };
 
+type OrderType = "takeaway" | "dineIn";
+
 export default function SalesPage() {
   const t = useTranslations("SalesMenu");
   const currentLocale = useLocale();
@@ -71,11 +82,14 @@ export default function SalesPage() {
   const [orderItems, setOrderItems] = useState<OrderItem[]>(initialOrderItems);
   const [selectedPayment, setSelectedPayment] =
     useState<PaymentMethodId>("cash");
-  const [orderType, setOrderType] = useState<"takeaway" | "dineIn">("takeaway");
+  const [orderType, setOrderType] = useState<OrderType>("takeaway");
+  const [draftOrderType, setDraftOrderType] = useState<OrderType>("takeaway");
+  const [isOrderTypeModalOpen, setIsOrderTypeModalOpen] = useState(false);
   const [orderChannel, setOrderChannel] = useState<OrderChannel>("Wownow");
   const [appliedPromotion, setAppliedPromotion] =
     useState<AppliedPromotion | null>(null);
   const [isPaid, setIsPaid] = useState(false);
+  const [isPaymentSuccessOpen, setIsPaymentSuccessOpen] = useState(false);
 
   const categoryOptions: Array<{ id: CategoryId; label: string }> = useMemo(
     () => categoryIds.map((id) => ({ id, label: t(`categories.${id}`) })),
@@ -306,6 +320,7 @@ export default function SalesPage() {
     setOrderItems([]);
     setAppliedPromotion(null);
     setIsPaid(false);
+    setIsPaymentSuccessOpen(false);
   };
 
   return (
@@ -326,6 +341,7 @@ export default function SalesPage() {
           sequenceNumber="155"
           statusLabel={t("ticketSummary.status")}
           status={t("ticketSummary.inProgress")}
+          orderTypeLabel={t("ticketSummary.orderType")}
           orderChannelLabel={t("ticketSummary.orderChannel")}
           orderChannel={
             <OrderChannelSelect
@@ -336,11 +352,10 @@ export default function SalesPage() {
           }
           orderType={orderType === "takeaway" ? t("takeaway") : t("dineIn")}
           changeButtonLabel={t("change")}
-          onChangeOrderType={() =>
-            setOrderType((current) =>
-              current === "takeaway" ? "dineIn" : "takeaway",
-            )
-          }
+          onChangeOrderType={() => {
+            setDraftOrderType(orderType);
+            setIsOrderTypeModalOpen(true);
+          }}
           clearButtonLabel={t("clearTicket")}
           onClearTicket={handleClearTicket}
           items={panelItems}
@@ -382,7 +397,10 @@ export default function SalesPage() {
           chargeLabel={t("payment.charge", { amount: formatCurrency(total) })}
           completeLabel={t("payment.complete")}
           paidMessage={t("payment.success")}
-          onCharge={() => setIsPaid(true)}
+          onCharge={() => {
+            setIsPaid(true);
+            setIsPaymentSuccessOpen(true);
+          }}
           isPaid={isPaid}
           printLabel={t("printReceipt")}
           onPrintReceipt={() => window.print()}
@@ -570,6 +588,69 @@ export default function SalesPage() {
           </div>
         </section>
       </div>
+      <Modal.Backdrop
+        isOpen={isOrderTypeModalOpen}
+        onOpenChange={setIsOrderTypeModalOpen}
+      >
+        <Modal.Container>
+          <Modal.Dialog className="sm:max-w-sm">
+            <Modal.CloseTrigger />
+            <Modal.Header>
+              <Modal.Heading>
+                {t("ticketSummary.changeOrderTypeTitle")}
+              </Modal.Heading>
+              <p className="mt-1.5 text-sm text-muted">
+                {t("ticketSummary.changeOrderTypeDescription")}
+              </p>
+            </Modal.Header>
+            <Modal.Body>
+              <RadioGroup
+                aria-label={t("ticketSummary.orderType")}
+                value={draftOrderType}
+                onChange={(value) => setDraftOrderType(value as OrderType)}
+              >
+                <Radio value="takeaway">
+                  <Radio.Content>
+                    <Radio.Control>
+                      <Radio.Indicator />
+                    </Radio.Control>
+                    {t("takeaway")}
+                  </Radio.Content>
+                </Radio>
+                <Radio value="dineIn">
+                  <Radio.Content>
+                    <Radio.Control>
+                      <Radio.Indicator />
+                    </Radio.Control>
+                    {t("dineIn")}
+                  </Radio.Content>
+                </Radio>
+              </RadioGroup>
+            </Modal.Body>
+            <Modal.Footer>
+              <Button slot="close" variant="secondary">
+                {t("cancel")}
+              </Button>
+              <Button
+                slot="close"
+                onPress={() => setOrderType(draftOrderType)}
+              >
+                {t("ticketSummary.applyOrderType")}
+              </Button>
+            </Modal.Footer>
+          </Modal.Dialog>
+        </Modal.Container>
+      </Modal.Backdrop>
+      <PaymentSuccessfulModal
+        isOpen={isPaymentSuccessOpen}
+        orderNumber="1048"
+        totalPayment={total > 0 ? formatCurrency(total) : undefined}
+        customerPays={total > 0 ? "US$200.00" : undefined}
+        change={total > 0 ? formatCurrency(Math.max(0, 200 - total)) : undefined}
+        onOpenChange={setIsPaymentSuccessOpen}
+        onPaymentDone={() => setIsPaymentSuccessOpen(false)}
+        onPrintBills={() => window.print()}
+      />
     </POSLayout>
   );
 }

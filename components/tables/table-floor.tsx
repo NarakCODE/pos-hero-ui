@@ -73,6 +73,7 @@ const bookingStatusDotColors: Record<TableBookingStatus, string> = {
 };
 
 export interface TableFloorProps {
+  headerTitle: string;
   tables: FloorTable[];
   selectedTableId: string | null;
   onTableSelect: (tableId: string) => void;
@@ -81,6 +82,7 @@ export interface TableFloorProps {
 }
 
 export function TableFloor({
+  headerTitle,
   tables,
   selectedTableId,
   onTableSelect,
@@ -212,6 +214,9 @@ export function TableFloor({
       </div>
 
       <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain scrollbar-thin px-(--pos-content-padding) pb-(--pos-content-padding)">
+        <h1 className="mb-3 text-xl font-semibold text-foreground">
+          {headerTitle}
+        </h1>
         {filteredTables.length > 0 ? (
           <div className={gridClassName}>
             {filteredTables.map((table) => (
@@ -311,6 +316,12 @@ function TableCard({
         </Card.Header>
 
         <Card.Content>
+          <div className="mb-3 rounded-xl bg-surface-secondary/50 px-2 py-1.5">
+            <TablePlanIllustration
+              capacity={table.capacity}
+              status={table.status}
+            />
+          </div>
           <BookingTimeline bookings={table.bookings} t={t} />
         </Card.Content>
       </Card>
@@ -327,6 +338,127 @@ function TableCard({
         onClick={onPress}
       />
     </div>
+  );
+}
+
+function TablePlanIllustration({
+  capacity,
+  status,
+}: {
+  capacity: number;
+  status: TableStatus;
+}) {
+  const seatCount = Math.max(2, Math.min(12, Math.floor(capacity)));
+  const isActive = status === "inProgress" || status === "reserved";
+  const seatClassName = isActive
+    ? "fill-warning-soft stroke-warning"
+    : "fill-surface stroke-border";
+
+  const geometry =
+    seatCount <= 2
+      ? { x: 133, y: 23, width: 54, height: 54, radius: 14 }
+      : seatCount <= 6
+        ? { x: 92, y: 32, width: 136, height: 42, radius: 12 }
+        : { x: 78, y: 36, width: 164, height: 36, radius: 18 };
+  const sideSeatCount = seatCount > 6 ? 2 : 0;
+  const horizontalSeatCount = seatCount - sideSeatCount;
+  const topSeatCount = Math.ceil(horizontalSeatCount / 2);
+  const bottomSeatCount = Math.floor(horizontalSeatCount / 2);
+  const topSeatCenters = getSeatCenters(
+    topSeatCount,
+    geometry.x + 19,
+    geometry.x + geometry.width - 19,
+  );
+  const bottomSeatCenters = getSeatCenters(
+    bottomSeatCount,
+    geometry.x + 19,
+    geometry.x + geometry.width - 19,
+  );
+
+  return (
+    <svg
+      aria-hidden="true"
+      className="block h-auto w-full"
+      fill="none"
+      viewBox="0 0 320 104"
+    >
+      {topSeatCenters.map((center, index) => (
+        <rect
+          key={`top-${index}`}
+          className={seatClassName}
+          height="9"
+          rx="4.5"
+          strokeWidth="1.5"
+          width="22"
+          x={center - 11}
+          y={geometry.y - 16}
+        />
+      ))}
+      {bottomSeatCenters.map((center, index) => (
+        <rect
+          key={`bottom-${index}`}
+          className={seatClassName}
+          height="9"
+          rx="4.5"
+          strokeWidth="1.5"
+          width="22"
+          x={center - 11}
+          y={geometry.y + geometry.height + 7}
+        />
+      ))}
+      {sideSeatCount > 0 ? (
+        <>
+          <rect
+            className={seatClassName}
+            height="22"
+            rx="5"
+            strokeWidth="1.5"
+            width="10"
+            x={geometry.x - 18}
+            y={geometry.y + (geometry.height - 22) / 2}
+          />
+          <rect
+            className={seatClassName}
+            height="22"
+            rx="5"
+            strokeWidth="1.5"
+            width="10"
+            x={geometry.x + geometry.width + 8}
+            y={geometry.y + (geometry.height - 22) / 2}
+          />
+        </>
+      ) : null}
+
+      <rect
+        className="fill-surface stroke-border"
+        height={geometry.height}
+        rx={geometry.radius}
+        strokeWidth="2"
+        width={geometry.width}
+        x={geometry.x}
+        y={geometry.y}
+      />
+      <rect
+        className="stroke-border/70"
+        height={geometry.height - 12}
+        rx={Math.max(5, geometry.radius - 5)}
+        strokeDasharray="3 4"
+        strokeWidth="1"
+        width={geometry.width - 14}
+        x={geometry.x + 7}
+        y={geometry.y + 6}
+      />
+    </svg>
+  );
+}
+
+function getSeatCenters(count: number, start: number, end: number) {
+  if (count === 0) return [];
+  if (count === 1) return [(start + end) / 2];
+
+  return Array.from(
+    { length: count },
+    (_, index) => start + ((end - start) * index) / (count - 1),
   );
 }
 
